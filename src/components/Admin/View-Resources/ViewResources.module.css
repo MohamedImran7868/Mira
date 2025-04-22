@@ -1,0 +1,133 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-primary);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 50px;
+}
+
+.topContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.topContainer label {
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin-right: 20px;
+}
+
+.topContainer select {
+  width: 150px;
+  padding: 10px;
+  border-radius: 15px;
+  border: none;
+  background-color: #ddd;
+  color: var(--color-text);
+  font-size: 1rem;
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.resourcesList {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.resourceItem {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  height: 400px;
+  margin-right: 40px;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: var(--color-navbar);
+  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.resourceName {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.resourceDesc {
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.resourceDetails {
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+  font-size: 1rem;
+  color: var(--color-text);
+  margin-bottom: 20px;
+}
+
+.resourceContact {
+  margin-bottom: 20px;
+}
+
+.btnContainer,
+.bottomContainer {
+  position: relative;
+  margin-top: auto;
+  margin-left: auto;
+}
+
+.editBtn,
+.deleteBtn {
+  width: 100px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--color-button);
+  color: var(--color-text);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+}
+
+.deleteBtn {
+  background-color: rgb(246, 77, 77);
+}
+
+.editBtn:hover {
+  background-color: var(--color-button-hover);
+  color: black;
+}
+.deleteBtn:hover {
+  background-color: rgb(251, 49, 49);
+  color: black;
+}
+
+.addBtn {
+  width: 150px;
+  font-weight: bold;
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--color-button);
+  color: var(--color-text);
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 30px;
+  transition: all 0.3s ease;
+}

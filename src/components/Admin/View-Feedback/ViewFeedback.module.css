@@ -1,0 +1,132 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-primary);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-background);
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 50px;
+}
+
+.topContainer {
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: row;
+  align-items: center;
+}
+
+.topContainer label {
+  font-size: 1.5rem;
+  color: var(--color-text);
+  margin-right: 20px;
+}
+
+.topContainer select{
+    width: 150px;
+    padding: 10px;
+    border-radius: 50px;
+    border: none;
+    background-color: #ddd;
+    color: var(--color-text);
+    font-size: 1rem;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+.topContainer .searchBtn{
+    width: 150px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 50px;
+    border: none;
+    background-color: var(--color-button);
+    color: var(--color-text);
+    font-size: 1rem;
+    cursor: pointer;
+    margin-left: 20px;
+    transition: all 0.3s ease;
+}
+
+.topContainer .searchBtn:hover{
+    background-color: var(--color-button-hover);
+}
+
+.userList{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    width: 100%;
+    margin-top: 20px;
+    background-color: var(--color-navbar);
+    padding: 50px;
+    box-sizing: border-box;
+    border-radius: 15px;
+}
+
+.userItem{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    border-radius: 15px;
+    background-color: var(--color-button);
+    margin-bottom: 5px;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.userItem:hover{
+    background-color: var(--color-button-hover);
+}
+
+.user{
+    font-weight: bold;
+}
+
+.feedbackContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    color: var(--color-text);
+    width: 100%;
+    margin-top: 20px;
+    box-sizing: border-box;
+}
+
+.btnContainer{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 20%;
+}
+
+.warningBtn, .deleteBtn{
+    width: 100px;
+    font-weight: bold;
+    padding: 10px 15px;
+    border-radius: 50px;
+    border: none;
+    color: var(--color-text);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.warningBtn{
+    background-color: orange;
+}
+
+.deleteBtn{
+    background-color: red;
+} 
+
+.warningBtn:hover, .deleteBtn:hover{
+    color: black;
+    filter: brightness(90%);
+}

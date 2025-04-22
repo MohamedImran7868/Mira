@@ -1,0 +1,21 @@
+@import url('https://fonts.cdnfonts.com/css/agrandir');
+:root {
+    /* Colors */
+    --color-background: #E3FEEF;
+    --color-navbar: #BAF1FF;
+    --color-text: #5A5A5A;
+    --color-button: #B3E7C3;
+    --color-button-hover: #80e49e;
+
+    /* Fonts */
+    --font-primary: 'Agrandir', sans-serif;
+}
+body{
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-primary);
+}
+
+button:active{
+    transform: scale(0.95);
+}

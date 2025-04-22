@@ -1,0 +1,153 @@
+/* Feedback.module.css */
+.container {
+  background-color: var(--color-background);
+  min-height: 100vh;
+  padding: 20px;
+  font-family: "Agrandir", sans-serif;
+  color: var(--color-text);
+}
+
+.topContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  background-color: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--color-text);
+}
+
+.type {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.typeSelect {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 30px;
+  font-size: 1rem;
+  font-family: "Agrandir", sans-serif;
+}
+
+.feedback {
+  font-weight: bold;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.feedbackTextarea {
+  width: 100%;
+  height: 200px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  resize: none;
+  font-family: "Agrandir", sans-serif;
+  font-size: 1rem;
+  margin-bottom: 10px;
+}
+
+.feedbackLength {
+  text-align: right;
+  color: #777;
+  font-size: 0.9rem;
+  margin-bottom: 30px;
+}
+
+.btn {
+  text-align: center;
+}
+
+.submitBtn {
+  background-color: var(--color-button);
+  color: var(--color-text);
+  border: none;
+  border-radius: 5px;
+  padding: 12px 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submitBtn:hover {
+  background-color: var(--color-button-hover);
+}
+
+/* Divider line */
+.form::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background-color: #eee;
+  margin: 20px 0;
+  width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .topContainer {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+
+  .feedbackTextarea {
+    height: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .topContainer {
+    padding: 15px;
+    border-radius: 8px;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .type,
+  .feedback {
+    font-size: 1rem;
+  }
+
+  .typeSelect,
+  .feedbackTextarea {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .submitBtn {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* Extra small devices */
+@media (max-width: 360px) {
+  .title {
+    font-size: 1.3rem;
+  }
+
+  .feedbackTextarea {
+    height: 120px;
+  }
+}

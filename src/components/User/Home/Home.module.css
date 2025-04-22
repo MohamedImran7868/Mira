@@ -1,0 +1,112 @@
+/* Home.module.css */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 80px);
+  background-color: var(--color-background);
+  text-align: center;
+  font-family: "Agrandir", sans-serif;
+  color: var(--color-text);
+}
+
+.title {
+  font-size: 3rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+  font-weight: normal;
+}
+
+.innerContainer {
+  max-width: 600px;
+  width: 100%;
+  margin-top: 50px;
+}
+
+.slogan {
+  font-size: 2rem;
+  margin: 30px 0;
+  letter-spacing: 1px;
+}
+
+.btnContainer {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 40px;
+}
+
+.registerBtn,
+.loginBtn {
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.registerBtn, .loginBtn {
+  background-color: var(--color-button);
+  color: var(--color-text);
+  border: none;
+}
+
+.registerBtn:hover, .loginBtn:hover {
+  background-color: var(--color-button-hover);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.8rem;
+  }
+
+  .content {
+    font-size: 1.1rem;
+  }
+
+  .slogan {
+    font-size: 1.1rem;
+    margin: 25px 0;
+  }
+
+  .btnContainer {
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+  }
+
+  .registerBtn,
+  .loginBtn {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .content {
+    font-size: 1rem;
+  }
+
+  .slogan {
+    font-size: 0.8rem;
+    margin: 20px 0;
+  }
+
+  .btnContainer {
+    margin-top: 25px;
+  }
+
+  .registerBtn,
+  .loginBtn {
+    padding: 10px 20px;
+    font-size: 1rem;
+  }
+}
