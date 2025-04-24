@@ -6,16 +6,25 @@ import profilepic from '../../../assets/imran.jpg';
 import { IoSettings } from "react-icons/io5";
 import { RiFeedbackFill } from "react-icons/ri";
 import styles from './Chat.module.css';
+import {auth} from '../../../firebase'
+import {signOut } from 'firebase/auth'
 
 const ChatScreen = () => {
-  const { user, logout } = useAuth();
   const navigate = useNavigate();
+
+  const logout = async () =>{
+    await signOut(auth)
+    .then(() => {
+      navigate('/login')
+    })
+  }
 
   return (
     <>
       <div className={styles.sideMenu}>
           <img src={logo} alt='mira logo' className={styles.logo}/>
         <div className={styles.btn}>
+          <button className={styles.feedbackBtn} onClick={logout}>Logout</button>
           <button className={styles.feedbackBtn} onClick={() => navigate('/feedback')}><RiFeedbackFill />Feedback</button>
           <button className={styles.settingsBtn} onClick={() => navigate('/admin-dashboard')}><IoSettings />Setting</button>
         </div>
