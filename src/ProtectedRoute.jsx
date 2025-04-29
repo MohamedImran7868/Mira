@@ -6,7 +6,7 @@ export default function ProtectedRoute({ children, adminOnly = false }) {
   const location = useLocation();
 
   if (isLoading) {
-    return <div>Loading...</div>; // Or a loading spinner
+    return <div>Loading...</div>;
   }
 
   if (!user) {

@@ -100,14 +100,19 @@ const LoginScreen = () => {
                 <input
                   type="email"
                   placeholder="Email"
+                  name="email"
+                  id="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   disabled={loading}
+                  autoComplete="true"
                 />
                 <input
                   type="password"
                   placeholder="Password"
+                  name="password"
+                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
