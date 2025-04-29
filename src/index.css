@@ -6,6 +6,8 @@
     --color-text: #5A5A5A;
     --color-button: #B3E7C3;
     --color-button-hover: #80e49e;
+    --color-human-message: aqua;
+    --color-bot-message: red;
 
     /* Fonts */
     --font-primary: 'Agrandir', sans-serif;

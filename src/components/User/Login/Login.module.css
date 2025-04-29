@@ -60,6 +60,12 @@
   background-color: var(--color-button-hover);
 }
 
+.forgotPassword {
+  color: var(--color-text);
+  cursor: pointer;
+  margin-bottom: 0;
+}
+
 .or{
   color: var(--color-text);
 }
