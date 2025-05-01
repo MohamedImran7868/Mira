@@ -8,6 +8,7 @@ import styles from './Chat.module.css';
 import { supabase } from "../../../supabase";
 
 const ChatScreen = () => {
+  const [message, setMessage] = useState("");
   const navigate = useNavigate();
 
   const logout = async () =>{
@@ -27,7 +28,7 @@ const ChatScreen = () => {
     }
   }
 
-  var [messageBegin, setMessageBegin]= useState(false);
+  const [messageBegin, setMessageBegin]= useState(false);
 
   const sendMessage = () =>{
     var message = document.getElementById("message");
@@ -47,6 +48,7 @@ const ChatScreen = () => {
     if(!messageBegin) containerPlaceHolder.style.display = 'none';
 
     createBubble(message.value, "human");
+    //insertData(message.value, "human");
     message.value = "";
   }
 
@@ -61,6 +63,8 @@ const ChatScreen = () => {
 
     const data = await response.json()
     createBubble( data.result, "bot");
+    //insertData(data.result, "bot");
+
     console.log(data.result);
   }
 
@@ -72,6 +76,18 @@ const ChatScreen = () => {
     messageDiv.innerHTML = message;
 
     chatContainer.appendChild(messageDiv);
+  }
+
+  const insertData = async (message, sender) => {
+    const messageData = {
+      sender: sender,
+      message_content: message,
+    }
+
+    const {data, error} = await supabase
+    .from("message")
+    .insert([messageData])
+    .single();
   }
 
   return (
@@ -94,7 +110,13 @@ const ChatScreen = () => {
           <h1 id="containerPlaceHolder" className={styles.containerPlaceHolder}>Hi Bestie!<br />How was your day?</h1>
         </div>
         <div className={styles.chatInput}>
-          <input type="text" id="message" className={styles.input} placeholder="Share your thoughts here..." />
+          <input 
+            type="text" 
+            id="message" 
+            className={styles.input} 
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Share your thoughts here..." 
+          />
           <button id='send button' className={styles.sendBtn} onClick={sendMessage}>Send</button>
         </div>
       </div>

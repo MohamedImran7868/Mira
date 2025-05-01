@@ -1,140 +1,153 @@
 /* Register.module.css */
 .container {
-    background-color: var(--color-background);
-    min-height: calc(100vh - 65px); /* Account for header */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    font-family: 'Agrandir', sans-serif;
+  background-color: var(--color-background);
+  min-height: calc(100vh - 65px); /* Account for header */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  font-family: "Agrandir", sans-serif;
+}
+
+.innerContainer {
+  background-color: white;
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.innerContainer h2 {
+  color: var(--color-text);
+  font-size: 1.8rem;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.inputContainer {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  color: var(--color-text);
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 1.1rem;
+}
+
+.input {
+  width: 95%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: "Agrandir", sans-serif;
+  margin-bottom: 5px;
+}
+
+.rowContainer {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.inputGroup {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.registerBtn {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-button);
+  color: var(--color-text);
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.registerBtn:hover {
+  background-color: var(--color-button-hover);
+}
+
+.loginContainer {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.loginBtn {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 5px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
   }
-  
+
   .innerContainer {
-    background-color: white;
-    width: 90%;
-    max-width: 500px;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 25px;
   }
-  
+
   .innerContainer h2 {
-    color: var(--color-text);
-    font-size: 1.8rem;
-    margin-bottom: 25px;
-    text-align: center;
+    font-size: 1.6rem;
   }
-  
-  .inputContainer {
-    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+  .container {
+    min-height: calc(100vh - 60px);
   }
-  
+
+  .innerContainer {
+    width: 80%;
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .innerContainer h2 {
+    font-size: 1.4rem;
+  }
+
   .label {
-    display: block;
-    color: var(--color-text);
-    font-weight: bold;
-    margin-bottom: 8px;
-    font-size: 1.1rem;
-  }
-  
-  .input {
-    width: 95%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
     font-size: 1rem;
-    font-family: 'Agrandir', sans-serif;
   }
-  
+
   .registerBtn {
-    width: 100%;
-    padding: 12px;
-    background-color: var(--color-button);
-    color: var(--color-text);
-    border: none;
-    border-radius: 4px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background-color 0.3s;
+    padding: 10px;
   }
-  
-  .registerBtn:hover {
-    background-color: var(--color-button-hover);
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 600px) and (orientation: landscape) {
+  .container {
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
-  
+
+  .innerContainer {
+    padding: 15px;
+  }
+
+  .inputContainer {
+    margin-bottom: 12px;
+  }
+
   .loginContainer {
-    text-align: center;
-    margin-top: 20px;
+    margin-top: 15px;
   }
-  
-  .loginBtn {
-    background: none;
-    border: none;
-    color: var(--color-text);
-    text-decoration: underline;
-    cursor: pointer;
-    font-size: 1rem;
-    padding: 5px;
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .container {
-      padding: 15px;
-    }
-    
-    .innerContainer {
-      padding: 25px;
-    }
-    
-    .innerContainer h2 {
-      font-size: 1.6rem;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .container {
-      min-height: calc(100vh - 60px);
-    }
-    
-    .innerContainer {
-        width: 80%;
-      box-shadow: none;
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-    
-    .innerContainer h2 {
-      font-size: 1.4rem;
-    }
-    
-    .label {
-      font-size: 1rem;
-    }
-    
-    .registerBtn {
-      padding: 10px;
-    }
-  }
-  
-  /* Landscape orientation for mobile */
-  @media (max-height: 600px) and (orientation: landscape) {
-    .container {
-      padding-top: 10px;
-      padding-bottom: 10px;
-    }
-    
-    .innerContainer {
-      padding: 15px;
-    }
-    
-    .inputContainer {
-      margin-bottom: 12px;
-    }
-    
-    .loginContainer {
-      margin-top: 15px;
-    }
-  }
+}
