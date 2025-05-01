@@ -9,6 +9,7 @@ lerna-debug.log*
 
 node_modules
 **/emotional_model_27
+**/loading.html
 dist
 dist-ssr
 *.local
