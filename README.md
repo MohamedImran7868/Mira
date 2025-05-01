@@ -42,7 +42,7 @@ MIRA is an AI-powered web chatbot designed to provide students with a **safe, st
 - [X] Frontend implementation (React)  
 - [X] User authentication (Supabase)  
 - [X] AI model integration (Flask)  
-- [ ] Database setup & optimization (PostgreSQL)  
+- [ ] Database setup & optimization (PostgreSQL) 
 - [ ] Initial deployment  
 - [ ] User testing & feedback collection  
 
