@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
@@ -13,7 +13,7 @@ import ManageUser from './components/Admin/Manage-User/ManageUser.jsx';
 import ViewFeedback from './components/Admin/View-Feedback/ViewFeedback.jsx';
 import ViewResources from './components/Admin/View-Resources/ViewResources.jsx';
 import AddResources from './components/Admin/Add-resources/AddResources.jsx';
-// Import other components...
+import UpdatePassword from './components/UpdatePassword.jsx';
 
 function App() {
   return (
@@ -23,14 +23,48 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/chat" element={<Chat />} />
-          <Route path="/feedback" element={ <Feedback /> } />
-          <Route path="/profile" element={ <Profile /> } />
-          <Route path="/admin-dashboard" element={ <AdminDashboard /> } />
-          <Route path="/manage-user" element={ <ManageUser /> } />
-          <Route path="/view-feedback" element={ <ViewFeedback /> } />
-          <Route path="/view-resources" element={ <ViewResources /> } />
-          <Route path="/add-resources" element={ <AddResources /> } />
+          <Route path="/profile" element={<Profile />} />
+          
+          {/* User protected routes */}
+          <Route path="/chat" element={
+            <ProtectedRoute>
+              <Chat />
+            </ProtectedRoute>
+          } />
+          <Route path="/feedback" element={
+            <ProtectedRoute>
+              <Feedback />
+            </ProtectedRoute>
+          } />
+          
+          {/* Admin protected routes */}
+          <Route path="/admin-dashboard" element={
+            <ProtectedRoute adminOnly>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/manage-user" element={
+            <ProtectedRoute adminOnly>
+              <ManageUser />
+            </ProtectedRoute>
+          } />
+          <Route path="/view-feedback" element={
+            <ProtectedRoute adminOnly>
+              <ViewFeedback />
+            </ProtectedRoute>
+          } />
+          <Route path="/view-resources" element={
+            <ProtectedRoute adminOnly>
+              <ViewResources />
+            </ProtectedRoute>
+          } />
+          <Route path="/add-resources" element={
+            <ProtectedRoute adminOnly>
+              <AddResources />
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/update-password" element={<UpdatePassword />} />
         </Routes>
       </Router>
     </AuthProvider>

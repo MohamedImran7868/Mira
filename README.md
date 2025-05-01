@@ -21,8 +21,8 @@ MIRA is an AI-powered web chatbot designed to provide students with a **safe, st
 |-----------------|------------|
 | Frontend        | ![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB) |
 | Backend         | ![Flask](https://img.shields.io/badge/Flask-000000?logo=flask&logoColor=white) |
-| Database        | ![MySQL](https://img.shields.io/badge/MySQL-4479A1?logo=mysql&logoColor=white) |
-| Authentication  | ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase&logoColor=black) |
+| Database        | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white) |
+| Authentication  | ![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?logo=supabase&logoColor=black) |
 | Version Control | ![Git](https://img.shields.io/badge/Git-F05032?logo=git&logoColor=white) |
 | Design          | ![Canva](https://img.shields.io/badge/Canva-00C4CC?logo=canva&logoColor=white) |
 | IDE             | ![VS Code](https://img.shields.io/badge/VS_Code-007ACC?logo=visual-studio-code&logoColor=white) |
@@ -40,10 +40,9 @@ MIRA is an AI-powered web chatbot designed to provide students with a **safe, st
 
 ### 🔧 Phase 2: Development (In Progress)  
 - [X] Frontend implementation (React)  
-- [X] User authentication (Firebase)  
-- [X] AI model integration  
-- [ ] Database setup & optimization  
-- [ ] API development (Flask)  
+- [X] User authentication (Supabase)  
+- [X] AI model integration (Flask)  
+- [ ] Database setup & optimization (PostgreSQL) 
 - [ ] Initial deployment  
 - [ ] User testing & feedback collection  
 
