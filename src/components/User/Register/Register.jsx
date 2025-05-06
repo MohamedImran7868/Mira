@@ -16,6 +16,8 @@ const Register = () => {
   const { signUp } = useAuth();
 
   const navigate = useNavigate();
+  const maxDate = `${new Date().getFullYear() - 18}-12-31`; // set the max input for birth date;
+  const minDate = `${new Date().getFullYear() - 30}-12-31`; // set the min input for birth date;
 
   // Calculate age from birthday
   useEffect(() => {
@@ -23,11 +25,6 @@ const Register = () => {
       const birthDate = new Date(birthday);
       const today = new Date();
       let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-      const monthDiff = today.getMonth() - birthDate.getMonth();
-      
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-        calculatedAge--;
-      }
       
       setAge(calculatedAge.toString());
     }
@@ -36,9 +33,9 @@ const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate age (must be at least 13 years old)
-    if (parseInt(age) < 13) {
-      setError("You must be at least 13 years old to register");
+    // Validate age (must be at least 18 years old)
+    if (parseInt(age) < 18) {
+      setError("You must be at least 18 years old to register");
       return;
     }
 
@@ -88,7 +85,8 @@ const Register = () => {
                   className={styles.input}
                   required
                   disabled={loading}
-                  max={new Date().toISOString().split('T')[0]} // Prevent future dates
+                  max={maxDate} // Prevent future dates
+                  min={minDate} // Prevent Past dates
                 />
               </div>
               
@@ -101,7 +99,7 @@ const Register = () => {
                   className={styles.input}
                   required
                   disabled={true} // Age is now read-only as it's calculated from birthday
-                  min="13"
+                  min="18"
                 />
               </div>
             </div>

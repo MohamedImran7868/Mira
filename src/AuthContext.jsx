@@ -66,7 +66,10 @@ export function AuthProvider({ children }) {
       try {
         const { error } = await supabase.auth.resend({
           type: 'signup',
-          email: email
+          email: email,
+          options: {
+            redirectTo: window.location.origin + "/login",
+          },
         });
     
         if (error) {
