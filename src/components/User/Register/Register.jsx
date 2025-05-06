@@ -13,6 +13,8 @@ const Register = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const { signUp } = useAuth();
+
   const navigate = useNavigate();
 
   // Calculate age from birthday

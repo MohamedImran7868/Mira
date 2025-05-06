@@ -1,4 +1,3 @@
-// components/User/VerifyEmail/VerifyEmail.jsx
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../../supabase';
