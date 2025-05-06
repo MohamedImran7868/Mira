@@ -10,11 +10,17 @@ const LoginScreen = () => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [resetEmail, setResetEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Sent Reset Password
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
-  const [loading, setLoading] = useState(false);
-  
-  const { signIn, signInWithGoogle, resetPassword } = useAuth();
+
+  // Resend verification
+  const [showResendVerification, setShowResendVerification] = useState(false);
+
+  const { signIn, signInWithGoogle, resetPassword, resendVerification } =
+    useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -25,13 +31,34 @@ const LoginScreen = () => {
     setError(null);
     setLoading(true);
 
+    setShowResendVerification(false);
+
     try {
-      await signIn(email, password);
+      const { data, error: authError } = await signIn(email, password);
+
+      if (authError) {
+        if (authError.needsVerification) {
+          setError(authError.message);
+          setShowResendVerification(true);
+        } else {
+          setError(authError.message);
+        }
+        return;
+      }
       navigate(from, { replace: true });
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    try {
+      const { success, error } = await resendVerification(email);
+      setShowResendVerification(false);
+    } catch (err) {
+      console.error("Resend failed:", err);
     }
   };
 
@@ -79,19 +106,18 @@ const LoginScreen = () => {
                 required
                 disabled={loading}
               />
-              <button 
-                onClick={handlePasswordReset}
-                disabled={loading}
-              >
+              <button onClick={handlePasswordReset} disabled={loading}>
                 {loading ? "Sending..." : "Send Reset Link"}
               </button>
-              <button 
+              <button
                 onClick={() => setShowResetForm(false)}
                 disabled={loading}
               >
                 Back to Login
               </button>
-              {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
+              {resetMessage && (
+                <p className={styles.resetMessage}>{resetMessage}</p>
+              )}
             </div>
           ) : (
             <>
@@ -118,20 +144,33 @@ const LoginScreen = () => {
                   required
                   disabled={loading}
                 />
-                {error && <span className={styles.errorMessage}>{error}</span>}
+                {error && (
+                  <div className={styles.errorMessage}>
+                    {error}
+                    {showResendVerification && (
+                      <button
+                        type="button"
+                        onClick={handleResendVerification}
+                        className={styles.resendButton}
+                      >
+                        Resend Verification Email
+                      </button>
+                    )}
+                  </div>
+                )}
                 <button type="submit" disabled={loading}>
                   {loading ? "Logging in..." : "Login"}
                 </button>
               </form>
-              <p 
-                className={styles.forgotPassword} 
+              <p
+                className={styles.forgotPassword}
                 onClick={() => !loading && setShowResetForm(true)}
               >
                 Forgot password?
               </p>
               <p className={styles.or}>or</p>
-              <button 
-                onClick={handleGoogleLogin} 
+              <button
+                onClick={handleGoogleLogin}
                 className={styles.googlebtn}
                 disabled={loading}
               >
