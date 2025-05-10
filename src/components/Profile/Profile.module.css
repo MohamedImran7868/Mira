@@ -1,137 +1,176 @@
-/* Profile.module.css */
 .container {
-    background-color: var(--color-background);
-    min-height: calc(100vh - 65px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    font-family: 'Agrandir', sans-serif;
-  }
-  
-  .profileCard {
-    background-color: white;
-    width: 100%;
-    max-width: 450px;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    text-align: center;
-  }
-  
-  .profileHeader {
-    margin-bottom: 30px;
-  }
-  
-  .profileImage {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid var(--color-button);
-    margin-bottom: 15px;
-  }
-  
-  .profileName {
-    color: var(--color-text);
-    font-size: 1.5rem;
-    margin: 0;
-  }
-  
-  .profileInfo {
-    margin-bottom: 30px;
-  }
-  
-  .infoRow {
-    display: flex;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-  }
-  
-  .infoLabel {
-    color: var(--color-text);
-    font-weight: bold;
-    font-size: 1.1rem;
-  }
-  
-  .infoValue {
-    color: #555;
-  }
-  
-  .editBtn {
-    background-color: var(--color-button);
-    color: var(--color-text);
-    border: none;
-    border-radius: 6px;
-    padding: 12px 30px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 100%;
-    max-width: 200px;
-  }
-  
-  .editBtn:hover {
-    background-color: var(--color-button-hover);
-    transform: translateY(-2px);
-  }
-  
-  /* Responsive Design */
-  @media (max-width: 768px) {
-    .profileCard {
-      padding: 25px;
-    }
-    
-    .profileImage {
-      width: 100px;
-      height: 100px;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .container {
-      padding: 15px;
-      align-items: flex-start;
-    }
-    
-    .profileCard {
-      padding: 20px;
-      box-shadow: none;
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-    
-    .profileImage {
-      width: 80px;
-      height: 80px;
-      border-width: 3px;
-    }
-    
-    .profileName {
-      font-size: 1.3rem;
-    }
-    
-    .infoLabel, .infoValue {
-      font-size: 1rem;
-    }
-  }
-  
-  /* Landscape orientation */
-  @media (max-height: 500px) and (orientation: landscape) {
-    .container {
-      padding: 10px 0;
-    }
-    
-    .profileCard {
-      padding: 15px;
-    }
-    
-    .profileHeader {
-      margin-bottom: 15px;
-    }
-    
-    .profileInfo {
-      margin-bottom: 15px;
-    }
-  }
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.profileCard {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+}
+
+.profileHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.imageContainer {
+  position: relative;
+  margin: 0 auto 1rem;
+  width: 150px;
+  height: 150px;
+}
+
+.profileImage {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #f0f0f0;
+}
+
+.imageUpload {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
+
+.uploadBtn {
+  background: #4CAF50;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  font-size: 0;
+}
+
+.uploadBtn::before {
+  content: '✎';
+  font-size: 1rem;
+}
+
+.profileName {
+  margin: 0;
+  color: #333;
+}
+
+.editName {
+  font-size: 1.5rem;
+  text-align: center;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.profileInfo {
+  margin-bottom: 2rem;
+}
+
+.infoRow {
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.infoLabel {
+  font-weight: bold;
+  width: 120px;
+  color: #555;
+}
+
+.infoValue {
+  flex: 1;
+}
+
+.editField {
+  flex: 1;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.invalid {
+  border-color: #ff4444;
+}
+
+.passwordRequirements {
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+}
+
+.passwordRequirements ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.passwordRequirements li {
+  margin-bottom: 0.3rem;
+  color: #888;
+}
+
+.passwordRequirements li.valid {
+  color: #4CAF50;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.editBtn, .saveBtn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+.editBtn {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.editBtn:hover {
+  background: #e0e0e0;
+}
+
+.saveBtn {
+  background: #4CAF50;
+  color: white;
+}
+
+.saveBtn:hover {
+  background: #45a049;
+}
+
+.errorMessage {
+  color: #ff4444;
+  background: #ffebee;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.successMessage {
+  color: #4CAF50;
+  background: #e8f5e9;
+  padding: 1rem;
+  border-radius: 5px;
+  margin: 1rem 0;
+  text-align: center;
+}

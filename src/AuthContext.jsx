@@ -82,7 +82,7 @@ export function AuthProvider({ children }) {
       }
     },
 
-    // Add this method to your existing AuthContext.js
+    // Register a new Student
     registerStudent: async (email, password, studentData) => {
       setLoading(true);
       try {
@@ -111,9 +111,10 @@ export function AuthProvider({ children }) {
           .insert([
             {
               userID: authData.user.id,
+              user_name: studentData.name,
               user_email: email,
               user_password: password,
-              role: "student"
+              role: "student",
             },
           ])
           .select();
@@ -123,7 +124,6 @@ export function AuthProvider({ children }) {
           .from("students")
           .insert([
             {
-              student_name: studentData.name,
               student_birthday: studentData.birthday,
               student_age: studentData.age,
               status: "active", // Default status
@@ -182,13 +182,133 @@ export function AuthProvider({ children }) {
       return data;
     },
 
-    // Update profile
-    updateUserProfile: async (updates) => {
-      const { data, error } = await supabase.auth.updateUser({
-        data: updates,
-      });
-      if (error) throw error;
-      return data;
+    // Fetch user Profile
+    getUserProfile: async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) throw new Error("No authenticated user");
+
+        // Get user data from 'user' table
+        const { data: userData, error: userError } = await supabase
+          .from("user")
+          .select("*")
+          .eq("userID", user.id)
+          .single();
+
+        if (userError) throw userError;
+
+        // Get student data if role is student
+        if (userData.role === "student") {
+          const { data: studentData, error: studentError } = await supabase
+            .from("students")
+            .select("*")
+            .eq("userID", user.id)
+            .single();
+
+          if (studentError) throw studentError;
+          return { ...userData, ...studentData };
+        }
+
+        return userData;
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+        throw error;
+      }
+    },
+
+    // Update user profile
+    updateProfile: async (updates) => {
+      setLoading(true);
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        // Update auth user data if email is changing
+        if (updates.email) {
+          const { error: authError } = await supabase.auth.updateUser({
+            email: updates.email,
+          });
+          if (authError) throw authError;
+        }
+
+        // Update custom user table
+        const { data, error } = await supabase
+          .from("user")
+          .update({
+            user_name: updates.name,
+            user_email: updates.email,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("userID", user.id)
+          .select();
+
+        if (error) throw error;
+
+        // Update student table if role is student
+        if (updates.birthday || updates.age) {
+          const { error: studentError } = await supabase
+            .from("students")
+            .update({
+              student_birthday: updates.birthday,
+              student_age: updates.age,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("userID", user.id);
+
+          if (studentError) throw studentError;
+        }
+
+        return data;
+      } catch (error) {
+        console.error("Error updating profile:", error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+
+    // Upload profile image
+    uploadProfileImage: async (file) => {
+      setLoading(true);
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+        const filePath = `profile-picture/${fileName}`;
+
+        // Upload to storage
+        const { error: uploadError } = await supabase.storage
+          .from("profile-picture")
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from("profile-picture").getPublicUrl(filePath);
+
+        // Update user record with new image URL
+        const { error: updateError } = await supabase
+          .from("user")
+          .update({ user_image: publicUrl })
+          .eq("userID", user.id);
+
+        if (updateError) throw updateError;
+
+        return publicUrl;
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
     },
   };
 

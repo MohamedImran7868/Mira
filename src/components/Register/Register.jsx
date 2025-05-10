@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import Header from "../../Header";
+import Header from "../Header";
 import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../AuthContext";
 
 const Register = () => {
   const [formData, setFormData] = useState({
