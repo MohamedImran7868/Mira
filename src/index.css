@@ -1,23 +1,41 @@
-@import url('https://fonts.cdnfonts.com/css/agrandir');
+@import url("https://fonts.cdnfonts.com/css/agrandir");
 :root {
-    /* Colors */
-    --color-background: #E3FEEF;
-    --color-navbar: #BAF1FF;
-    --color-text: #5A5A5A;
-    --color-button: #B3E7C3;
-    --color-button-hover: #80e49e;
-    --color-human-message: aqua;
-    --color-bot-message: red;
+  /* Colors */
+  --color-background: #e3feef;
+  --color-navbar: #baf1ff;
+  --color-text: #5a5a5a;
+  --color-button: #b3e7c3;
+  --color-button-hover: #80e49e;
+  --color-human-message: aqua;
+  --color-bot-message: red;
 
-    /* Fonts */
-    --font-primary: 'Agrandir', sans-serif;
+  --color-primary: #4a6fa5;
+  --color-primary-dark: #3a5a8a;
+  --color-text: #333;
+  --color-text-light: #666;
+  --color-border: #ddd;
+  --color-star-active: #ffc107;
+  --color-star-inactive: #e0e0e0;
+  --color-error: #dc3545;
+  --color-error-bg: #f8d7da;
+  --color-success: #28a745;
+  --color-disabled: #6c757d;
+
+  /* Fonts */
+  --font-primary: "Agrandir", sans-serif;
 }
-body{
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-primary);
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-primary);
 }
 
-button:active{
-    transform: scale(0.95);
+button:active {
+  transform: scale(0.95);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }

@@ -27,6 +27,11 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  // Date calculations
+  const currentYear = new Date().getFullYear();
+  const maxDate = `${currentYear - 18}-12-31`;
+  const minDate = `${currentYear - 30}-01-01`;
+
   // Fetch user profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
@@ -49,6 +54,17 @@ const Profile = () => {
     };
     fetchProfile();
   }, [getUserProfile]);
+
+  // Calculate age from birthday
+    useEffect(() => {
+      if (editData.birthday) {
+        const birthDate = new Date(editData.birthday);
+        const today = new Date();
+        let calculatedAge = today.getFullYear() - birthDate.getFullYear();
+  
+        setEditData((prev) => ({ ...prev, age: calculatedAge.toString() }));
+      }
+    }, [editData.birthday]);
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -213,6 +229,8 @@ const Profile = () => {
                   value={editData.birthday}
                   onChange={handleInputChange}
                   className={styles.editField}
+                  max={maxDate}
+                  min={minDate}
                 />
               ) : (
                 <span className={styles.infoValue}>
@@ -230,6 +248,7 @@ const Profile = () => {
                   value={editData.age}
                   onChange={handleInputChange}
                   className={styles.editField}
+                  readOnly
                 />
               ) : (
                 <span className={styles.infoValue}>{profile.student_age}</span>

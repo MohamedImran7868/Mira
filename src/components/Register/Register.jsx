@@ -22,7 +22,7 @@ const Register = () => {
   // Date calculations
   const currentYear = new Date().getFullYear();
   const maxDate = `${currentYear - 18}-12-31`;
-  const minDate = `${currentYear - 100}-01-01`; // More reasonable minimum age
+  const minDate = `${currentYear - 30}-01-01`;
 
   // Calculate age from birthday
   useEffect(() => {

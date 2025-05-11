@@ -1,153 +1,205 @@
-/* Feedback.module.css */
 .container {
-  background-color: var(--color-background);
-  min-height: 100vh;
-  padding: 20px;
-  font-family: "Agrandir", sans-serif;
-  color: var(--color-text);
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
-.topContainer {
-  max-width: 800px;
-  margin: 0 auto;
-  background-color: white;
+.feedbackCard {
+  background: white;
   border-radius: 10px;
-  padding: 30px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 800px;
 }
 
 .title {
-  font-size: 2rem;
   text-align: center;
-  margin-bottom: 30px;
-  color: var(--color-text);
+  color: var(--color-primary);
+  margin-bottom: 2rem;
 }
 
-.type {
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formGroup label {
   display: block;
-  font-weight: bold;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-}
-
-.typeSelect {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  margin-bottom: 30px;
-  font-size: 1rem;
-  font-family: "Agrandir", sans-serif;
-}
-
-.feedback {
-  font-weight: bold;
-  margin-bottom: 10px;
-  font-size: 1.2rem;
-}
-
-.feedbackTextarea {
-  width: 100%;
-  height: 200px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  resize: none;
-  font-family: "Agrandir", sans-serif;
-  font-size: 1rem;
-  margin-bottom: 10px;
-}
-
-.feedbackLength {
-  text-align: right;
-  color: #777;
-  font-size: 0.9rem;
-  margin-bottom: 30px;
-}
-
-.btn {
-  text-align: center;
-}
-
-.submitBtn {
-  background-color: var(--color-button);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
   color: var(--color-text);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+  appearance: none; /* Remove the default Arrow */
+}
+
+/* Added own dropdown arrow */
+.formGroup select {
+  background-color: white;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2rem;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.charCount {
+  display: block;
+  text-align: right;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+  margin-top: 0.25rem;
+}
+
+.ratingContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.star {
+  background: none;
   border: none;
-  border-radius: 5px;
-  padding: 12px 30px;
-  font-size: 1.1rem;
+  font-size: 1.8rem;
+  color: var(--color-star-inactive);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.star:hover {
+  transform: scale(1.1);
+}
+
+.star.active {
+  color: var(--color-star-active);
+}
+
+.submitButton {
+  width: 100%;
+  padding: 1rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.submitBtn:hover {
-  background-color: var(--color-button-hover);
+.submitButton:hover {
+  background-color: var(--color-primary-dark);
 }
 
-/* Divider line */
-.form::after {
-  content: "";
-  display: block;
-  height: 1px;
-  background-color: #eee;
-  margin: 20px 0;
-  width: 100%;
+.submitButton:disabled {
+  background-color: var(--color-disabled);
+  cursor: not-allowed;
 }
 
-/* Responsive Design */
+.errorMessage {
+  color: var(--color-error);
+  background-color: var(--color-error-bg);
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.successContainer {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.successCard {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  margin: 0 auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+.successCard h2 {
+  color: var(--color-success);
+  margin-bottom: 1rem;
+}
+
+.successCard p {
+  color: var(--color-text);
+  margin-bottom: 2rem;
+}
+
+.returnButton {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.returnButton:hover {
+  background-color: var(--color-primary-dark);
+}
+
+/* Responsive styles */
 @media (max-width: 768px) {
-  .topContainer {
-    padding: 20px;
-  }
-
-  .title {
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-  }
-
-  .feedbackTextarea {
-    height: 150px;
-  }
-}
-
-@media (max-width: 480px) {
-  .container {
-    padding: 10px;
-  }
-
-  .topContainer {
-    padding: 15px;
-    border-radius: 8px;
+  .feedbackCard,
+  .successCard {
+    padding: 1.5rem;
   }
 
   .title {
     font-size: 1.5rem;
   }
 
-  .type,
-  .feedback {
-    font-size: 1rem;
-  }
-
-  .typeSelect,
-  .feedbackTextarea {
-    padding: 10px;
-    font-size: 0.9rem;
-  }
-
-  .submitBtn {
-    padding: 10px 20px;
-    font-size: 1rem;
+  .star {
+    font-size: 1.5rem;
   }
 }
 
-/* Extra small devices */
-@media (max-width: 360px) {
-  .title {
-    font-size: 1.3rem;
+@media (max-width: 480px) {
+  .container,
+  .successContainer {
+    padding: 0 0.5rem;
   }
 
-  .feedbackTextarea {
-    height: 120px;
+  .feedbackCard,
+  .successCard {
+    padding: 1rem;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .formGroup input,
+  .formGroup select,
+  .formGroup textarea {
+    padding: 0.5rem;
   }
 }

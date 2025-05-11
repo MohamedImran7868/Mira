@@ -190,7 +190,7 @@ export function AuthProvider({ children }) {
           data: { user },
         } = await supabase.auth.getUser();
 
-        // Get user data with image URL
+        // Get user data
         const { data: userData, error } = await supabase
           .from("user")
           .select(`*`)
@@ -199,6 +199,7 @@ export function AuthProvider({ children }) {
 
         if (error) throw error;
         setUserImage(userData.user_image);
+
         // Get student data if role is student
         if (userData.role === "student") {
           const { data: studentData, error: studentError } = await supabase
@@ -218,6 +219,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // Generate the public path for the image
     getImageUrl: (path) => {
       return `${supabase.supabaseUrl}/storage/v1/object/public/profile-picture/${path}`;
     },
@@ -277,9 +279,6 @@ export function AuthProvider({ children }) {
     // Upload profile image
     uploadProfileImage: async (file) => {
       try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
         const fileName = `${user.id}-${Date.now()}.webp`;
         console.log(userImage);
 
@@ -302,6 +301,41 @@ export function AuthProvider({ children }) {
         return fileName;
       } catch (error) {
         console.error("Error uploading image:", error);
+        throw error;
+      }
+    },
+
+    // Upload feedback
+    uploadFeedback: async (feedback) => {
+      try {
+        // Get user data
+        const { data: userData, error: userError } = await supabase
+          .from("user")
+          .select(`*`)
+          .eq("userID", user.id)
+          .single();
+
+        if (userError) throw userError;
+
+        // Insert feedback
+        const { data, error } = await supabase
+          .from("feedback")
+          .insert([
+            {
+              feedback_title: feedback.title,
+              feedback_category: feedback.category,
+              feedback_rating: feedback.rating,
+              feedback_message: feedback.message,
+              feedback_by: userData.user_name,
+              user_Id: user.id,
+            },
+          ])
+          .select();
+
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error("Error uploading feedback:", error);
         throw error;
       }
     },
