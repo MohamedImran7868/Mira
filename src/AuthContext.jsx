@@ -6,6 +6,7 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
+  const [userImage, setUserImage] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -189,17 +190,15 @@ export function AuthProvider({ children }) {
           data: { user },
         } = await supabase.auth.getUser();
 
-        if (!user) throw new Error("No authenticated user");
-
-        // Get user data from 'user' table
-        const { data: userData, error: userError } = await supabase
+        // Get user data with image URL
+        const { data: userData, error } = await supabase
           .from("user")
-          .select("*")
+          .select(`*`)
           .eq("userID", user.id)
           .single();
 
-        if (userError) throw userError;
-
+        if (error) throw error;
+        setUserImage(userData.user_image);
         // Get student data if role is student
         if (userData.role === "student") {
           const { data: studentData, error: studentError } = await supabase
@@ -217,6 +216,10 @@ export function AuthProvider({ children }) {
         console.error("Error fetching profile:", error);
         throw error;
       }
+    },
+
+    getImageUrl: (path) => {
+      return `${supabase.supabaseUrl}/storage/v1/object/public/profile-picture/${path}`;
     },
 
     // Update user profile
@@ -273,41 +276,33 @@ export function AuthProvider({ children }) {
 
     // Upload profile image
     uploadProfileImage: async (file) => {
-      setLoading(true);
       try {
         const {
           data: { user },
         } = await supabase.auth.getUser();
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${user.id}-${Math.random()}.${fileExt}`;
-        const filePath = `profile-picture/${fileName}`;
+        const fileName = `${user.id}-${Date.now()}.webp`;
+        console.log(userImage);
 
         // Upload to storage
         const { error: uploadError } = await supabase.storage
           .from("profile-picture")
-          .upload(filePath, file);
-
+          .upload(fileName, file, {
+            upsert: true, // Overwrite if file already exists
+          });
         if (uploadError) throw uploadError;
 
-        // Get public URL
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("profile-picture").getPublicUrl(filePath);
-
-        // Update user record with new image URL
+        // Update database with filename only
         const { error: updateError } = await supabase
           .from("user")
-          .update({ user_image: publicUrl })
+          .update({ user_image: fileName })
           .eq("userID", user.id);
 
         if (updateError) throw updateError;
 
-        return publicUrl;
+        return fileName;
       } catch (error) {
         console.error("Error uploading image:", error);
         throw error;
-      } finally {
-        setLoading(false);
       }
     },
   };
