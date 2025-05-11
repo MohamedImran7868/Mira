@@ -11,6 +11,8 @@
 }
 
 .formContainer {
+  width: 80%;
+  max-width: 600px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,11 +20,10 @@
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 50%;
-  max-width: 400px;
 }
 
 .form{
+  width: 100%;
   padding: 0;
   margin: 0;
 }
@@ -35,7 +36,7 @@
 }
 
 .form input {
-  width: 94%;
+  width: 100%;
   padding: 0.65rem;
   margin-bottom: 1rem;
   border: 1px solid #ccc;
@@ -74,7 +75,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 60%;
+  width: 100%;
   border-radius: 5px;
   height: 50px;
   padding: 0 30px;
@@ -84,7 +85,7 @@
 }
 
 .googlebtn:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .googlebtn img{

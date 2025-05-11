@@ -11,9 +11,11 @@ CREATE TYPE resource_type AS ENUM ('association', 'consultant');
 
 -- User table (linked to Supabase auth)
 CREATE TABLE "user" (
-    userID UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    userID UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_name VARCHAR(50) NOT NULL,
     user_email VARCHAR(50) NOT NULL UNIQUE,
     user_password VARCHAR(255) NOT NULL,
+    user_image VARCHAR(255) NOT NULL DEFAULT 'Default_pfp.jpg',
     role user_role NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -22,10 +24,8 @@ CREATE TABLE "user" (
 -- Students table
 CREATE TABLE students (
     studentID UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    student_name VARCHAR(50) NOT NULL,
     student_birthday DATE NOT NULL,
     student_age INT NOT NULL,
-    student_contact VARCHAR(15) NOT NULL,
     status account_status NOT NULL,
     userID UUID NOT NULL REFERENCES "user"(userID) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -35,9 +35,8 @@ CREATE TABLE students (
 -- Admin table
 CREATE TABLE admin (
     adminID UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    admin_name VARCHAR(50) NOT NULL,
+    admin_birthday DATE NOT NULL,
     admin_age INT NOT NULL,
-    admin_contact VARCHAR(15) NOT NULL,
     userID UUID NOT NULL REFERENCES "user"(userID) ON DELETE CASCADE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()

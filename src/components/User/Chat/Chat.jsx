@@ -5,28 +5,21 @@ import profilepic from '../../../assets/imran.jpg';
 import { IoSettings } from "react-icons/io5";
 import { RiFeedbackFill } from "react-icons/ri";
 import styles from './Chat.module.css';
-import { supabase } from "../../../supabase";
+import { useAuth } from "../../../AuthContext";
 
 const ChatScreen = () => {
   const [message, setMessage] = useState("");
+  const { signOut } = useAuth();
   const navigate = useNavigate();
 
-  const logout = async () =>{
+  const logout = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      
-      // Verify session is cleared
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        throw new Error('Logout failed: Session still active');
-      }
-      
-      navigate('/login');
+      await signOut();
+      navigate("/chat");
     } catch (err) {
-      setError(err.message);
+      console.error("Error signing out:", err.message);
     }
-  }
+  };
 
   const [messageBegin, setMessageBegin]= useState(false);
 
@@ -95,9 +88,9 @@ const ChatScreen = () => {
       <div className={styles.sideMenu}>
           <img src={logo} alt='mira logo' className={styles.logo}/>
         <div className={styles.btn}>
-          <button className={styles.feedbackBtn} onClick={logout}>Logout</button>
           <button className={styles.feedbackBtn} onClick={() => navigate('/feedback')}><RiFeedbackFill size={24}/>Feedback</button>
-          <button className={styles.settingsBtn} onClick={() => navigate('/admin-dashboard')}><IoSettings size={24}/>Setting</button>
+          <button className={styles.settingsBtn} onClick={() => navigate('/admin-dashboard')}><IoSettings size={24}/>Setting</button>         
+          <button className={styles.feedbackBtn} onClick={logout}>Logout</button>
         </div>
       </div>
       <div className={styles.container}>

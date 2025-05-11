@@ -3,8 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
 import Home from './components/User/Home/Home.jsx';
-import Login from './components/User/Login/Login.jsx';
-import Register from './components/User/Register/Register.jsx';
+import Login from './components/Login/Login.jsx';
+import Register from './components/Register/Register.jsx';
 import Chat from './components/User/Chat/Chat.jsx';
 import Feedback from './components/User/Feedback/Feedback.jsx';
 import Profile from './components/Profile/Profile.jsx';
@@ -23,7 +23,6 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
           
           {/* User protected routes */}
           <Route path="/chat" element={
@@ -34,6 +33,11 @@ function App() {
           <Route path="/feedback" element={
             <ProtectedRoute>
               <Feedback />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           } />
           
