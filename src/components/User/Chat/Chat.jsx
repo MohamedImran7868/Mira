@@ -276,6 +276,8 @@ const ChatScreen = () => {
         <div className={styles.chatInput}>
           <input
             type="text"
+            id="input"
+            name="input"
             value={message}
             className={styles.input}
             onChange={(e) => setMessage(e.target.value)}
