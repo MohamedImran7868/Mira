@@ -1,0 +1,3 @@
+react-router
+supabase
+react-pro-sidebar
