@@ -1,8 +1,0 @@
-torch>=2.3.0 --index-url https://download.pytorch.org/whl/cu121  # Use --index-url for CUDA 12.1
-transformers>=4.40.0
-huggingface-hub>=0.22.0
-numpy>=1.26.0
-tqdm>=4.66.0  # For progress bars (used by transformers)
-python-dotenv>=1.0.0  # For environment variables (optional)
-gradio>=4.0.0  # Only needed for GUI
-flask>=3.0.0  # Only needed for web API
