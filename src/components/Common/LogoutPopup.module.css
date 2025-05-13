@@ -1,0 +1,99 @@
+.popup {
+  display: flex;
+  position: fixed;
+  z-index: 1000;
+  width: 100%;
+  height: 100%; 
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+  animation-name: animateOpen;
+  animation-duration: 0.4s
+}
+
+@keyframes animateOpen {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+.popupContent {
+  background-color: #fefefe;
+  border: 1px solid #888;
+  
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+}
+
+.closelgout {
+  position: absolute;
+  padding: 10px;
+  border: none;
+  background: none;
+  right: 15px;
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.closelgout:hover,
+.closelgout:focus {
+  color: black;
+  text-decoration: none;
+}
+
+.contentpp {
+  padding: 30px;
+}
+
+.popupButtons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.popupButtons button {
+  padding: 10px 20px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.yesBtn {
+  background-color: #06509f;
+}
+
+.yesBtn:hover {
+  background-color: #053f80;
+}
+
+.noBtn {
+  background-color: #ec2227;
+}
+
+.noBtn:hover {
+  background-color: #c22e31;
+}
+
+@media (max-width: 480px) {
+  .popupContent {
+    width: 70%;
+    margin: 0;
+    border-radius: 6px;
+  }
+
+  .popupButtons {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .popupButtons button {
+    width: 100%;
+  }
+}

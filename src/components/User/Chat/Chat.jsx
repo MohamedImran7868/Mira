@@ -1,8 +1,11 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { Sidebar, Menu, MenuItem, sidebarClasses } from "react-pro-sidebar";
-import styles from "./Chat.module.css";
 import { useAuth } from "../../../AuthContext";
+
+// Pages
+import styles from "./Chat.module.css";
+import LogoutPopup from "../../Common/LogoutPopup";
 
 // Images
 import logo from "../../../assets/Logo.png";
@@ -20,6 +23,7 @@ const ChatScreen = () => {
   const [message, setMessage] = useState("");
   const [messageBegin, setMessageBegin] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const chatContainerRef = useRef(null);
   const typingIntervalRef = useRef(null);
@@ -182,6 +186,12 @@ const ChatScreen = () => {
 
   return (
     <div style={{ display: "flex", height: "100vh" }}>
+      {/* Show popup if needed */}
+      <LogoutPopup
+        isVisible={showPopup}
+        onConfirm={logout}
+        onClose={() => setShowPopup(false)}
+      />
       {/* Sidebar Overlay for mobile */}
       {!isSidebarOpen && (
         <div
@@ -226,14 +236,14 @@ const ChatScreen = () => {
             </MenuItem>
             <MenuItem
               icon={<IoSettings size={24} />}
-              onClick={() => navigate("/admin-dashboard")}
+              onClick={() => navigate("/profile")}
               className={styles.menuItem}
             >
               Settings
             </MenuItem>
             <MenuItem
               icon={<IoLogOut size={24} />}
-              onClick={logout}
+              onClick={() => setShowPopup(true)}
               className={styles.menuItem}
             >
               Logout
@@ -243,7 +253,9 @@ const ChatScreen = () => {
       </Sidebar>
 
       <div
-        className={`${styles.container} ${isSidebarOpen ? "" : "collapsed"}`}
+        className={`${styles.container} ${
+          !isSidebarOpen ? styles.collapsed : ""
+        }`}
       >
         <button className={styles.menuToggle} onClick={toggleSidebar}>
           {isSidebarOpen ? <FiX size={24} /> : <FiMenu size={24} />}
