@@ -3,6 +3,7 @@ import { useAuth } from "../../AuthContext";
 import pp from "../../assets/imran.jpg";
 import Header from "../Header";
 import styles from "./Profile.module.css";
+import LoadingModal from "../Common/LoadingModal";
 
 const Profile = () => {
   const { getUserProfile, updateProfile, updatePassword, uploadProfileImage, getImageUrl } =
@@ -172,7 +173,7 @@ const Profile = () => {
   };
 
   if (loading && !profile) {
-    return <div>Loading profile...</div>;
+    return <LoadingModal message="Loding Profile..." />;
   }
 
   if (!profile) {
