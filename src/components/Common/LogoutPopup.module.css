@@ -8,6 +8,16 @@
   background-color: rgba(0, 0, 0, 0.6);
   justify-content: center;
   align-items: center;
+}
+
+.popupContent {
+  background-color: #fefefe;
+  border: 1px solid #888;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
   animation-name: animateOpen;
   animation-duration: 0.4s
 }
@@ -15,17 +25,6 @@
 @keyframes animateOpen {
   from {top:-300px; opacity:0}
   to {top:0; opacity:1}
-}
-
-.popupContent {
-  background-color: #fefefe;
-  border: 1px solid #888;
-  
-  border-radius: 15px;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  position: relative;
 }
 
 .closelgout {

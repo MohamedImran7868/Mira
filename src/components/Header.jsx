@@ -1,9 +1,12 @@
 import logo from "../assets/Logo.png";
+import { useState } from "react";
 import { useAuth } from "../AuthContext";
 import { useNavigate } from "react-router-dom";
+import LogoutPopup from "./Common/LogoutPopup";
 
 function Header() {
   const { signOut } = useAuth();
+  const [showPopup, setShowPopup] = useState(false);
   const navigate = useNavigate();
 
   const headerStyle = {
@@ -34,12 +37,19 @@ function Header() {
   };
 
   return (
+    <>
+    <LogoutPopup
+        isVisible={showPopup}
+        onConfirm={logout}
+        onClose={() => setShowPopup(false)}
+      />
     <header style={headerStyle}>
       <img src={logo} alt="logo" style={logoStyle} />
-      <button style={logOutStyle} onClick={logout}>
+      <button style={logOutStyle} onClick={() => setShowPopup(true)}>
         Log Out
       </button>
     </header>
+    </>
   );
 }
 
