@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "../../Header.jsx";
+import Header from "../../Common/Header.jsx";
 import styles from "./ViewResources.module.css";
 import { MdAttachEmail } from "react-icons/md";
 import { FaClock } from "react-icons/fa6";

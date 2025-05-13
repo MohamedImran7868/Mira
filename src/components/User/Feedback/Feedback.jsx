@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Header from "../../Header";
+import Header from "../../Common/Header";
 import styles from "./Feedback.module.css";
 import { useAuth } from "../../../AuthContext";
 

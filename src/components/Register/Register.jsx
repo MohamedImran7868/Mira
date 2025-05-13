@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Header from "../Header";
+import Header from "../Common/Header";
 import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import { useAuth } from "../../AuthContext";
+import LoadingModal from "../Common/LoadingModal";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -72,6 +73,10 @@ const Register = () => {
       setLoading(false);
     }
   };
+
+  if (loading){
+    return <LoadingModal message="Registering account..." />;
+  }
 
   return (
     <>

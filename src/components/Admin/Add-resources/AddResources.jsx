@@ -1,4 +1,4 @@
-import Header from "../../Header";
+import Header from "../../Common/Header";
 import styles from "./AddResources.module.css";
 
 function AddResources(){

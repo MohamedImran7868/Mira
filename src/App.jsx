@@ -13,7 +13,7 @@ import ManageUser from './components/Admin/Manage-User/ManageUser.jsx';
 import ViewFeedback from './components/Admin/View-Feedback/ViewFeedback.jsx';
 import ViewResources from './components/Admin/View-Resources/ViewResources.jsx';
 import AddResources from './components/Admin/Add-resources/AddResources.jsx';
-import UpdatePassword from './components/UpdatePassword.jsx';
+import UpdatePassword from './components/Common/UpdatePassword.jsx';
 
 function App() {
   return (
