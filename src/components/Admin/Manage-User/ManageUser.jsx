@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 import { useNavigate, Link } from 'react-router-dom';
-import Header from '../../Header';
+import Header from '../../Common/Header';
 import styles from './ManageUser.module.css';
 
 function ManageUser() {

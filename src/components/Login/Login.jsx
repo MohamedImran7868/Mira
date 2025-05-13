@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../Header";
+import Header from "../Common/Header";
 import styles from "./Login.module.css";
 import { useAuth } from "../../AuthContext";
 import googleImage from "../../assets/google.png";
+
+import LoadingModal from "../Common/LoadingModal";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -89,6 +91,10 @@ const LoginScreen = () => {
       setLoading(false);
     }
   };
+
+  if (loading){
+    return <LoadingModal message="Logging In..." />;
+  }
 
   return (
     <>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../../AuthContext";
-import pp from "../../assets/imran.jpg";
-import Header from "../Header";
+import Header from "../Common/Header";
 import styles from "./Profile.module.css";
 import LoadingModal from "../Common/LoadingModal";
 

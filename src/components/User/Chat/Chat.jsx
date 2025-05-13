@@ -19,7 +19,7 @@ import { IoLogOut } from "react-icons/io5";
 import { FiMenu, FiX } from "react-icons/fi";
 
 const ChatScreen = () => {
-  const { signOut } = useAuth();
+  const { signOut, getImageUrl } = useAuth();
   const [message, setMessage] = useState("");
   const [messageBegin, setMessageBegin] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

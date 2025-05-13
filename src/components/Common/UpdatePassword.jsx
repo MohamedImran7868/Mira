@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../../AuthContext';
+import styles from './UpdatePassword.module.css';
 
 function UpdatePassword() {
   const [password, setPassword] = useState('');
@@ -32,10 +33,10 @@ function UpdatePassword() {
   };
 
   return (
-    <div className="password-update-container">
+    <div className={styles.passwordUpdateContainer}>
       <h2>Update Password</h2>
-      {error && <p className="error-message">{error}</p>}
-      {message && <p className="success-message">{message}</p>}
+      {error && <p className={styles.errorMessage}>{error}</p>}
+      {message && <p className={styles.successMessage}>{message}</p>}
       <form onSubmit={handleSubmit}>
         <input
           type="password"
