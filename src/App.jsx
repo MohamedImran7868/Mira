@@ -2,10 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute';
-import Home from './components/User/Home/Home.jsx';
+import Home from './components/Home/Home.jsx';
 import Login from './components/Login/Login.jsx';
 import Register from './components/Register/Register.jsx';
 import Chat from './components/User/Chat/Chat.jsx';
+import CompleteProfile from './components/User/CompleteProfile/CompleteProfile.jsx';
 import Feedback from './components/User/Feedback/Feedback.jsx';
 import Profile from './components/Profile/Profile.jsx';
 import AdminDashboard from './components/Admin/Admin-Dashboard/AdminDashboard.jsx';
@@ -23,20 +24,21 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/complete-profile" element={<CompleteProfile />} />
           
           {/* User protected routes */}
           <Route path="/chat" element={
-            <ProtectedRoute>
+            <ProtectedRoute studentOnly>
               <Chat />
             </ProtectedRoute>
           } />
           <Route path="/feedback" element={
-            <ProtectedRoute>
+            <ProtectedRoute studentOnly>
               <Feedback />
             </ProtectedRoute>
           } />
           <Route path="/profile" element={
-            <ProtectedRoute>
+            <ProtectedRoute studentOnly>
               <Profile />
             </ProtectedRoute>
           } />

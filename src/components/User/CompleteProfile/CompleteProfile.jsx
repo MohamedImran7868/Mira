@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../AuthContext';
-//import styles from './CompleteProfile.module.css';
+import styles from './CompleteProfile.module.css';
 import LoadingModal from '../../Common/LoadingModal';
 
 const CompleteProfile = () => {
