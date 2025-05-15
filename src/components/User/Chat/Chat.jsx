@@ -16,7 +16,7 @@ import profilepic from "../../../assets/imran.jpg";
 import { IoSettings } from "react-icons/io5";
 import { RiFeedbackFill } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
-import { FiMenu, FiX } from "react-icons/fi";
+import { FiMenu, FiX, FiSend } from "react-icons/fi";
 
 const ChatScreen = () => {
   const { signOut, getImageUrl } = useAuth();
@@ -302,7 +302,7 @@ const ChatScreen = () => {
             onClick={sendMessage}
             disabled={!message.trim() || isTyping}
           >
-            {isTyping ? "..." : "Send"}
+            {isTyping ? <div className={styles.loader}></div> : <FiSend className={styles.sendIcon} size={24}/>}
           </button>
         </div>
       </div>

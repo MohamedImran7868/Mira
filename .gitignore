@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+conversation_history
 **/emotion_model_27
 **/loading.html
 dist
