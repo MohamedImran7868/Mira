@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import logo from "../../assets/Logo.png";
 import LogoutPopup from "./LogoutPopup";
 import { IoLogOut } from "react-icons/io5";
@@ -30,10 +30,14 @@ function Header() {
       />
       <header className={styles.header}>
         <div className={styles.headerContainer}>
-          <img src={logo} alt="logo" className={styles.logo} />
+          <Link to="/">
+            <img src={logo} alt="logo" className={styles.logo} />
+          </Link>
           {user && (
             <button
-              className={`${styles.logoutBtn} ${isHovered ? styles.hovered : ""}`}
+              className={`${styles.logoutBtn} ${
+                isHovered ? styles.hovered : ""
+              }`}
               onClick={() => setShowPopup(true)}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
