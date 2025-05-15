@@ -24,9 +24,9 @@ import { IoLogOut } from "react-icons/io5";
 import { FiMenu, FiX, FiSend, FiTrash2, FiEdit } from "react-icons/fi";
 
 const ChatScreen = () => {
-  const { 
-    userProfile, 
-    getImageUrl, 
+  const {
+    userProfile,
+    getImageUrl,
     signOut,
     getChatSessions,
     getChatMessages,
@@ -34,9 +34,9 @@ const ChatScreen = () => {
     saveMessage,
     updateChatName,
     deleteChatSession,
-    endChatSession
+    endChatSession,
   } = useAuth();
-  
+
   const [message, setMessage] = useState("");
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -48,7 +48,7 @@ const ChatScreen = () => {
   const [newChatName, setNewChatName] = useState("");
   const [messages, setMessages] = useState([]);
   const [typingIndicator, setTypingIndicator] = useState(false);
-  
+
   const chatContainerRef = useRef(null);
   const typingIntervalRef = useRef(null);
   const navigate = useNavigate();
@@ -58,13 +58,13 @@ const ChatScreen = () => {
     const fetchChatSessions = async () => {
       const sessions = await getChatSessions();
       setChatSessions(sessions);
-      
+
       // If there are sessions but no current chat, set the first one as current
       if (sessions.length > 0 && !currentChat) {
         loadChat(sessions[0].chatid);
       }
     };
-    
+
     if (userProfile?.studentid) {
       fetchChatSessions();
     }
@@ -89,7 +89,8 @@ const ChatScreen = () => {
   // Scroll to bottom when messages change
   useEffect(() => {
     if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
     }
   }, [messages, typingIndicator]);
 
@@ -99,34 +100,40 @@ const ChatScreen = () => {
       setCurrentChat(chatId);
       setMessages(messages);
     } catch (error) {
-      console.error('Error loading chat:', error);
+      console.error("Error loading chat:", error);
     }
   };
 
   const startNewChat = async () => {
     try {
       const newSession = await createChatSession();
-      setChatSessions(prev => [newSession, ...prev]);
+      setChatSessions((prev) => [newSession, ...prev]);
       setCurrentChat(newSession.chatid);
+      console.log(newSession.chatid);
       setMessages([]);
     } catch (error) {
-      console.error('Error starting new chat:', error);
+      console.error("Error starting new chat:", error);
     }
+  };
+
+  const clearChat = () => {
+    setCurrentChat(null);
+    setMessages([]);
   };
 
   const handleRenameChat = async (chatId, currentName) => {
     if (editingChatId === chatId) {
       try {
         await updateChatName(chatId, newChatName);
-        setChatSessions(prev => 
-          prev.map(chat => 
+        setChatSessions((prev) =>
+          prev.map((chat) =>
             chat.chatid === chatId ? { ...chat, chat_name: newChatName } : chat
           )
         );
         setEditingChatId(null);
         setNewChatName("");
       } catch (error) {
-        console.error('Error renaming chat:', error);
+        console.error("Error renaming chat:", error);
       }
     } else {
       setEditingChatId(chatId);
@@ -137,43 +144,46 @@ const ChatScreen = () => {
   const handleDeleteChat = async (chatId) => {
     try {
       await deleteChatSession(chatId);
-      setChatSessions(prev => prev.filter(chat => chat.chatid !== chatId));
-      
-      // If we deleted the current chat, start a new one
-      if (currentChat === chatId) {
-        startNewChat();
+      setChatSessions((prev) => prev.filter((chat) => chat.chatid !== chatId));
+      if (currentChat == chatId) {
+        clearChat();
       }
     } catch (error) {
-      console.error('Error deleting chat:', error);
+      console.error("Error deleting chat:", error);
     }
   };
 
   const sendMessage = async () => {
     if (!message.trim() || isTyping) return;
 
+    let chatId = currentChat;
     // If no current chat, create a new one
-    if (!currentChat) {
-      await startNewChat();
-      return;
+    if (!chatId) {
+      const newSession = await createChatSession();
+      setChatSessions((prev) => [newSession, ...prev]);
+      chatId = newSession.chatid; // Use the new chatId directly
+      setCurrentChat(chatId); // Still update state for future messages
+      setMessages([]);
     }
-
+    console.log("B4 save: ", chatId);
     // Save human message
     const newHumanMessage = {
       message_content: message,
-      sender: 'human',
-      message_timestamp: new Date().toISOString()
+      sender: "human",
+      message_timestamp: new Date().toISOString(),
     };
-    
-    setMessages(prev => [...prev, newHumanMessage]);
-    await saveMessage(currentChat, message, "human");
-    callModel(message);
+
+    console.log(chatId);
+    setMessages((prev) => [...prev, newHumanMessage]);
+    await saveMessage(chatId, message, "human");
+    callModel(message, chatId);
     setMessage("");
   };
 
-  const callModel = async (input) => {
+  const callModel = async (input, chatId) => {
     setIsTyping(true);
     setTypingIndicator(true);
-    
+
     try {
       const response = await fetch("http://127.0.0.1:5000/model", {
         method: "POST",
@@ -189,14 +199,14 @@ const ChatScreen = () => {
 
       const data = await response.json();
       simulateTypingEffect(data.result);
-      
+
       // Save bot response to database
-      await saveMessage(currentChat, data.result, "bot");
+      await saveMessage(chatId, data.result, "bot");
     } catch (error) {
       console.error("Error calling model:", error);
-      const errorMsg = "Sorry, I'm having trouble connecting to the AI service.";
+      const errorMsg =
+        "Sorry, I'm having trouble connecting to the AI service.";
       simulateTypingEffect(errorMsg);
-      await saveMessage(currentChat, errorMsg, "bot");
     }
   };
 
@@ -213,26 +223,32 @@ const ChatScreen = () => {
     typingIntervalRef.current = setInterval(() => {
       if (i < words.length) {
         partialMessage = words.slice(0, i + 1).join(" ");
-        
+
         // Update the last message with the partial content
-        setMessages(prev => {
+        setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          
-          if (lastMessage && lastMessage.sender === 'bot' && lastMessage.isTyping) {
+
+          if (
+            lastMessage &&
+            lastMessage.sender === "bot" &&
+            lastMessage.isTyping
+          ) {
             newMessages[newMessages.length - 1] = {
               ...lastMessage,
-              message_content: partialMessage + (i < words.length - 1 ? "..." : "")
+              message_content:
+                partialMessage + (i < words.length - 1 ? "..." : ""),
             };
           } else {
             newMessages.push({
-              message_content: partialMessage + (i < words.length - 1 ? "..." : ""),
-              sender: 'bot',
+              message_content:
+                partialMessage + (i < words.length - 1 ? "..." : ""),
+              sender: "bot",
               isTyping: true,
-              message_timestamp: new Date().toISOString()
+              message_timestamp: new Date().toISOString(),
             });
           }
-          
+
           return newMessages;
         });
 
@@ -240,22 +256,22 @@ const ChatScreen = () => {
       } else {
         clearInterval(typingIntervalRef.current);
         typingIntervalRef.current = null;
-        
+
         // Mark the message as complete
-        setMessages(prev => {
+        setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-          
-          if (lastMessage && lastMessage.sender === 'bot') {
+
+          if (lastMessage && lastMessage.sender === "bot") {
             newMessages[newMessages.length - 1] = {
               ...lastMessage,
-              isTyping: false
+              isTyping: false,
             };
           }
-          
+
           return newMessages;
         });
-        
+
         setTypingIndicator(false);
         setIsTyping(false);
       }
@@ -287,7 +303,7 @@ const ChatScreen = () => {
         onConfirm={logout}
         onClose={() => setShowPopup(false)}
       />
-      
+
       {/* Sidebar Overlay for mobile */}
       {!isSidebarOpen && (
         <div
@@ -323,21 +339,25 @@ const ChatScreen = () => {
             )}
           </div>
 
-          {/* Menu for chat history */}
+          {/* Menu for chat */}
           <Menu iconShape="circle" className={styles.menu}>
             <MenuItem
-              icon={<RiChatAiFill size={24} className={styles.sidebarIconbutton}/>}
+              icon={
+                <RiChatAiFill size={24} className={styles.sidebarIconbutton} />
+              }
               className={styles.menuItem}
-              onClick={startNewChat}
+              onClick={clearChat}
             >
               New Chat
             </MenuItem>
-            <SubMenu 
+            <SubMenu
               label="Our Chat"
-              icon={<IoChatbubbles size={24} className={styles.sidebarIconbutton}/>}
+              icon={
+                <IoChatbubbles size={24} className={styles.sidebarIconbutton} />
+              }
             >
-              {chatSessions.map(chat => (
-                <MenuItem 
+              {chatSessions.map((chat) => (
+                <MenuItem
                   key={chat.chatid}
                   active={currentChat === chat.chatid}
                   onClick={() => loadChat(chat.chatid)}
@@ -383,7 +403,7 @@ const ChatScreen = () => {
                           }}
                           className={styles.chatActionButton}
                         >
-                          <FiTrash2 size={14}/>
+                          <FiTrash2 size={14} />
                         </button>
                       </div>
                     </div>
@@ -398,21 +418,28 @@ const ChatScreen = () => {
         <div>
           <Menu iconShape="circle" className={styles.menu}>
             <MenuItem
-              icon={<RiFeedbackFill size={24} className={styles.sidebarIconbutton}/>}
+              icon={
+                <RiFeedbackFill
+                  size={24}
+                  className={styles.sidebarIconbutton}
+                />
+              }
               onClick={() => navigate("/feedback")}
               className={styles.menuItem}
             >
               Feedback
             </MenuItem>
             <MenuItem
-              icon={<IoSettings size={24} className={styles.sidebarIconbutton}/>}
+              icon={
+                <IoSettings size={24} className={styles.sidebarIconbutton} />
+              }
               onClick={() => navigate("/profile")}
               className={styles.menuItem}
             >
               Settings
             </MenuItem>
             <MenuItem
-              icon={<IoLogOut size={24} className={styles.sidebarIconbutton}/>}
+              icon={<IoLogOut size={24} className={styles.sidebarIconbutton} />}
               onClick={() => setShowPopup(true)}
               className={styles.menuItem}
             >
@@ -428,7 +455,11 @@ const ChatScreen = () => {
         }`}
       >
         <button className={styles.menuToggle} onClick={toggleSidebar}>
-          {isSidebarOpen ? <FiX size={24} className={styles.sidebarIconbutton}/> : <FiMenu size={24} className={styles.sidebarIconbutton}/>}
+          {isSidebarOpen ? (
+            <FiX size={24} className={styles.sidebarIconbutton} />
+          ) : (
+            <FiMenu size={24} className={styles.sidebarIconbutton} />
+          )}
         </button>
 
         <div className={styles.topContainer}>
@@ -448,7 +479,8 @@ const ChatScreen = () => {
         >
           {messages.length === 0 && !typingIndicator ? (
             <h1 className={styles.containerPlaceHolder}>
-              Hi Bestie!<br />
+              Hi Bestie!
+              <br />
               How was your day?
             </h1>
           ) : (
@@ -456,12 +488,17 @@ const ChatScreen = () => {
               <div
                 key={index}
                 className={`${
-                  msg.sender === 'human' ? styles.humanMessage : styles.botMessage
+                  msg.sender === "human"
+                    ? styles.humanMessage
+                    : styles.botMessage
                 } ${styles.bubble}`}
                 dangerouslySetInnerHTML={{
-                  __html: msg.message_content.split('\n').map((paragraph, i) => 
-                    paragraph ? `<p key=${i}>${paragraph}</p>` : '<br/>'
-                  ).join('')
+                  __html: msg.message_content
+                    .split("\n")
+                    .map((paragraph, i) =>
+                      paragraph ? `<p key=${i}>${paragraph}</p>` : "<br/>"
+                    )
+                    .join(""),
                 }}
               />
             ))
