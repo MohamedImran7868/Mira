@@ -1,153 +1,149 @@
-/* Login.module.css */
 .container {
-  background-color: var(--color-background);
-  height: calc(100vh - 80px); /* Adjust for header height */
   display: flex;
-  flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-family: 'Agrandir', sans-serif;
-  margin-top: 0px;
+  align-items: center;
+  min-height: calc(100vh - 70px);
+  padding: 2rem;
+  background-color: var(--color-background);
 }
 
-.formContainer {
-  width: 80%;
-  max-width: 600px;
+.card {
+  width: 100%;
+  max-width: 500px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem;
+  position: relative;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  transition: color var(--transition-fast);
+}
+
+.backButton:hover {
+  color: var(--color-primary-dark);
+}
+
+.loginHeader, .resetHeader {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.loginHeader h2, .resetHeader h2 {
+  font-size: 1.75rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+
+.loginHeader p, .resetHeader p {
+  color: var(--color-text-light);
+  font-size: 0.95rem;
+}
+
+.form {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  display: flex;
   align-items: center;
-  background-color: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  gap: 0.5rem;
 }
 
-.form{
-  width: 100%;
-  padding: 0;
-  margin: 0;
+.inputIcon {
+  color: var(--color-primary);
+  font-size: 0.9rem;
 }
 
-.form h2 {
-  color: var(--color-text);
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-size: 1.5rem;
+.inputField {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-primary);
+  transition: all var(--transition-fast);
 }
 
-.form input {
-  width: 100%;
-  padding: 0.65rem;
-  margin-bottom: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: 'Agrandir', sans-serif;
-}
-
-.form button {
-  width: 100%;
-  padding: 0.65rem;
-  background-color: var(--color-button);
-  color: var(--color-text);
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  font-family: 'Agrandir', sans-serif;
-  transition: background-color 0.3s;
-}
-
-.form button:hover {
-  background-color: var(--color-button-hover);
+.inputField:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
 }
 
 .forgotPassword {
-  color: var(--color-text);
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  text-align: right;
   cursor: pointer;
-  margin-bottom: 0;
+  padding: 0;
+  transition: color var(--transition-fast);
 }
 
-.or{
-  color: var(--color-text);
-}
-
-.googlebtn{
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  border-radius: 5px;
-  height: 50px;
-  padding: 0 30px;
-  background: #FFF;
-  border: 1px solid #CCC;
-  transition: transform 0.2s ease;
-}
-
-.googlebtn:hover {
-  transform: scale(1.05);
-}
-
-.googlebtn img{
-  width: 25px;
-  margin-right: 10px;
-}
-.googlebtn p{
-  font-family: 'Poppins', sans-serif;
-  font-size: 15px;
-  width: 90%;
-}
-
-.register {
-  text-align: center;
-  margin-top: 1rem;
-  color: var(--color-text);
-}
-
-.register span {
-  color: var(--color-text);
+.forgotPassword:hover {
+  color: var(--color-primary-dark);
   text-decoration: underline;
-  cursor: pointer;
-  font-weight: bold;
 }
 
 .errorMessage {
-  color: #dc3545; /* red */
-  background-color: #f8d7da;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin: 1rem 0;
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
+  margin-top: -0.5rem;
 }
 
 .successMessage {
-  color: #28a745; /* green */
-  background-color: #d4edda;
-  padding: 0.75rem;
-  border-radius: 4px;
-  margin: 1rem 0;
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
+  margin-top: 1rem;
+}
+
+.resendButton {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  transition: color var(--transition-fast);
+}
+
+.resendButton:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
 }
 
 .resetContainer{
   display: flex;
   flex-direction: column;
-}
-
-.resendButton {
-  display: block;
-  margin-top: 0.5rem;
-  background: none;
-  border: none;
-  color: #007bff;
-  cursor: pointer;
-  text-decoration: underline;
-  padding: 0;
-  font-size: 0.9rem;
-}
-
-.resendButton:hover {
-  color: #0056b3;
 }
 
 .loginButton, .resetButton {
@@ -179,54 +175,100 @@
 .loginButton:disabled, .resetButton:disabled {
   opacity: 0.7;
   cursor: not-allowed;
-  text-decoration: none;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-  .formContainer {
-    width: 90%;
-    padding: 1.5rem;
-  }
+.buttonIcon {
+  font-size: 0.9rem;
+}
 
-  .form h2 {
-    font-size: 1.3rem;
-    margin-bottom: 1.2rem;
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 1.5rem 0;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
+}
+
+.divider::before, .divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.divider::before {
+  margin-right: 1rem;
+}
+
+.divider::after {
+  margin-left: 1rem;
+}
+
+.googleButton {
+  width: 100%;
+  background: white;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.googleButton:hover {
+  background: #f8f9fa;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.googleIcon {
+  color: #DB4437;
+  font-size: 1.25rem;
+}
+
+.registerPrompt {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.registerLink {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color var(--transition-fast);
+}
+
+.registerLink:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
   }
 }
 
 @media (max-width: 480px) {
-  .container {
-    padding: 10px;
-    justify-content: center;
+  .loginHeader h2, .resetHeader h2 {
+    font-size: 1.5rem;
   }
-
-  .formContainer {
-    padding: 1.2rem;
-    box-shadow: none;
-    border: 1px solid #eee;
-  }
-
-  .form input {
-    padding: 0.6rem;
-  }
-
-  .form button {
-    padding: 0.4rem;
-  }
-
-  .or, .register{
-    font-size: 0.8rem;
-  }
-}
-
-/* Orentation landscape */
-@media (max-height: 500px) and (orientation: landscape) {
-  .container {
-    margin-top: 30px;
-  }
-  .form{
-    height: 80%;
-    margin-bottom: 1.5rem;
+  
+  .loginHeader p, .resetHeader p {
+    font-size: 0.85rem;
   }
 }

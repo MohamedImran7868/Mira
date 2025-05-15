@@ -1,15 +1,45 @@
-from flask import Flask, request, jsonify # Flask API: a light-weight REST API for communication between server and website
+from flask import Flask, request, jsonify
+from mira import MIRA
 from flask_cors import CORS
-from emotiondetector import predict_emotion
+import logging
 
 app = Flask(__name__)
 CORS(app)
+mira = MIRA()
 
-@app.route('/model', methods=['POST']) # route the connection
-def response_generator():
-    data = request.json # set the request received in a variable
-    result = predict_emotion(data['input']) # genereate the response
-    return jsonify({'result': result})
+@app.route('/model', methods=['POST'])
+def process_message():
+    try:
+        data = request.get_json()
+        user_input = data.get('input', '').strip()
+        
+        if not user_input:
+            return jsonify({'result': "Please share how you're feeling."})
+        
+        # Detect emotions
+        emotion_results = mira.detect_emotions(user_input)
+        
+        # Generate response
+        emotions = [er["emotion"] for er in emotion_results]
+        response = mira.generate_response(emotions)
+        
+        # Format emotion display
+        emotion_strings = [f"{er['emotion']} ({er['confidence']:.0%})" for er in emotion_results]
+        emotion_display = ", ".join(emotion_strings)
+        
+        full_response = f"{response}"
+        
+        # Log conversation
+        mira.log_conversation(user_input, {
+            'emotions_detected': emotion_results,
+            'bot_response': response
+        })
+        
+        return jsonify({'result': full_response})
+    
+    except Exception as e:
+        logging.error(f"Error processing message: {e}")
+        return jsonify({'result': "Sorry, I encountered an error. Please try again."})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

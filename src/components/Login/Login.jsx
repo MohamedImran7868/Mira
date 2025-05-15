@@ -1,9 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../Header";
+import Header from "../Common/Header";
 import styles from "./Login.module.css";
 import { useAuth } from "../../AuthContext";
-import googleImage from "../../assets/google.png";
+import { FaGoogle, FaEnvelope, FaLock, FaArrowLeft, FaPaperPlane } from "react-icons/fa";
+import LoadingModal from "../Common/LoadingModal";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -11,31 +12,23 @@ const LoginScreen = () => {
   const [error, setError] = useState(null);
   const [resetEmail, setResetEmail] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Sent Reset Password
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetMessage, setResetMessage] = useState("");
-
-  // Resend verification
   const [showResendVerification, setShowResendVerification] = useState(false);
 
-  const { signIn, signInWithGoogle, resetPassword, resendVerification } =
-    useAuth();
+  const { signIn, signInWithGoogle, resetPassword, resendVerification } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-
   const from = location.state?.from?.pathname || "/chat";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     setShowResendVerification(false);
 
     try {
       const { data, error: authError } = await signIn(email, password);
-
       if (authError) {
         if (authError.needsVerification) {
           setError(authError.message);
@@ -64,6 +57,7 @@ const LoginScreen = () => {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     try {
       await signInWithGoogle();
     } catch (err) {
@@ -90,63 +84,113 @@ const LoginScreen = () => {
     }
   };
 
+  if (loading) {
+    return <LoadingModal message="Logging In..." />;
+  }
+
   return (
     <>
       <Header />
       <div className={styles.container}>
-        <div className={styles.formContainer}>
+        <div className={styles.card}>
           {showResetForm ? (
-            <div className={styles.resetForm}>
-              <h3>Reset Password</h3>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                required
+            <div className={styles.resetContainer}>
+              <button 
+                onClick={() => setShowResetForm(false)}
+                className={styles.backButton}
+              >
+                <FaArrowLeft /> Back to Login
+              </button>
+              
+              <div className={styles.resetHeader}>
+                <h2>Reset Password</h2>
+                <p>Enter your email to receive a reset link</p>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>
+                  <FaEnvelope className={styles.inputIcon} />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className={styles.inputField}
+                />
+              </div>
+
+              <button 
+                onClick={handlePasswordReset} 
                 disabled={loading}
-              />
-              <button onClick={handlePasswordReset} disabled={loading}>
+                className={styles.resetButton}
+              >
+                <FaPaperPlane className={styles.buttonIcon} />
                 {loading ? "Sending..." : "Send Reset Link"}
               </button>
-              <button
-                onClick={() => setShowResetForm(false)}
-                disabled={loading}
-              >
-                Back to Login
-              </button>
+
               {resetMessage && (
-                <p className={styles.resetMessage}>{resetMessage}</p>
+                <div className={resetMessage.includes("sent") ? styles.successMessage : styles.errorMessage}>
+                  {resetMessage}
+                </div>
               )}
             </div>
           ) : (
             <>
+              <div className={styles.loginHeader}>
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue to your account</p>
+              </div>
+
               <form onSubmit={handleSubmit} className={styles.form}>
-                <h2>Enter Your Information</h2>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  name="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  autoComplete="true"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>
+                    <FaEnvelope className={styles.inputIcon} />
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                    className={styles.inputField}
+                    autoComplete="email"
+                  />
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>
+                    <FaLock className={styles.inputIcon} />
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    disabled={loading}
+                    className={styles.inputField}
+                    autoComplete="current-password"
+                  />
+                </div>
+
+                <button 
+                  type="button"
+                  onClick={() => setShowResetForm(true)}
+                  className={styles.forgotPassword}
+                >
+                  Forgot password?
+                </button>
+
                 {error && (
                   <div className={styles.errorMessage}>
-                    {error}
+                    <div>{error}</div>
                     {showResendVerification && (
                       <button
                         type="button"
@@ -158,31 +202,38 @@ const LoginScreen = () => {
                     )}
                   </div>
                 )}
-                <button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
+
+                <button 
+                  type="submit" 
+                  disabled={loading}
+                  className={styles.loginButton}
+                >
+                  {loading ? "Signing In..." : "Sign In"}
                 </button>
               </form>
-              <p
-                className={styles.forgotPassword}
-                onClick={() => !loading && setShowResetForm(true)}
-              >
-                Forgot password?
-              </p>
-              <p className={styles.or}>or</p>
+
+              <div className={styles.divider}>
+                <span>or continue with</span>
+              </div>
+
               <button
                 onClick={handleGoogleLogin}
-                className={styles.googlebtn}
                 disabled={loading}
+                className={styles.googleButton}
               >
-                <img src={googleImage} alt="google img" />
-                Sign In With Google
+                <FaGoogle className={styles.googleIcon} />
+                Sign in with Google
               </button>
-              <p className={styles.register}>
+
+              <div className={styles.registerPrompt}>
                 Don't have an account?{" "}
-                <span onClick={() => !loading && navigate("/register")}>
-                  Register
-                </span>
-              </p>
+                <button 
+                  onClick={() => !loading && navigate("/register")}
+                  className={styles.registerLink}
+                >
+                  Create account
+                </button>
+              </div>
             </>
           )}
         </div>

@@ -6,14 +6,64 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const getUserProfile = async () => {
+    try {
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
+      // Fetch from your user table
+      const { data: userData, error } = await supabase
+        .from("user")
+        .select("*")
+        .eq("userID", authUser.id)
+        .single();
+
+      if (error) throw error;
+
+      // Combine auth user with custom user data
+      const completeUser = {
+        ...authUser,
+        ...userData,
+        role: userData.role, // Ensure role is included
+      };
+
+      setUser(completeUser);
+      setUserProfile(userData);
+
+      // For student role, fetch additional data
+      if (userData.role === "student") {
+        const { data: studentData } = await supabase
+          .from("students")
+          .select("*")
+          .eq("userID", authUser.id)
+          .single();
+
+        setUserProfile((prev) => ({ ...prev, ...studentData }));
+      }
+
+      return completeUser;
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
     // Fetch initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        // This updates the global user state
+        getUserProfile();
+      } else {
+        setUser(null);
+        setUserProfile(null);
+      }
+
       setLoading(false);
     });
 
@@ -36,6 +86,7 @@ export function AuthProvider({ children }) {
   const value = {
     session,
     user,
+    userProfile,
     isLoading: loading,
 
     // Sign in with email/password
@@ -183,42 +234,6 @@ export function AuthProvider({ children }) {
       return data;
     },
 
-    // Fetch user Profile
-    getUserProfile: async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        // Get user data
-        const { data: userData, error } = await supabase
-          .from("user")
-          .select(`*`)
-          .eq("userID", user.id)
-          .single();
-
-        if (error) throw error;
-        setUserImage(userData.user_image);
-
-        // Get student data if role is student
-        if (userData.role === "student") {
-          const { data: studentData, error: studentError } = await supabase
-            .from("students")
-            .select("*")
-            .eq("userID", user.id)
-            .single();
-
-          if (studentError) throw studentError;
-          return { ...userData, ...studentData };
-        }
-
-        return userData;
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        throw error;
-      }
-    },
-
     // Generate the public path for the image
     getImageUrl: (path) => {
       return `${supabase.supabaseUrl}/storage/v1/object/public/profile-picture/${path}`;
@@ -232,16 +247,8 @@ export function AuthProvider({ children }) {
           data: { user },
         } = await supabase.auth.getUser();
 
-        // Update auth user data if email is changing
-        if (updates.email) {
-          const { error: authError } = await supabase.auth.updateUser({
-            email: updates.email,
-          });
-          if (authError) throw authError;
-        }
-
-        // Update custom user table
-        const { data, error } = await supabase
+        // First, update the user table
+        const { data: userData, error: userError } = await supabase
           .from("user")
           .update({
             user_name: updates.name,
@@ -249,25 +256,36 @@ export function AuthProvider({ children }) {
             updated_at: new Date().toISOString(),
           })
           .eq("userID", user.id)
-          .select();
+          .select()
+          .single();
 
-        if (error) throw error;
+        if (userError) throw userError;
 
-        // Update student table if role is student
-        if (updates.birthday || updates.age) {
-          const { error: studentError } = await supabase
-            .from("students")
-            .update({
-              student_birthday: updates.birthday,
-              student_age: updates.age,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("userID", user.id);
+        // Then, update the students table
+        const { data: studentData, error: studentError } = await supabase
+          .from("students")
+          .update({
+            student_birthday: updates.birthday,
+            student_age: updates.age,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("userID", user.id)
+          .select()
+          .single();
 
-          if (studentError) throw studentError;
-        }
+        if (studentError) throw studentError;
 
-        return data;
+        // Combine the updated data
+        const updatedProfile = {
+          ...userProfile,
+          ...userData,
+          ...studentData,
+        };
+
+        // Update the context state
+        setUserProfile(updatedProfile);
+
+        return updatedProfile;
       } catch (error) {
         console.error("Error updating profile:", error);
         throw error;
@@ -280,7 +298,6 @@ export function AuthProvider({ children }) {
     uploadProfileImage: async (file) => {
       try {
         const fileName = `${user.id}-${Date.now()}.webp`;
-        console.log(userImage);
 
         // Upload to storage
         const { error: uploadError } = await supabase.storage
