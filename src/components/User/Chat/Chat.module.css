@@ -60,6 +60,60 @@
   transition: left 0.3s ease;
 }
 
+/* Chat Edit button (Delete or rename) */
+.chatItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.chatName {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chatActions {
+  display: flex;
+  gap: 8px;
+}
+
+.chatActionButton {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.chatEditContainer {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.chatNameInput {
+  width: 100%;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.chatEditButton{
+  border: none;
+  background: none;
+}
+
+.chatActionButton:hover, .chatEditButton:hover{
+  color: var(--color-primary);
+}
+
 /* Top Profile Section */
 .topContainer {
   display: flex;

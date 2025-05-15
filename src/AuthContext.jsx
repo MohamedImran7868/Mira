@@ -43,7 +43,11 @@ export function AuthProvider({ children }) {
           .single();
 
         setUserProfile((prev) => ({ ...prev, ...studentData }));
+
+        console.log("User Profile: ", studentData);
       }
+
+      console.log("User: ", completeUser);
 
       return completeUser;
     } catch (error) {
@@ -171,7 +175,7 @@ export function AuthProvider({ children }) {
           ])
           .select();
 
-        // Step 2: Create student record in students table
+        // Step 3: Create student record in students table
         const { data: studentRecord, error: dbError } = await supabase
           .from("students")
           .insert([
@@ -325,15 +329,6 @@ export function AuthProvider({ children }) {
     // Upload feedback
     uploadFeedback: async (feedback) => {
       try {
-        // Get user data
-        const { data: userData, error: userError } = await supabase
-          .from("user")
-          .select(`*`)
-          .eq("userID", user.id)
-          .single();
-
-        if (userError) throw userError;
-
         // Insert feedback
         const { data, error } = await supabase
           .from("feedback")
@@ -343,8 +338,8 @@ export function AuthProvider({ children }) {
               feedback_category: feedback.category,
               feedback_rating: feedback.rating,
               feedback_message: feedback.message,
-              feedback_by: userData.user_name,
-              user_Id: user.id,
+              feedback_by: user.user_name,
+              user_Id: userProfile?.studentid,
             },
           ])
           .select();
@@ -356,6 +351,129 @@ export function AuthProvider({ children }) {
         throw error;
       }
     },
+
+    // Chat-related functions
+    getChatSessions: async () => {
+      try {
+        if (!userProfile?.studentid) return [];
+        
+        const { data, error } = await supabase
+          .from('chatsession')
+          .select('*')
+          .eq('studentid', userProfile.studentid)
+          .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error fetching chat sessions:', error);
+        return [];
+      }
+    },
+
+    getChatMessages: async (chatId) => {
+      try {
+        const { data, error } = await supabase
+          .from('message')
+          .select('*')
+          .eq('chatid', chatId)
+          .order('message_timestamp', { ascending: true });
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error fetching chat messages:', error);
+        return [];
+      }
+    },
+
+    createChatSession: async () => {
+      try {
+        if (!userProfile?.studentid) throw new Error('User not authenticated');
+        
+        const { data, error } = await supabase
+          .from('chatsession')
+          .insert([{ studentid: userProfile.studentid }])
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error creating chat session:', error);
+        throw error;
+      }
+    },
+
+    saveMessage: async (chatId, message, sender) => {
+      try {
+        const { data, error } = await supabase
+          .from('message')
+          .insert([{
+            chatid: chatId,
+            message_content: message,
+            sender: sender
+          }])
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error saving message:', error);
+        throw error;
+      }
+    },
+
+    updateChatName: async (chatId, newName) => {
+      try {
+        const { data, error } = await supabase
+          .from('chatsession')
+          .update({ chat_name: newName })
+          .eq('chatid', chatId)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error updating chat name:', error);
+        throw error;
+      }
+    },
+
+    deleteChatSession: async (chatId) => {
+      try {
+        // Messages will be automatically deleted due to CASCADE
+        const { error } = await supabase
+          .from('chatsession')
+          .delete()
+          .eq('chatid', chatId);
+        
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error('Error deleting chat session:', error);
+        throw error;
+      }
+    },
+
+    endChatSession: async (chatId) => {
+      try {
+        const { data, error } = await supabase
+          .from('chatsession')
+          .update({ end_date: new Date().toISOString() })
+          .eq('chatid', chatId)
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error('Error ending chat session:', error);
+        throw error;
+      }
+    }
   };
 
   return (
@@ -372,3 +490,42 @@ export function useAuth() {
   }
   return context;
 }
+
+/* Sample User ID
+User Profile: 
+created_at: "2025-05-10T05:50:59.002925+00:00"
+status: "active"
+student_age: 22
+student_birthday: "2003-04-01"
+studentid: "ab279076-cab2-4448-867e-ac9cd3dfae47"
+updated_at: "2025-05-15T00:05:48.739288+00:00"
+userID: "d5cf7dd4-c488
+
+
+User:
+app_metadata: {provider: 'email', providers: Array(2)}
+aud: "authenticated"
+confirmation_sent_at: "2025-05-10T05:50:56.52414Z"
+confirmed_at: "2025-05-10T05:51:20.812614Z"
+created_at: "2025-05-10T05:50:58.910777+00:00"
+email: "imranwork7868@gmail.com"
+email_confirmed_at: "2025-05-10T05:51:20.812614Z"
+id: "d5cf7dd4-c488-48d8-a592-5b6d5982e392"
+identities: (2) [{…}, {…}]
+is_anonymous: false
+last_sign_in_at: "2025-05-15T02:27:06.705429Z"
+phone: ""
+role: "student"
+updated_at: "2025-05-15T00:05:49.389+00:00"
+userID: "d5cf7dd4-c488-48d8-a592-5b6d5982e392"
+user_email: "imranwork7868@gmail.com"
+user_image: "d5cf7dd4-c488-48d8-a592-5b6d5982e392-1747229231606.webp"
+user_metadata: {
+  age: 22, avatar_url: 'https://lh3.googleusercontent.com/a/ACg8ocIDdASIa0MbnIO68QwZtNr-F7SQ-3jY-EqLpOscHBXMA8DtXA=s96-c', 
+  birthday: '2003-04-01', 
+  email: 'imranwork7868@gmail.com',
+  email_verified: true, 
+…}
+user_name: "Mohamed Imran Bin Mohamed Yunus"
+user_password:
+*/

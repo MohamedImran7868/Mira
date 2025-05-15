@@ -3,8 +3,6 @@ import { useAuth } from "../../AuthContext";
 import Header from "../Common/Header";
 import styles from "./Profile.module.css";
 import LoadingModal from "../Common/LoadingModal";
-import showPasswordImg from "../../assets/show.png";
-import hidePasswordImg from "../../assets/hide.png";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const Profile = () => {

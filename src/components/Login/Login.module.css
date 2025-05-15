@@ -141,6 +141,11 @@
   text-decoration: underline;
 }
 
+.resetContainer{
+  display: flex;
+  flex-direction: column;
+}
+
 .loginButton, .resetButton {
   background: var(--color-primary);
   color: white;
@@ -155,6 +160,10 @@
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
+}
+
+.resetButton{
+  margin-top: 20px;
 }
 
 .loginButton:hover:not(:disabled), .resetButton:hover:not(:disabled) {
