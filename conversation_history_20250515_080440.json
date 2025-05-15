@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp": "2025-05-15T08:04:19.997226",
+    "user_input": "Hi",
+    "response": {
+      "emotions_detected": [
+        {
+          "emotion": "neutral",
+          "confidence": 0.9640623331069946
+        },
+        {
+          "emotion": "approval",
+          "confidence": 0.01664872281253338
+        }
+      ],
+      "bot_response": "I see. How can I support you today?"
+    }
+  },
+  {
+    "timestamp": "2025-05-15T08:04:22.735942",
+    "user_input": "save",
+    "response": {
+      "emotions_detected": [
+        {
+          "emotion": "neutral",
+          "confidence": 0.9653769135475159
+        },
+        {
+          "emotion": "approval",
+          "confidence": 0.01351756788790226
+        }
+      ],
+      "bot_response": "I see. How can I support you today?"
+    }
+  },
+  {
+    "timestamp": "2025-05-15T08:04:27.057307",
+    "user_input": "fuck u",
+    "response": {
+      "emotions_detected": [
+        {
+          "emotion": "anger",
+          "confidence": 0.8183272480964661
+        },
+        {
+          "emotion": "annoyance",
+          "confidence": 0.10669918358325958
+        }
+      ],
+      "bot_response": "It's okay to feel angry. Take a deep breath. \ud83c\udf2a\ufe0f"
+    }
+  }
+]

@@ -27,7 +27,7 @@ def process_message():
         emotion_strings = [f"{er['emotion']} ({er['confidence']:.0%})" for er in emotion_results]
         emotion_display = ", ".join(emotion_strings)
         
-        full_response = f"I sense you're feeling {emotion_display}.\n{response}"
+        full_response = f"{response}"
         
         # Log conversation
         mira.log_conversation(user_input, {
