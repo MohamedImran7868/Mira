@@ -31,6 +31,7 @@ class MIRA:
                 model=self.model_name,
                 device=self.device,
                 top_k=None,
+                function_to_apply="sigmoid",
                 return_all_scores=True
             )
             logger.info(f"Model '{model_name}' loaded successfully on {'GPU' if self.device == 0 else 'CPU'}.")
@@ -40,16 +41,15 @@ class MIRA:
             exit(1)
 
         # Load LLaMA model
-        llama_model_path = "C:\\Users\\Shadow\\OneDrive\\Documents\\MIRA\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+        llama_model_path = "C:\\Users\\Shadow\\OneDrive\\Documents\\MIRA\\llama-2-7b-chat.Q4_K_M.gguf"
         try:
             self.llama = Llama(
                 model_path=llama_model_path,
-                n_ctx=1024,  # Reduce context size for faster response
-                n_threads=min(8, os.cpu_count() or 6),
-                n_batch=32,  # Reduce batch size for lower latency
-                use_mlock=True,
-                use_mmap=True,
-                n_gpu_layers=32 if torch.cuda.is_available() else 0
+                n_ctx=1024,
+                n_threads=6,
+                n_batch=64,
+                n_gpu_layers=35,  # Adjust according to your GPU VRAM
+                verbose=False
             )
             logger.info("LLaMA model loaded successfully.")
         except Exception as e:
@@ -101,22 +101,21 @@ class MIRA:
 
         try:
             prompt = f"""You are MIRA, a friendly and emotionally intelligent chatbot.
-
 The user seems to be feeling {emotion_summary}.
-Respond kindly and empathetically to their input.
+Respond kindly and empathetically to this input:
 
 User: {user_input}
 MIRA:"""
 
             output = self.llama(
                 prompt,
-                max_tokens=192,
+                max_tokens=256,
                 temperature=0.7,
                 top_p=0.9,
-                stop=["\nUser:", "\nMIRA:", "\nThis response"]
+                stop=["User:", "MIRA:"]
             )
 
-            return output["choices"][0]["text"].strip().split("\n")[0]
+            return output["choices"][0]["text"].strip()
 
         except Exception as e:
             logger.error(f"LLaMA response generation failed: {e}", exc_info=True)
@@ -159,8 +158,7 @@ MIRA:"""
                 emotion_summary = ", ".join([
                     f"{er['emotion']} ({er['confidence']:.0%})"
                     for er in emotion_results
-                    if er["emotion"] != "error"
-                ]) or "unclear emotions"
+                ])
 
                 llama_response = self.generate_llama_response(user_input, emotion_summary)
 
