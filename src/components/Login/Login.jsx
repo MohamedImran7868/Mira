@@ -55,18 +55,6 @@ const LoginScreen = () => {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handlePasswordReset = async () => {
     if (!resetEmail) {
       setResetMessage("Please enter your email address");
@@ -211,19 +199,6 @@ const LoginScreen = () => {
                   {loading ? "Signing In..." : "Sign In"}
                 </button>
               </form>
-
-              <div className={styles.divider}>
-                <span>or continue with</span>
-              </div>
-
-              <button
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                className={styles.googleButton}
-              >
-                <FaGoogle className={styles.googleIcon} />
-                Sign in with Google
-              </button>
 
               <div className={styles.registerPrompt}>
                 Don't have an account?{" "}
