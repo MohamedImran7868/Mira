@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Header from "../Common/Header";
 import styles from "./Login.module.css";
 import { useAuth } from "../../AuthContext";
-import { FaGoogle, FaEnvelope, FaLock, FaArrowLeft, FaPaperPlane } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaArrowLeft, FaPaperPlane } from "react-icons/fa";
 import LoadingModal from "../Common/LoadingModal";
 
 const LoginScreen = () => {
@@ -16,10 +16,8 @@ const LoginScreen = () => {
   const [resetMessage, setResetMessage] = useState("");
   const [showResendVerification, setShowResendVerification] = useState(false);
 
-  const { signIn, signInWithGoogle, resetPassword, resendVerification } = useAuth();
+  const { signIn, resetPassword, resendVerification } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-  const from = location.state?.from?.pathname || "/chat";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -38,7 +36,7 @@ const LoginScreen = () => {
         }
         return;
       }
-      navigate(from, { replace: true });
+      navigate("/chat");
     } catch (err) {
       setError(err.message);
     } finally {
@@ -52,18 +50,6 @@ const LoginScreen = () => {
       setShowResendVerification(false);
     } catch (err) {
       console.error("Resend failed:", err);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -211,19 +197,6 @@ const LoginScreen = () => {
                   {loading ? "Signing In..." : "Sign In"}
                 </button>
               </form>
-
-              <div className={styles.divider}>
-                <span>or continue with</span>
-              </div>
-
-              <button
-                onClick={handleGoogleLogin}
-                disabled={loading}
-                className={styles.googleButton}
-              >
-                <FaGoogle className={styles.googleIcon} />
-                Sign in with Google
-              </button>
 
               <div className={styles.registerPrompt}>
                 Don't have an account?{" "}

@@ -6,7 +6,7 @@ import Home from './components/Home/Home.jsx';
 import Login from './components/Login/Login.jsx';
 import Register from './components/Register/Register.jsx';
 import Chat from './components/User/Chat/Chat.jsx';
-import CompleteProfile from './components/User/CompleteProfile/CompleteProfile.jsx';
+import CompleteProfile from './components/Common/CompleteProfile/CompleteProfile.jsx';
 import Feedback from './components/User/Feedback/Feedback.jsx';
 import Profile from './components/Profile/Profile.jsx';
 import AdminDashboard from './components/Admin/Admin-Dashboard/AdminDashboard.jsx';

@@ -202,19 +202,7 @@ export function AuthProvider({ children }) {
         setLoading(false);
       }
     },
-
-    // SignIn with google
-    signInWithGoogle: async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/chat",
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-
+    
     // SignOut
     signOut: async () => {
       const { error } = await supabase.auth.signOut();
