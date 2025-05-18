@@ -13,88 +13,110 @@ export function AuthProvider({ children }) {
     try {
       const {
         data: { user: authUser },
+        error: authError,
       } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!authUser) return null;
 
-      // Fetch from your user table
+      // Fetch from user table with timeout
       const { data: userData, error } = await supabase
         .from("user")
         .select("*")
         .eq("userID", authUser.id)
-        .single();
+        .maybeSingle(); // Use maybeSingle instead of single
 
-      if (error) throw error;
+      if (error || !userData) {
+        console.error("Profile not found");
+        return null;
+      }
 
       // Combine auth user with custom user data
       const completeUser = {
         ...authUser,
         ...userData,
-        role: userData.role, // Ensure role is included
       };
 
       setUser(completeUser);
       setUserProfile(userData);
 
-      // For student role, fetch additional data
+      // Fetch role data only if needed
       if (userData.role === "student") {
         const { data: studentData } = await supabase
           .from("students")
           .select("*")
           .eq("userID", authUser.id)
-          .single();
-
+          .maybeSingle();
         setUserProfile((prev) => ({ ...prev, ...studentData }));
-
-        console.log("User Profile: ", studentData);
-      } else if (userData.role === "admin"){
+      } else if (userData.role === "admin") {
         const { data: adminData } = await supabase
           .from("admin")
           .select("*")
           .eq("userID", authUser.id)
-          .single();
-
+          .maybeSingle();
         setUserProfile((prev) => ({ ...prev, ...adminData }));
-
-        console.log("User Profile: ", adminData);
       }
-
-      console.log("User: ", completeUser);
 
       return completeUser;
     } catch (error) {
       console.error("Error fetching profile:", error);
-      throw error;
+      setLoading(false);
+      return null;
     }
   };
 
   useEffect(() => {
-    // Fetch initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+    let isMounted = true;
+
+    const initializeAuth = async () => {
+      try {
+        // First check local session to avoid flash
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!isMounted) return;
+
+        if (session?.user) {
+          await getUserProfile(session.user);
+        } else {
+          setUser(null);
+          setUserProfile(null);
+        }
+      } catch (error) {
+        console.error("Auth init error:", error);
+        if (isMounted) {
+          setUser(null);
+          setUserProfile(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Add small delay to allow session restoration
+    const timer = setTimeout(() => {
+      initializeAuth();
+    }, 100); // 100ms delay helps prevent race conditions
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
       if (session?.user) {
-        // This updates the global user state
-        getUserProfile();
+        getUserProfile(session.user);
       } else {
         setUser(null);
         setUserProfile(null);
       }
-
-      setLoading(false);
     });
 
-    // Listen for auth state changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      // Handle password recovery
-      if (event === "PASSWORD_RECOVERY") {
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const value = {
@@ -103,13 +125,18 @@ export function AuthProvider({ children }) {
     userProfile,
     isLoading: loading,
 
-    // Sign in with email/password
     signIn: async (email, password) => {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
+      setLoading(true);
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+
+        const profile = await getUserProfile();
+        return { data, profile };
+      } catch (error) {
         if (error.message === "Email not confirmed") {
           return {
             error: {
@@ -120,9 +147,69 @@ export function AuthProvider({ children }) {
           };
         }
         throw error;
+      } finally {
+        setLoading(false);
       }
-      getUserProfile();
-      return data;
+    },
+
+    registerStudent: async (email, password, studentData) => {
+      setLoading(true);
+      try {
+        // 1. Create auth user
+        const { data: authData, error: authError } = await supabase.auth.signUp(
+          {
+            email,
+            password,
+            options: {
+              data: {
+                full_name: studentData.name,
+                role: "student",
+              },
+              emailRedirectTo: `${window.location.origin}/login`,
+            },
+          }
+        );
+        if (authError) throw authError;
+
+        // 2. Create user record
+        const { error: userError } = await supabase.from("user").insert([
+          {
+            userID: authData.user.id,
+            user_name: studentData.name,
+            user_email: email,
+            role: "student",
+          },
+        ]);
+        if (userError) throw userError;
+
+        // 3. Create student record
+        const { error: studentError } = await supabase.from("students").insert([
+          {
+            userID: authData.user.id,
+            student_birthday: studentData.birthday,
+            student_age: studentData.age,
+            status: "active",
+          },
+        ]);
+        if (studentError) throw studentError;
+
+        return authData;
+      } catch (error) {
+        console.error("Registration error:", error);
+        throw error;
+      } finally {
+        setLoading(false);
+      }
+    },
+
+    signOut: async () => {
+      try {
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+      } catch (error) {
+        console.error("Sign out error:", error);
+        throw error;
+      }
     },
 
     // Resend verification email
@@ -149,76 +236,6 @@ export function AuthProvider({ children }) {
       }
     },
 
-    // Register a new Student
-    registerStudent: async (email, password, studentData) => {
-      setLoading(true);
-      try {
-        // Step 1: Create auth user
-        const { data: authData, error: authError } = await supabase.auth.signUp(
-          {
-            email,
-            password,
-            options: {
-              data: {
-                full_name: studentData.name,
-                age: studentData.age,
-                birthday: studentData.birthday,
-                role: "student", // Set default role
-              },
-              emailRedirectTo: `${window.location.origin}/login`,
-            },
-          }
-        );
-
-        if (authError) throw authError;
-
-        // Step 2: Create User record in user table
-        const { data: userRecord, error } = await supabase
-          .from("user")
-          .insert([
-            {
-              userID: authData.user.id,
-              user_name: studentData.name,
-              user_email: email,
-              user_password: password,
-              role: "student",
-            },
-          ])
-          .select();
-
-        // Step 3: Create student record in students table
-        const { data: studentRecord, error: dbError } = await supabase
-          .from("students")
-          .insert([
-            {
-              student_birthday: studentData.birthday,
-              student_age: studentData.age,
-              status: "active", // Default status
-              userID: authData.user.id,
-            },
-          ])
-          .select();
-
-        if (dbError) throw dbError;
-
-        return {
-          authData,
-          studentData: studentRecord[0],
-        };
-      } catch (error) {
-        console.error("Registration error:", error);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-    
-    // SignOut
-    signOut: async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    },
-
     // Reset Password
     resetPassword: async (email) => {
       const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
@@ -230,7 +247,6 @@ export function AuthProvider({ children }) {
 
     // Update password
     updatePassword: async (newPassword) => {
-
       // Update Auth table
       const { data, error } = await supabase.auth.updateUser({
         password: newPassword,
@@ -239,13 +255,13 @@ export function AuthProvider({ children }) {
 
       // Update user table password
       const { data: userData, error: userError } = await supabase
-          .from("user")
-          .update({
-            user_password: newPassword,
-          })
-          .eq("userID", user.id)
-          .select()
-          .single();
+        .from("user")
+        .update({
+          user_password: newPassword,
+        })
+        .eq("userID", user.id)
+        .select()
+        .single();
 
       return data;
     },
@@ -490,11 +506,7 @@ export function AuthProvider({ children }) {
     },
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
@@ -506,40 +518,6 @@ export function useAuth() {
 }
 
 /* Sample User ID
-User Profile: 
-created_at: "2025-05-10T05:50:59.002925+00:00"
-status: "active"
-student_age: 22
-student_birthday: "2003-04-01"
-studentid: "ab279076-cab2-4448-867e-ac9cd3dfae47"
-updated_at: "2025-05-15T00:05:48.739288+00:00"
-userID: "d5cf7dd4-c488
 
 
-User:
-app_metadata: {provider: 'email', providers: Array(2)}
-aud: "authenticated"
-confirmation_sent_at: "2025-05-10T05:50:56.52414Z"
-confirmed_at: "2025-05-10T05:51:20.812614Z"
-created_at: "2025-05-10T05:50:58.910777+00:00"
-email: "imranwork7868@gmail.com"
-email_confirmed_at: "2025-05-10T05:51:20.812614Z"
-id: "d5cf7dd4-c488-48d8-a592-5b6d5982e392"
-identities: (2) [{…}, {…}]
-is_anonymous: false
-last_sign_in_at: "2025-05-15T02:27:06.705429Z"
-phone: ""
-role: "student"
-updated_at: "2025-05-15T00:05:49.389+00:00"
-userID: "d5cf7dd4-c488-48d8-a592-5b6d5982e392"
-user_email: "imranwork7868@gmail.com"
-user_image: "d5cf7dd4-c488-48d8-a592-5b6d5982e392-1747229231606.webp"
-user_metadata: {
-  age: 22, avatar_url: 'https://lh3.googleusercontent.com/a/ACg8ocIDdASIa0MbnIO68QwZtNr-F7SQ-3jY-EqLpOscHBXMA8DtXA=s96-c', 
-  birthday: '2003-04-01', 
-  email: 'imranwork7868@gmail.com',
-  email_verified: true, 
-…}
-user_name: "Mohamed Imran Bin Mohamed Yunus"
-user_password:
 */
