@@ -111,6 +111,7 @@ export function AuthProvider({ children }) {
         }
         throw error;
       }
+      getUserProfile();
       return data;
     },
 
@@ -219,10 +220,23 @@ export function AuthProvider({ children }) {
 
     // Update password
     updatePassword: async (newPassword) => {
+
+      // Update Auth table
       const { data, error } = await supabase.auth.updateUser({
         password: newPassword,
       });
       if (error) throw error;
+
+      // Update user table password
+      const { data: userData, error: userError } = await supabase
+          .from("user")
+          .update({
+            user_password: newPassword,
+          })
+          .eq("userID", user.id)
+          .select()
+          .single();
+
       return data;
     },
 
@@ -344,17 +358,17 @@ export function AuthProvider({ children }) {
     getChatSessions: async () => {
       try {
         if (!userProfile?.studentid) return [];
-        
+
         const { data, error } = await supabase
-          .from('chatsession')
-          .select('*')
-          .eq('studentid', userProfile.studentid)
-          .order('created_at', { ascending: false });
-        
+          .from("chatsession")
+          .select("*")
+          .eq("studentid", userProfile.studentid)
+          .order("created_at", { ascending: false });
+
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error fetching chat sessions:', error);
+        console.error("Error fetching chat sessions:", error);
         return [];
       }
     },
@@ -362,33 +376,33 @@ export function AuthProvider({ children }) {
     getChatMessages: async (chatId) => {
       try {
         const { data, error } = await supabase
-          .from('message')
-          .select('*')
-          .eq('chatid', chatId)
-          .order('message_timestamp', { ascending: true });
-        
+          .from("message")
+          .select("*")
+          .eq("chatid", chatId)
+          .order("message_timestamp", { ascending: true });
+
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error fetching chat messages:', error);
+        console.error("Error fetching chat messages:", error);
         return [];
       }
     },
 
     createChatSession: async () => {
       try {
-        if (!userProfile?.studentid) throw new Error('User not authenticated');
-        
+        if (!userProfile?.studentid) throw new Error("User not authenticated");
+
         const { data, error } = await supabase
-          .from('chatsession')
+          .from("chatsession")
           .insert([{ studentid: userProfile.studentid }])
           .select()
           .single();
-        
+
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error creating chat session:', error);
+        console.error("Error creating chat session:", error);
         throw error;
       }
     },
@@ -396,19 +410,21 @@ export function AuthProvider({ children }) {
     saveMessage: async (chatId, message, sender) => {
       try {
         const { data, error } = await supabase
-          .from('message')
-          .insert([{
-            chatid: chatId,
-            message_content: message,
-            sender: sender
-          }])
+          .from("message")
+          .insert([
+            {
+              chatid: chatId,
+              message_content: message,
+              sender: sender,
+            },
+          ])
           .select()
           .single();
-        
+
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error saving message:', error);
+        console.error("Error saving message:", error);
         throw error;
       }
     },
@@ -416,16 +432,16 @@ export function AuthProvider({ children }) {
     updateChatName: async (chatId, newName) => {
       try {
         const { data, error } = await supabase
-          .from('chatsession')
+          .from("chatsession")
           .update({ chat_name: newName })
-          .eq('chatid', chatId)
+          .eq("chatid", chatId)
           .select()
           .single();
-        
+
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error updating chat name:', error);
+        console.error("Error updating chat name:", error);
         throw error;
       }
     },
@@ -434,14 +450,14 @@ export function AuthProvider({ children }) {
       try {
         // Messages will be automatically deleted due to CASCADE
         const { error } = await supabase
-          .from('chatsession')
+          .from("chatsession")
           .delete()
-          .eq('chatid', chatId);
-        
+          .eq("chatid", chatId);
+
         if (error) throw error;
         return true;
       } catch (error) {
-        console.error('Error deleting chat session:', error);
+        console.error("Error deleting chat session:", error);
         throw error;
       }
     },
@@ -449,19 +465,19 @@ export function AuthProvider({ children }) {
     endChatSession: async (chatId) => {
       try {
         const { data, error } = await supabase
-          .from('chatsession')
+          .from("chatsession")
           .update({ end_date: new Date().toISOString() })
-          .eq('chatid', chatId)
+          .eq("chatid", chatId)
           .select()
           .single();
-        
+
         if (error) throw error;
         return data;
       } catch (error) {
-        console.error('Error ending chat session:', error);
+        console.error("Error ending chat session:", error);
         throw error;
       }
-    }
+    },
   };
 
   return (
