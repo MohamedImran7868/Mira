@@ -103,24 +103,26 @@ const CompleteProfile = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    //console.log(user.role);
+    navigate("/admin-dashboard", { replace: true });
 
-    try {
-      validateForm();
+    // try {
+    //   validateForm();
 
-      if (user.role === "admin") {
-        // await CompleteAdminProfile(editData);
+    //   if (user.role === "admin") {
+    //     await CompleteAdminProfile(editData);
 
-        // if (passwordData.password) {
-        //   await updatePassword(passwordData.password);
-        // }
+    //     if (passwordData.password) {
+    //       await updatePassword(passwordData.password);
+    //     }
 
-        navigate("/admin-dashboard", { replace: true });
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    //     navigate("/admin-dashboard", { replace: true });
+    //   }
+    // } catch (err) {
+    //   setError(err.message);
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   return (
@@ -134,7 +136,7 @@ const CompleteProfile = () => {
 
         {error && <div className={styles.error}>{error}</div>}
 
-        <form className={styles.form} onSubmit={handleSubmit} autocomplete="off" >
+        <form className={styles.form} onSubmit={handleSubmit} autoComplete="off" >
           <div className={styles.inputGroup}>
             <label className={styles.label}>Full Name:</label>
             <input
