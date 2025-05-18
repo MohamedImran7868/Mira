@@ -10,9 +10,9 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const [resetEmail, setResetEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [showResendVerification, setShowResendVerification] = useState(false);
 
@@ -26,7 +26,8 @@ const LoginScreen = () => {
     setShowResendVerification(false);
 
     try {
-      const { data, error: authError } = await signIn(email, password);
+      const { data, profile, error: authError } = await signIn(email, password);
+
       if (authError) {
         if (authError.needsVerification) {
           setError(authError.message);
@@ -36,7 +37,15 @@ const LoginScreen = () => {
         }
         return;
       }
-      navigate("/chat");
+
+      console.log(profile?.role);
+
+      // Redirect based on role
+      if (profile?.role === "admin") {
+        navigate("/admin-dashboard");
+      } else {
+        navigate("/chat");
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -71,7 +80,7 @@ const LoginScreen = () => {
   };
 
   if (loading) {
-    return <LoadingModal message="Logging In..." />;
+    return <LoadingModal message={showResetForm ? "Processing..." : "Logging In..."} />;
   }
 
   return (
@@ -81,13 +90,13 @@ const LoginScreen = () => {
         <div className={styles.card}>
           {showResetForm ? (
             <div className={styles.resetContainer}>
-              <button 
+              <button
                 onClick={() => setShowResetForm(false)}
                 className={styles.backButton}
               >
                 <FaArrowLeft /> Back to Login
               </button>
-              
+
               <div className={styles.resetHeader}>
                 <h2>Reset Password</h2>
                 <p>Enter your email to receive a reset link</p>
@@ -109,8 +118,8 @@ const LoginScreen = () => {
                 />
               </div>
 
-              <button 
-                onClick={handlePasswordReset} 
+              <button
+                onClick={handlePasswordReset}
                 disabled={loading}
                 className={styles.resetButton}
               >
@@ -119,7 +128,13 @@ const LoginScreen = () => {
               </button>
 
               {resetMessage && (
-                <div className={resetMessage.includes("sent") ? styles.successMessage : styles.errorMessage}>
+                <div
+                  className={
+                    resetMessage.includes("sent")
+                      ? styles.successMessage
+                      : styles.errorMessage
+                  }
+                >
                   {resetMessage}
                 </div>
               )}
@@ -166,7 +181,7 @@ const LoginScreen = () => {
                   />
                 </div>
 
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowResetForm(true)}
                   className={styles.forgotPassword}
@@ -189,8 +204,8 @@ const LoginScreen = () => {
                   </div>
                 )}
 
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className={styles.loginButton}
                 >
@@ -200,7 +215,7 @@ const LoginScreen = () => {
 
               <div className={styles.registerPrompt}>
                 Don't have an account?{" "}
-                <button 
+                <button
                   onClick={() => !loading && navigate("/register")}
                   className={styles.registerLink}
                 >
