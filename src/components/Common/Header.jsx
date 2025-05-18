@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../../AuthContext";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logo from "../../assets/Logo.png";
 import LogoutPopup from "./LogoutPopup";
 import { IoLogOut } from "react-icons/io5";
@@ -10,12 +10,10 @@ function Header() {
   const { signOut, user } = useAuth();
   const [showPopup, setShowPopup] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
-  const navigate = useNavigate();
 
   const logout = async () => {
     try {
       await signOut();
-      navigate("/chat");
     } catch (err) {
       console.error("Error signing out:", err.message);
     }
