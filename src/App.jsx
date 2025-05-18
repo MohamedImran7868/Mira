@@ -6,7 +6,6 @@ import Home from './components/Home/Home.jsx';
 import Login from './components/Login/Login.jsx';
 import Register from './components/Register/Register.jsx';
 import Chat from './components/User/Chat/Chat.jsx';
-import CompleteProfile from './components/Common/CompleteProfile/CompleteProfile.jsx';
 import Feedback from './components/User/Feedback/Feedback.jsx';
 import Profile from './components/Profile/Profile.jsx';
 import AdminDashboard from './components/Admin/Admin-Dashboard/AdminDashboard.jsx';
@@ -24,9 +23,9 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/complete-profile" element={<CompleteProfile />} />
+          <Route path="/update-password" element={<UpdatePassword />} />
           
-          {/* User protected routes */}
+          {/* Student routes */}
           <Route path="/chat" element={
             <ProtectedRoute studentOnly>
               <Chat />
@@ -43,7 +42,7 @@ function App() {
             </ProtectedRoute>
           } />
           
-          {/* Admin protected routes */}
+          {/* Admin routes */}
           <Route path="/admin-dashboard" element={
             <ProtectedRoute adminOnly>
               <AdminDashboard />
@@ -69,8 +68,6 @@ function App() {
               <AddResources />
             </ProtectedRoute>
           } />
-          
-          <Route path="/update-password" element={<UpdatePassword />} />
         </Routes>
       </Router>
     </AuthProvider>

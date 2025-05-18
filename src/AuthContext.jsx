@@ -45,6 +45,16 @@ export function AuthProvider({ children }) {
         setUserProfile((prev) => ({ ...prev, ...studentData }));
 
         console.log("User Profile: ", studentData);
+      } else if (userData.role === "admin"){
+        const { data: adminData } = await supabase
+          .from("admin")
+          .select("*")
+          .eq("userID", authUser.id)
+          .single();
+
+        setUserProfile((prev) => ({ ...prev, ...adminData }));
+
+        console.log("User Profile: ", adminData);
       }
 
       console.log("User: ", completeUser);
