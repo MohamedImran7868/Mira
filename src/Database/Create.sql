@@ -160,3 +160,36 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER calculate_chat_duration
 BEFORE UPDATE ON chatSession
 FOR EACH ROW EXECUTE FUNCTION update_chat_duration();
+
+
+--- ADMIN
+-- For user table
+CREATE POLICY "Admins can view all student users" 
+ON "user"
+FOR SELECT
+USING (auth.jwt() ->> 'role' = 'admin' AND role = 'student');
+
+-- For students table
+CREATE POLICY "Admins can view all student profiles"
+ON students
+FOR SELECT
+USING (
+    EXISTS (
+        SELECT 1 FROM "user"
+        WHERE "user"."userID" = auth.uid()
+        AND "user".role = 'admin'
+    )
+);
+
+
+CREATE OR REPLACE FUNCTION delete_student_account(user_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+    -- This will cascade to delete from both user and students tables
+    DELETE FROM auth.users WHERE id = user_id;
+END;
+$$;
+

@@ -119,6 +119,18 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
+  // Helper function to format category display
+  function formatCategoryDisplay(category) {
+    const categoryMap = {
+      general: "General Feedback",
+      bug: "Bug Report",
+      feature: "Feature Request",
+      improvement: "Improvement Suggestion",
+      response: "Chatbot Response",
+    };
+    return categoryMap[category] || category;
+  }
+
   const value = {
     session,
     user,
@@ -178,6 +190,7 @@ export function AuthProvider({ children }) {
             user_name: studentData.name,
             user_email: email,
             role: "student",
+            isProfile_set: "set",
           },
         ]);
         if (userError) throw userError;
@@ -252,18 +265,6 @@ export function AuthProvider({ children }) {
         password: newPassword,
       });
       if (error) throw error;
-
-      // Update user table password
-      const { data: userData, error: userError } = await supabase
-        .from("user")
-        .update({
-          user_password: newPassword,
-        })
-        .eq("userID", user.id)
-        .select()
-        .single();
-
-      return data;
     },
 
     // Generate the public path for the image
@@ -504,6 +505,263 @@ export function AuthProvider({ children }) {
         throw error;
       }
     },
+
+    // Admin
+    // Search students
+    getStudents: async (page = 1, searchTerm = "") => {
+      const itemsPerPage = 15;
+      const from = (page - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      try {
+        let query = supabase
+          .from("user")
+          .select(
+            `
+          userID,
+          user_name,
+          user_email,
+          students:students(status)
+        `,
+            { count: "exact" }
+          ) // Get total count
+          .eq("role", "student")
+          .order("created_at", { ascending: false })
+          .range(from, to);
+
+        if (searchTerm) {
+          query = query.or(
+            `user_name.ilike.%${searchTerm}%,user_email.ilike.%${searchTerm}%`
+          );
+        }
+
+        const { data, error, count } = await query;
+
+        if (error) throw error;
+        return {
+          students: data || [],
+          totalCount: count || 0,
+          totalPages: Math.ceil(count / itemsPerPage) || 1,
+        };
+      } catch (error) {
+        console.error("Error fetching students:", error);
+        throw error;
+      }
+    },
+
+    // Delete student account
+    deleteStudent: async (userId) => {
+      try {
+        const { error } = await supabase.auth.admin.deleteUser(userId);
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error deleting student:", error);
+        throw error;
+      }
+    },
+
+    getFeedback: async (
+      page = 1,
+      filters = {},
+      sortField = "timestamp",
+      sortOrder = "desc",
+      searchQuery = ""
+    ) => {
+      const itemsPerPage = 15;
+      const from = (page - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      try {
+        let query = supabase
+          .from("feedback")
+          .select(
+            `
+        feedback_id,
+        feedback_title,
+        feedback_message,
+        feedback_rating,
+        feedback_category,
+        timestamp,
+        created_at,
+        user:students(
+          user:user(user_name)
+        )
+      `,
+            { count: "exact" }
+          )
+          .range(from, to);
+
+        // Apply filters
+        if (filters.category) {
+          query = query.eq("feedback_category", filters.category);
+        }
+        if (filters.rating) {
+          query = query.eq("feedback_rating", filters.rating);
+        }
+        if (filters.startDate && filters.endDate) {
+          query = query
+            .gte("timestamp", filters.startDate)
+            .lte("timestamp", filters.endDate);
+        }
+
+        // Apply search - exact match when searching for user
+        if (searchQuery) {
+          query = query.eq("students.user.user_name", searchQuery);
+        }
+
+        // Apply sorting
+        if (sortField === "feedback_category") {
+          query = query.order("feedback_category", {
+            ascending: sortOrder === "asc",
+          });
+        } else if (sortField === "feedback_rating") {
+          query = query.order("feedback_rating", {
+            ascending: sortOrder === "asc",
+          });
+        } else if (sortField === "timestamp") {
+          query = query.order("timestamp", {
+            ascending: sortOrder === "asc",
+          });
+        } else {
+          query = query.order(sortField, { ascending: sortOrder === "asc" });
+        }
+
+        const { data, error, count } = await query;
+
+        if (error) throw error;
+
+        // Format category display names
+        const formattedData =
+          data?.map((item) => ({
+            ...item,
+            displayCategory: formatCategoryDisplay(item.feedback_category),
+          })) || [];
+
+        return {
+          feedback: formattedData,
+          totalCount: count || 0,
+          totalPages: Math.ceil(count / itemsPerPage) || 1,
+        };
+      } catch (error) {
+        console.error("Error fetching feedback:", error);
+        throw error;
+      }
+    },
+
+    // Delete feedback
+    deleteFeedback: async (feedbackId) => {
+      try {
+        const { error } = await supabase
+          .from("feedback")
+          .delete()
+          .eq("feedback_id", feedbackId);
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error deleting feedback:", error);
+        throw error;
+      }
+    },
+
+    // Get Resources
+    getResources: async (page = 1, type = undefined, searchQuery = "") => {
+      const itemsPerPage = 4;
+      const from = (page - 1) * itemsPerPage;
+      const to = from + itemsPerPage - 1;
+
+      try {
+        let query = supabase
+          .from("resources")
+          .select("*", { count: "exact" })
+          .order("created_at", { ascending: false })
+          .range(from, to);
+
+        if (type) {
+          query = query.eq("resource_type", type);
+        }
+
+        if (searchQuery) {
+          query = query.ilike("resource_name", `%${searchQuery}%`);
+        }
+
+        const { data, error, count } = await query;
+
+        if (error) throw error;
+        return {
+          data: data || [],
+          totalPages: Math.ceil(count / itemsPerPage) || 1,
+        };
+      } catch (error) {
+        console.error("Error fetching resources:", error);
+        throw error;
+      }
+    },
+
+    // Get single resource
+    getResource: async (resourceId) => {
+      try {
+        const { data, error } = await supabase
+          .from("resources")
+          .select("*")
+          .eq("resourceid", resourceId)
+          .single();
+
+        if (error) throw error;
+        return data;
+      } catch (error) {
+        console.error("Error fetching resource:", error);
+        throw error;
+      }
+    },
+
+    // Add new resource
+    addResource: async (resourceData) => {
+      try {
+        const { error } = await supabase
+          .from("resources")
+          .insert([resourceData]);
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error adding resource:", error);
+        throw error;
+      }
+    },
+
+    // Update resource
+    updateResource: async (resourceId, updatedData) => {
+      try {
+        const { error } = await supabase
+          .from("resources")
+          .update(updatedData)
+          .eq("resourceid", resourceId);
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error updating resource:", error);
+        throw error;
+      }
+    },
+
+    // Delete resource
+    deleteResource: async (resourceId) => {
+      try {
+        const { error } = await supabase
+          .from("resources")
+          .delete()
+          .eq("resourceid", resourceId);
+
+        if (error) throw error;
+        return true;
+      } catch (error) {
+        console.error("Error deleting resource:", error);
+        throw error;
+      }
+    },
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
@@ -516,8 +774,3 @@ export function useAuth() {
   }
   return context;
 }
-
-/* Sample User ID
-
-
-*/

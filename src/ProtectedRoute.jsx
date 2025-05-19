@@ -7,7 +7,7 @@ export default function ProtectedRoute({ children, adminOnly = false, studentOnl
   const location = useLocation();
 
   if (isLoading) {
-    return <LoadingModal message='Loading session...' />;
+    return null;
   }
 
   if (!user) {

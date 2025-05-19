@@ -9,7 +9,7 @@ const Feedback = () => {
   const [feedback, setFeedback] = useState({
     title: "",
     message: "",
-    rating: 0,
+    rating: 1,
     category: "general",
   });
   const [submitted, setSubmitted] = useState(false);

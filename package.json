@@ -18,6 +18,7 @@
     "concurrently": "^9.1.2",
     "postgres": "^3.4.5",
     "react": "^19.0.0",
+    "react-datepicker": "^8.3.0",
     "react-dom": "^19.0.0",
     "react-pro-sidebar": "^1.1.0",
     "react-router": "^7.5.3",

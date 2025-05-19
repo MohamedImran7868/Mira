@@ -1,132 +1,205 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-primary);
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: var(--color-background);
-}
-
 .container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 50px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .topContainer {
-  display: flex;
-  justify-content: flex-start;
-  flex-direction: row;
-  align-items: center;
+    margin-bottom: 20px;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
 }
 
-.topContainer label {
-  font-size: 1.5rem;
-  color: var(--color-text);
-  margin-right: 20px;
+.filterForm {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: flex-end;
 }
 
-.topContainer select{
-    width: 150px;
-    padding: 10px;
-    border-radius: 50px;
-    border: none;
-    background-color: #ddd;
-    color: var(--color-text);
-    font-size: 1rem;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-}
-
-.topContainer .searchBtn{
-    width: 150px;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 50px;
-    border: none;
-    background-color: var(--color-button);
-    color: var(--color-text);
-    font-size: 1rem;
-    cursor: pointer;
-    margin-left: 20px;
-    transition: all 0.3s ease;
-}
-
-.topContainer .searchBtn:hover{
-    background-color: var(--color-button-hover);
-}
-
-.userList{
+.filterGroup {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    width: 100%;
-    margin-top: 20px;
-    background-color: var(--color-navbar);
-    padding: 50px;
-    box-sizing: border-box;
-    border-radius: 15px;
+    min-width: 150px;
 }
 
-.userItem{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
-    border-radius: 15px;
-    background-color: var(--color-button);
+.filterGroup label {
     margin-bottom: 5px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.userItem:hover{
-    background-color: var(--color-button-hover);
-}
-
-.user{
     font-weight: bold;
+    font-size: 0.9em;
 }
 
-.feedbackContainer{
+.filterGroup select,
+.dateInput {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+}
+
+.buttonGroup {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    color: var(--color-text);
-    width: 100%;
-    margin-top: 20px;
-    box-sizing: border-box;
+    gap: 10px;
+    align-self: flex-end;
 }
 
-.btnContainer{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 20%;
-}
-
-.warningBtn, .deleteBtn{
-    width: 100px;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 50px;
+.searchBtn {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
     border: none;
-    color: var(--color-text);
-    font-size: 1rem;
+    border-radius: 4px;
     cursor: pointer;
-    transition: all 0.3s ease;
 }
 
-.warningBtn{
-    background-color: orange;
+.searchBtn:hover {
+    background-color: #45a049;
 }
 
-.deleteBtn{
-    background-color: red;
-} 
+.searchBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
 
-.warningBtn:hover, .deleteBtn:hover{
-    color: black;
-    filter: brightness(90%);
+.resetBtn {
+    padding: 8px 16px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.resetBtn:hover {
+    background-color: #5a6268;
+}
+
+.error {
+    color: #f44336;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #ffebee;
+    border-radius: 4px;
+}
+
+.tableContainer {
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+.feedbackTable {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.feedbackTable th, 
+.feedbackTable td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.feedbackTable th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    cursor: pointer;
+    position: relative;
+}
+
+.feedbackTable th:hover {
+    background-color: #e9ecef;
+}
+
+.feedbackTable tr:hover {
+    background-color: #f5f5f5;
+}
+
+.contentCell {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.starFilled {
+    color: #ffc107;
+}
+
+.starEmpty {
+    color: #e0e0e0;
+}
+
+.deleteBtn {
+    padding: 6px 12px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.deleteBtn:hover {
+    background-color: #d32f2f;
+}
+
+.deleteBtn:disabled {
+    background-color: #ffcdd2;
+    cursor: not-allowed;
+}
+
+.noResults {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding: 10px;
+}
+
+.pagination button {
+    padding: 8px 16px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.pagination button:hover:not(:disabled) {
+    background-color: #e9ecef;
+}
+
+.pagination button:disabled {
+    color: #adb5bd;
+    cursor: not-allowed;
+}
+
+.pagination span {
+    font-weight: bold;
+}
+
+.dateInput {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.filterForm {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  align-items: flex-end;
+}
+
+@media (max-width: 768px) {
+  .filterForm {
+    grid-template-columns: 1fr;
+  }
 }

@@ -13,9 +13,7 @@ function AdminDashboard() {
         <div className={styles.container}>
             <div className={styles.topContainer}>
                 <h1>Welcome to your dashboard!</h1>
-                <Link to="/profile" className={styles.profileLink}>
-                    <img src={profilepic} alt='user profile picture' className={styles.profilePic}/>
-                </Link>
+                <img src={profilepic} alt='user profile picture' className={styles.profilePic}/>
             </div>
             <div className={styles.btnContainer}>
                 <button className={styles.btn} onClick={() => navigate('/manage-user')}>Manage User</button>

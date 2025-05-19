@@ -210,6 +210,7 @@ const Register = () => {
                   minLength="8"
                   className={styles.inputField}
                   placeholder="Create a password"
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
