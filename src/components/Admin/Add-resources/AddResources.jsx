@@ -15,23 +15,26 @@ function AddResources() {
     resource_name: "",
     resource_details: "",
     resource_contact: "",
-    resource_time: ""
+    resource_time: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    
+
     try {
       await addResource({
-        ...formData,
-        adminid: userProfile.adminid
+        resource_type: formData.resource_type,
+        resource_name: formData.resource_name,
+        resource_details: formData.resource_details,
+        resource_contact: formData.resource_contact,
+        resource_time: formData.resource_time,
       });
       navigate("/view-resources");
     } catch (err) {

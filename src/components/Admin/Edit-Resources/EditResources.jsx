@@ -7,7 +7,7 @@ import LoadingModal from "../../Common/LoadingModal";
 
 function EditResources() {
   const { resourceid } = useParams();
-  const { getResource, updateResource } = useAuth();
+  const { getResourceById, updateResource } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -24,7 +24,7 @@ function EditResources() {
     const fetchResource = async () => {
       setLoading(true);
       try {
-        const resource = await getResource(resourceid);
+        const resource = await getResourceById(resourceid);
         setFormData({
           resource_type: resource.resource_type,
           resource_name: resource.resource_name,

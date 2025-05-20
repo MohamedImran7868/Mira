@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../AuthContext";
 import Header from "../../Common/Header";
 import styles from "./ViewFeedback.module.css";
-import LoadingModal from "../../Common/LoadingModal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -31,7 +30,7 @@ function ViewFeedback() {
   // Load initial feedback
   useEffect(() => {
     fetchFeedback();
-  }, [currentPage, sortConfig, category, rating, dateRange]);
+  }, [currentPage, sortConfig, category, rating, dateRange, searchName]);
 
   const fetchFeedback = async () => {
     setLoading(true);

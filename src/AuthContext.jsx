@@ -38,6 +38,7 @@ export function AuthProvider({ children }) {
 
       setUser(completeUser);
       setUserProfile(userData);
+      console.log("User: ", completeUser);
 
       // Fetch role data only if needed
       if (userData.role === "student") {
@@ -165,54 +166,9 @@ export function AuthProvider({ children }) {
     },
 
     registerStudent: async (email, password, studentData) => {
-      setLoading(true);
-      try {
-        // 1. Create auth user
-        const { data: authData, error: authError } = await supabase.auth.signUp(
-          {
-            email,
-            password,
-            options: {
-              data: {
-                full_name: studentData.name,
-                role: "student",
-              },
-              emailRedirectTo: `${window.location.origin}/login`,
-            },
-          }
-        );
-        if (authError) throw authError;
-
-        // 2. Create user record
-        const { error: userError } = await supabase.from("user").insert([
-          {
-            userID: authData.user.id,
-            user_name: studentData.name,
-            user_email: email,
-            role: "student",
-            isProfile_set: "set",
-          },
-        ]);
-        if (userError) throw userError;
-
-        // 3. Create student record
-        const { error: studentError } = await supabase.from("students").insert([
-          {
-            userID: authData.user.id,
-            student_birthday: studentData.birthday,
-            student_age: studentData.age,
-            status: "active",
-          },
-        ]);
-        if (studentError) throw studentError;
-
-        return authData;
-      } catch (error) {
-        console.error("Registration error:", error);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
+      await supabase.functions.invoke("register-student", {
+        body: { email, password, studentData },
+      });
     },
 
     signOut: async () => {
@@ -238,12 +194,12 @@ export function AuthProvider({ children }) {
         });
 
         if (error) {
-          throw new Error(error.message); // Convert to regular Error
+          throw new Error(error.message);
         }
         return { success: true };
       } catch (error) {
         console.error("Resend error:", error);
-        return { error: error.message }; // Return plain error message
+        return { error: error.message };
       } finally {
         setLoading(false);
       }
@@ -400,6 +356,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // Get Chat message
     getChatMessages: async (chatId) => {
       try {
         const { data, error } = await supabase
@@ -416,6 +373,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // Get Chat session
     createChatSession: async () => {
       try {
         if (!userProfile?.studentid) throw new Error("User not authenticated");
@@ -434,6 +392,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // Save message
     saveMessage: async (chatId, message, sender) => {
       try {
         const { data, error } = await supabase
@@ -456,6 +415,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // Updated the chat name
     updateChatName: async (chatId, newName) => {
       try {
         const { data, error } = await supabase
@@ -473,6 +433,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // Delete the Chat
     deleteChatSession: async (chatId) => {
       try {
         // Messages will be automatically deleted due to CASCADE
@@ -489,6 +450,7 @@ export function AuthProvider({ children }) {
       }
     },
 
+    // End the chat session to count interval
     endChatSession: async (chatId) => {
       try {
         const { data, error } = await supabase
@@ -582,6 +544,7 @@ export function AuthProvider({ children }) {
         feedback_message,
         feedback_rating,
         feedback_category,
+        feedback_by,
         timestamp,
         created_at,
         user:students(
@@ -607,7 +570,7 @@ export function AuthProvider({ children }) {
 
         // Apply search - exact match when searching for user
         if (searchQuery) {
-          query = query.eq("students.user.user_name", searchQuery);
+          query = query.ilike("feedback_by", `%${searchQuery}%`);
         }
 
         // Apply sorting
@@ -699,8 +662,8 @@ export function AuthProvider({ children }) {
       }
     },
 
-    // Get single resource
-    getResource: async (resourceId) => {
+    // Get single resource by ID
+    getResourceById: async (resourceId) => {
       try {
         const { data, error } = await supabase
           .from("resources")

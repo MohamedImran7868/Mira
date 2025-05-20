@@ -288,7 +288,7 @@ const Register = () => {
           </form>
 
           <div className={styles.footer}>
-            <p>Already have an account?</p>
+            <span>Already have an account?</span>
             <button
               onClick={() => navigate("/login")}
               className={styles.loginLink}

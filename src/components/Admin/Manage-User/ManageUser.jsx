@@ -17,7 +17,7 @@ function ManageUser() {
   // Load initial students
   useEffect(() => {
     fetchStudents();
-  }, [currentPage]);
+  }, [currentPage, searchTerm]);
 
   const fetchStudents = async (searchQuery = "") => {
     setLoading(true);

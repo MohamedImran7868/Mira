@@ -5,6 +5,7 @@ import styles from "./Login.module.css";
 import { useAuth } from "../../AuthContext";
 import { FaEnvelope, FaLock, FaArrowLeft, FaPaperPlane } from "react-icons/fa";
 import LoadingModal from "../Common/LoadingModal";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
@@ -15,6 +16,7 @@ const LoginScreen = () => {
   const [resetEmail, setResetEmail] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [showResendVerification, setShowResendVerification] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const { signIn, resetPassword, resendVerification } = useAuth();
   const navigate = useNavigate();
@@ -80,7 +82,11 @@ const LoginScreen = () => {
   };
 
   if (loading) {
-    return <LoadingModal message={showResetForm ? "Processing..." : "Logging In..."} />;
+    return (
+      <LoadingModal
+        message={showResetForm ? "Processing..." : "Logging In..."}
+      />
+    );
   }
 
   return (
@@ -169,8 +175,9 @@ const LoginScreen = () => {
                     <FaLock className={styles.inputIcon} />
                     Password
                   </label>
+                  <div className={styles.passwordWrapper}>
                   <input
-                    type="password"
+                    type={showPassword? "text" : "password"}
                     placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -179,6 +186,17 @@ const LoginScreen = () => {
                     className={styles.inputField}
                     autoComplete="current-password"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    className={styles.passwordToggle}
+                    aria-label={
+                      showPassword ? "Hide password" : "Show password"
+                    }
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
+                  </div>
                 </div>
 
                 <button

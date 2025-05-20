@@ -193,3 +193,9 @@ BEGIN
 END;
 $$;
 
+-- Admin - read, write, update, delete (students, feedback, resources)
+--       - read, write, update (user and admin) 
+--       - read (chatSeesion and message)
+-- Student - read, write, update, delete (chatSeesion , message, feedback) 
+--         - read, write, update (user, student) 
+--         - read (resources)
