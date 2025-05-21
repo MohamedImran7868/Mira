@@ -12,6 +12,7 @@ import { useAuth } from "../../../AuthContext";
 // Pages
 import styles from "./Chat.module.css";
 import LogoutPopup from "../../Common/LogoutPopup";
+import { containsProfanity } from "../../Common/filter";
 
 // Images
 import logo from "../../../assets/Logo.png";
@@ -48,6 +49,8 @@ const ChatScreen = () => {
   const [newChatName, setNewChatName] = useState("");
   const [messages, setMessages] = useState([]);
   const [typingIndicator, setTypingIndicator] = useState(false);
+  const [isInappropriate, setIsInAppropriate] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   const chatContainerRef = useRef(null);
   const typingIntervalRef = useRef(null);
@@ -94,6 +97,17 @@ const ChatScreen = () => {
     }
   }, [messages, typingIndicator]);
 
+  // Check for profanity whenever message changes
+  useEffect(() => {
+    if (message && containsProfanity(message)) {
+      setIsInAppropriate(true);
+      setShowWarning(true);
+    } else {
+      setIsInAppropriate(false);
+      setShowWarning(false);
+    }
+  }, [message]);
+
   const loadChat = async (chatId) => {
     try {
       const messages = await getChatMessages(chatId);
@@ -101,18 +115,6 @@ const ChatScreen = () => {
       setMessages(messages);
     } catch (error) {
       console.error("Error loading chat:", error);
-    }
-  };
-
-  const startNewChat = async () => {
-    try {
-      const newSession = await createChatSession();
-      setChatSessions((prev) => [newSession, ...prev]);
-      setCurrentChat(newSession.chatid);
-      console.log(newSession.chatid);
-      setMessages([]);
-    } catch (error) {
-      console.error("Error starting new chat:", error);
     }
   };
 
@@ -155,6 +157,11 @@ const ChatScreen = () => {
 
   const sendMessage = async () => {
     if (!message.trim() || isTyping) return;
+
+    if (isInappropriate) {
+      setShowWarning(true);
+      return;
+    }
 
     let chatId = currentChat;
     // If no current chat, create a new one
@@ -513,12 +520,29 @@ const ChatScreen = () => {
         </div>
 
         <div className={styles.chatInput}>
+          {/* Popup Warning */}
+          {showWarning && (
+            <div className={styles.warningPopup}>
+              <div className={styles.warningContent}>
+                <span className={styles.warningIcon}>⚠️</span>
+                <p>Please remove inappropriate language before sending</p>
+                <button
+                  className={styles.closeWarning}
+                  onClick={() => setShowWarning(false)}
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
           <input
             type="text"
             id="input"
             name="input"
             value={message}
-            className={styles.input}
+            className={`${styles.input} ${
+              isInappropriate ? styles.inappropriate : ""
+            }`}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {

@@ -27,6 +27,67 @@
   transform: scale(1.05);
 }
 
+.iconsContainer {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.icon {
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+}
+
+.pagesWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.pagesDropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.5rem 0;
+  min-width: 150px;
+  z-index: 1001;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: var(--color-primary-dark);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-primary);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 .logoutBtn {
   display: flex;
   align-items: center;
@@ -47,29 +108,36 @@
   transform: translateY(-1px);
 }
 
-.logoutIcon {
-  font-size: 1.5rem;
-  transition: transform 0.3s ease;
-}
-
-.logoutBtn:hover .logoutIcon {
+.logoutBtn:hover .icon {
   transform: rotate(-15deg);
-}
-
-.logoutText {
-  font-size: 0.9rem;
 }
 
 @media (max-width: 768px) {
   .headerContainer {
     padding: 0 1rem;
   }
-  
-  .logoutText {
-    display: none;
+
+  .iconsContainer {
+    gap: 1rem;
   }
-  
-  .logoutBtn {
-    padding: 0.5rem;
+
+  .pagesDropdown {
+    left: -50px;
+    transform: none;
+  }
+
+  .pagesDropdown {
+    animation: fadeInMobile 0.2s ease-out forwards;
+  }
+
+  @keyframes fadeInMobile {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }

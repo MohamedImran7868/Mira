@@ -40,8 +40,6 @@ const LoginScreen = () => {
         return;
       }
 
-      console.log(profile?.role);
-
       // Redirect based on role
       if (profile?.role === "admin") {
         navigate("/admin-dashboard");

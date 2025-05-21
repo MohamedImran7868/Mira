@@ -199,3 +199,42 @@ $$;
 -- Student - read, write, update, delete (chatSeesion , message, feedback) 
 --         - read, write, update (user, student) 
 --         - read (resources)
+
+CREATE OR REPLACE FUNCTION public.delete_auth_user(user_id uuid)
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+BEGIN
+  -- This will delete the auth user which cascades to your custom tables
+  DELETE FROM auth.users WHERE id = user_id;
+END;
+$$;
+
+-- Allow admins to delete from students table
+CREATE POLICY "Enable delete for admins on students" 
+ON students
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1 FROM "user"
+    WHERE "user"."userID" = auth.uid()
+    AND "user".role = 'admin'
+  )
+);
+
+-- Allow admins to delete from user table
+CREATE POLICY "Enable delete for admins on user" 
+ON "user"
+FOR DELETE
+USING (
+  EXISTS (
+    SELECT 1 FROM "user" u
+    WHERE u."userID" = auth.uid()
+    AND u.role = 'admin'
+  )
+);
+
+-- Grant your database role permission to execute the function
+GRANT EXECUTE ON FUNCTION public.delete_auth_user(uuid) TO postgres;
+-- Or whatever role your Supabase connection uses

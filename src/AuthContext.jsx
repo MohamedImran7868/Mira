@@ -514,7 +514,9 @@ export function AuthProvider({ children }) {
     // Delete student account
     deleteStudent: async (userId) => {
       try {
-        const { error } = await supabase.auth.admin.deleteUser(userId);
+        const { error } = await supabase.rpc("delete_auth_user", {
+          user_id: userId,
+        });
         if (error) throw error;
         return true;
       } catch (error) {

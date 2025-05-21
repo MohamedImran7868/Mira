@@ -3,3 +3,4 @@ supabase
 react-pro-sidebar
 react-datepicker
 concurrently
+bad-words

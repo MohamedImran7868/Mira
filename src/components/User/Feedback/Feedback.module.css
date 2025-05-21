@@ -151,6 +151,68 @@
   gap: 0.5rem;
 }
 
+/* Warning Popup Styles */
+.warningPopup {
+  position: fixed;
+  top: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid #ffeeba;
+  max-width: 90%;
+  width: max-content;
+}
+
+.warningContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.closeWarning {
+  background: none;
+  border: none;
+  color: #856404;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 15px;
+  padding: 0 5px;
+}
+
+.closeWarning:hover {
+  color: #5a3b02;
+}
+
+/* Inappropriate input styling */
+.inputField.inappropriate,
+.textareaField.inappropriate {
+  border: 2px solid #dc3545;
+  background-color: #fff8f8;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 .submitButton {
   background: var(--color-primary);
   color: white;
@@ -182,44 +244,65 @@
   font-size: 0.9rem;
 }
 
-.successContainer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: calc(100vh - 70px);
-  padding: 2rem;
-  background-color: var(--color-background);
+/* Success Popup Styles */
+
+.successOverlay {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  border-radius: 12px;
+  z-index: 2;
+  cursor: pointer;
 }
 
-.successCard {
+.successPopup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  color: var(--color-text);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  max-width: 90%;
   width: 100%;
   max-width: 500px;
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  padding: 2.5rem;
   text-align: center;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.successContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .successIcon {
   font-size: 3rem;
   color: var(--color-success);
-  margin-bottom: 1.5rem;
 }
 
-.successCard h2 {
+.successPopup h3 {
   font-size: 1.5rem;
   color: var(--color-primary);
-  margin-bottom: 1rem;
+  margin: 0.5rem 0;
 }
 
-.successCard p {
+.successPopup p {
   color: var(--color-text-light);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   line-height: 1.5;
 }
 
-.returnButton {
+.closeSuccess {
   background: var(--color-primary);
   color: white;
   border: none;
@@ -231,18 +314,44 @@
   transition: all var(--transition-normal);
 }
 
-.returnButton:hover {
+.closeSuccess:hover {
   background: var(--color-primary-dark);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
 
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Backdrop for popups */
+.successPopup::before,
+.warningPopup::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
 @media (max-width: 768px) {
-  .container, .successContainer {
+  .container {
     padding: 1rem;
   }
+  .successPopup{
+    width: 90%;
+  }
   
-  .feedbackCard, .successCard {
+  .feedbackCard {
     padding: 1.5rem;
   }
 }

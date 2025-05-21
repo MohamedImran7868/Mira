@@ -1,6 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import LoadingModal from './components/Common/LoadingModal';
 
 export default function ProtectedRoute({ children, adminOnly = false, studentOnly = false }) {
   const { user, userProfile, isLoading } = useAuth();

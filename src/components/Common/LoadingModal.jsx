@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './LoadingModal.module.css';
 import { FaSpinner } from 'react-icons/fa';
 
