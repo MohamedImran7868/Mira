@@ -14,6 +14,8 @@ function ViewFeedback() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const [searchName, setSearchName] = useState("");
+  const [selectedFeedback, setSelectedFeedback] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Filters
   const [category, setCategory] = useState("");
@@ -82,7 +84,7 @@ function ViewFeedback() {
       field,
       order: prev.field === field && prev.order === "asc" ? "desc" : "asc",
     }));
-    setCurrentPage(1); // Reset to first page when sorting
+    setCurrentPage(1);
   };
 
   const handlePageChange = (newPage) => {
@@ -98,6 +100,33 @@ function ViewFeedback() {
     setDateRange([null, null]);
     setCurrentPage(1);
     setSortConfig({ field: "timestamp", order: "desc" });
+  };
+
+  const openModal = (feedback) => {
+    setSelectedFeedback(feedback);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedFeedback(null);
+  };
+
+  const handleDeleteFromModal = async () => {
+    if (!selectedFeedback) return;
+
+    if (window.confirm("Are you sure you want to delete this feedback?")) {
+      setLoading(true);
+      try {
+        await deleteFeedback(selectedFeedback.feedback_id);
+        closeModal();
+        await fetchFeedback(); // Refresh the list
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   return (
@@ -217,7 +246,10 @@ function ViewFeedback() {
                 feedback.map((item) => (
                   <tr key={item.feedback_id}>
                     <td>{item.feedback_title || "N/A"}</td>
-                    <td className={styles.contentCell}>
+                    <td
+                      className={styles.contentCell}
+                      onClick={() => openModal(item)}
+                    >
                       {item.feedback_message}
                     </td>
                     <td>
@@ -257,6 +289,80 @@ function ViewFeedback() {
               )}
             </tbody>
           </table>
+
+          {/* Feedback Detail Modal */}
+          {isModalOpen && selectedFeedback && (
+            <div className={styles.modalOverlay} onClick={closeModal}>
+              <div
+                className={styles.modalContent}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <button className={styles.modalClose} onClick={closeModal}>
+                  &times;
+                </button>
+
+                <h3 className={styles.modalTitle}>
+                  {selectedFeedback.feedback_title || "Feedback Details"}
+                </h3>
+
+                <div className={styles.modalGrid}>
+                  <div className={styles.modalSection}>
+                    <h4>From:</h4>
+                    <p>{selectedFeedback.user?.user?.user_name || "Unknown"}</p>
+                  </div>
+
+                  <div className={styles.modalSection}>
+                    <h4>Category:</h4>
+                    <p>{selectedFeedback.displayCategory}</p>
+                  </div>
+
+                  <div className={styles.modalSection}>
+                    <h4>Rating:</h4>
+                    <div className={styles.ratingDisplay}>
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <span
+                          key={i}
+                          className={
+                            i < selectedFeedback.feedback_rating
+                              ? styles.starFilled
+                              : styles.starEmpty
+                          }
+                        >
+                          ★
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className={styles.modalSection}>
+                    <h4>Submitted:</h4>
+                    <p>
+                      {new Date(selectedFeedback.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+
+                <div className={styles.modalSection}>
+                  <h4>Full Message:</h4>
+                  <div className={styles.feedbackMessageContainer}>
+                    <pre className={styles.feedbackMessage}>
+                      {selectedFeedback.feedback_message}
+                    </pre>
+                  </div>
+                </div>
+
+                <div className={styles.modalFooter}>
+                  <button
+                    className={styles.modalDeleteBtn}
+                    onClick={handleDeleteFromModal}
+                    disabled={loading}
+                  >
+                    {loading ? "Deleting..." : "Delete Feedback"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           {totalPages > 1 && (
             <div className={styles.pagination}>

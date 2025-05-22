@@ -80,7 +80,7 @@ function App() {
           <Route
             path="/view-resources"
             element={
-              <ProtectedRoute adminOnly>
+              <ProtectedRoute>
                 <ViewResources />
               </ProtectedRoute>
             }

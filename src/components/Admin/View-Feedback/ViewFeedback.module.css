@@ -1,187 +1,337 @@
 .container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .topContainer {
-    margin-bottom: 20px;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
 }
 
 .filterForm {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    align-items: flex-end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: flex-end;
 }
 
 .filterGroup {
-    display: flex;
-    flex-direction: column;
-    min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
 }
 
 .filterGroup label {
-    margin-bottom: 5px;
-    font-weight: bold;
-    font-size: 0.9em;
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 0.9em;
 }
 
 .filterGroup select,
 .dateInput {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: white;
 }
 
 .buttonGroup {
-    display: flex;
-    gap: 10px;
-    align-self: flex-end;
+  display: flex;
+  gap: 10px;
+  align-self: flex-end;
 }
 
 .searchBtn {
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 8px 16px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .searchBtn:hover {
-    background-color: #45a049;
+  background-color: #45a049;
 }
 
 .searchBtn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
 .resetBtn {
-    padding: 8px 16px;
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .resetBtn:hover {
-    background-color: #5a6268;
+  background-color: #5a6268;
 }
 
 .error {
-    color: #f44336;
-    padding: 10px;
-    margin-bottom: 15px;
-    background-color: #ffebee;
-    border-radius: 4px;
+  color: #f44336;
+  padding: 10px;
+  margin-bottom: 15px;
+  background-color: #ffebee;
+  border-radius: 4px;
 }
 
 .tableContainer {
-    overflow-x: auto;
-    margin-top: 20px;
+  overflow-x: auto;
+  margin-top: 20px;
 }
 
 .feedbackTable {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.feedbackTable th, 
+.feedbackTable th,
 .feedbackTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
 .feedbackTable th {
-    background-color: #f8f9fa;
-    font-weight: bold;
-    cursor: pointer;
-    position: relative;
+  background-color: #f8f9fa;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
 }
 
 .feedbackTable th:hover {
-    background-color: #e9ecef;
+  background-color: #e9ecef;
 }
 
 .feedbackTable tr:hover {
-    background-color: #f5f5f5;
+  background-color: #f5f5f5;
 }
 
 .contentCell {
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.contentCell:hover {
+  background-color: #f5f5f5;
+}
+
+/* View Full feedback content */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modalContent {
+  background-color: white;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 25px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modalClose {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  transition: color 0.2s;
+}
+
+.modalClose:hover {
+  color: #333;
+}
+
+.modalTitle {
+  margin-top: 0;
+  color: #2c3e50;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.modalSection {
+  margin-bottom: 20px;
+}
+
+.modalSection h4 {
+  margin: 0 0 8px 0;
+  color: #3498db;
+  font-size: 16px;
+}
+
+/* Rating display in modal */
+.ratingDisplay {
+  font-size: 24px;
+  letter-spacing: 2px;
 }
 
 .starFilled {
-    color: #ffc107;
+  color: #f1c40f;
 }
 
 .starEmpty {
-    color: #e0e0e0;
+  color: #ecf0f1;
+}
+
+.starFilled {
+  color: #ffc107;
+}
+
+.starEmpty {
+  color: #e0e0e0;
+}
+
+.feedbackMessageContainer {
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 5px;
+  border-left: 4px solid #3498db;
+}
+
+.feedbackMessage {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.modalDeleteBtn {
+  padding: 8px 16px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.modalDeleteBtn:hover {
+  background-color: #c0392b;
+}
+
+.modalDeleteBtn:disabled {
+  background-color: #e0a7a1;
+  cursor: not-allowed;
+}
+
+/* Scrollbar styling */
+.feedbackMessageContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.feedbackMessageContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.feedbackMessageContainer::-webkit-scrollbar-thumb {
+  background: #bdc3c7;
+  border-radius: 4px;
+}
+
+.feedbackMessageContainer::-webkit-scrollbar-thumb:hover {
+  background: #95a5a6;
 }
 
 .deleteBtn {
-    padding: 6px 12px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 6px 12px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .deleteBtn:hover {
-    background-color: #d32f2f;
+  background-color: #d32f2f;
 }
 
 .deleteBtn:disabled {
-    background-color: #ffcdd2;
-    cursor: not-allowed;
+  background-color: #ffcdd2;
+  cursor: not-allowed;
 }
 
 .noResults {
-    text-align: center;
-    color: #666;
-    padding: 20px;
+  text-align: center;
+  color: #666;
+  padding: 20px;
 }
 
 .pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 15px;
-    margin-top: 20px;
-    padding: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding: 10px;
 }
 
 .pagination button {
-    padding: 8px 16px;
-    background-color: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
+  padding: 8px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .pagination button:hover:not(:disabled) {
-    background-color: #e9ecef;
+  background-color: #e9ecef;
 }
 
 .pagination button:disabled {
-    color: #adb5bd;
-    cursor: not-allowed;
+  color: #adb5bd;
+  cursor: not-allowed;
 }
 
 .pagination span {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .dateInput {

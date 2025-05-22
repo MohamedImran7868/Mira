@@ -23,6 +23,7 @@ import { IoSettings, IoChatbubbles } from "react-icons/io5";
 import { RiFeedbackFill, RiChatAiFill } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
 import { FiMenu, FiX, FiSend, FiTrash2, FiEdit } from "react-icons/fi";
+import { FaHandHoldingHeart } from "react-icons/fa";
 
 const ChatScreen = () => {
   const {
@@ -424,6 +425,18 @@ const ChatScreen = () => {
         {/* Menu for button */}
         <div>
           <Menu iconShape="circle" className={styles.menu}>
+            <MenuItem
+              icon={
+                <FaHandHoldingHeart
+                  size={24}
+                  className={styles.sidebarIconbutton}
+                />
+              }
+              onClick={() => navigate("/view-resources")}
+              className={styles.menuItem}
+            >
+              External Help
+            </MenuItem>
             <MenuItem
               icon={
                 <RiFeedbackFill

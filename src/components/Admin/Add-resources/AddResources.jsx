@@ -30,6 +30,7 @@ function AddResources() {
 
     try {
       await addResource({
+        adminid: userProfile.adminid,
         resource_type: formData.resource_type,
         resource_name: formData.resource_name,
         resource_details: formData.resource_details,

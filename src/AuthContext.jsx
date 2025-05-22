@@ -38,7 +38,6 @@ export function AuthProvider({ children }) {
 
       setUser(completeUser);
       setUserProfile(userData);
-      console.log("User: ", completeUser);
 
       // Fetch role data only if needed
       if (userData.role === "student") {

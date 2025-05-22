@@ -32,7 +32,7 @@ function Header() {
     { path: "/admin-dashboard", name: "Dashboard" },
     { path: "/manage-user", name: "User Management" },
     { path: "/view-feedback", name: "Feedback Management" },
-    { path: "/view-resources", name: "Feedback Management" },
+    { path: "/view-resources", name: "Resource Management" },
   ];
 
   const currentPages = user?.role === "admin" ? adminPages : studentPages;
