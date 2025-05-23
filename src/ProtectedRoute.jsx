@@ -13,8 +13,6 @@ export default function ProtectedRoute({ children, adminOnly = false, studentOnl
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  console.log(userProfile?.role);
-
   // Check role-based access
   if (adminOnly && userProfile?.role !== "admin") {
     return <Navigate to="/" replace />;

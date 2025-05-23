@@ -173,7 +173,6 @@ const ChatScreen = () => {
       setCurrentChat(chatId); // Still update state for future messages
       setMessages([]);
     }
-    console.log("B4 save: ", chatId);
     // Save human message
     const newHumanMessage = {
       message_content: message,
@@ -181,7 +180,6 @@ const ChatScreen = () => {
       message_timestamp: new Date().toISOString(),
     };
 
-    console.log(chatId);
     setMessages((prev) => [...prev, newHumanMessage]);
     await saveMessage(chatId, message, "human");
     callModel(message, chatId);

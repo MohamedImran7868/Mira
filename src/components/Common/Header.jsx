@@ -1,10 +1,15 @@
 import { useState } from "react";
 import { useAuth } from "../../AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/Logo.png";
 import LogoutPopup from "./LogoutPopup";
-import { IoLogOut, IoNotificationsCircleOutline } from "react-icons/io5";
-import { RiPagesFill } from "react-icons/ri";
+import { 
+  IoLogOut, 
+  IoNotificationsOutline,
+  IoChevronDown,
+  IoChevronUp
+} from "react-icons/io5";
+import { RiPagesLine } from "react-icons/ri";
 import styles from "./Header.module.css";
 
 function Header() {
@@ -12,10 +17,13 @@ function Header() {
   const [showPopup, setShowPopup] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [showPagesDropdown, setShowPagesDropdown] = useState(false);
+  const navigate = useNavigate();
 
   const logout = async () => {
     try {
       await signOut();
+      setShowPopup(false);
+      navigate("/");
     } catch (err) {
       console.error("Error signing out:", err.message);
     }
@@ -23,16 +31,17 @@ function Header() {
 
   // Pages based on role
   const studentPages = [
-    { path: "/chat", name: "Chat" },
-    { path: "/feedback", name: "Feedback" },
-    { path: "/profile", name: "Profile Management" },
+    { path: "/chat", name: "Chat", icon: "💬" },
+    { path: "/feedback", name: "Feedback", icon: "📝" },
+    { path: "/view-resources", name: "Resources", icon: "📚" },
+    { path: "/profile", name: "Profile", icon: "👤" },
   ];
 
   const adminPages = [
-    { path: "/admin-dashboard", name: "Dashboard" },
-    { path: "/manage-user", name: "User Management" },
-    { path: "/view-feedback", name: "Feedback Management" },
-    { path: "/view-resources", name: "Resource Management" },
+    { path: "/admin-dashboard", name: "Dashboard", icon: "📊" },
+    { path: "/manage-user", name: "Users", icon: "👥" },
+    { path: "/view-feedback", name: "Feedback", icon: "📝" },
+    { path: "/view-resources", name: "Resources", icon: "📚" },
   ];
 
   const currentPages = user?.role === "admin" ? adminPages : studentPages;
@@ -46,19 +55,49 @@ function Header() {
       />
       <header className={styles.header}>
         <div className={styles.headerContainer}>
-          <Link to="/">
-            <img src={logo} alt="logo" className={styles.logo} />
+          <Link to="/" className={styles.logoLink}>
+            <img src={logo} alt="MIRA Logo" className={styles.logo} />
+            {/* <span className={styles.logoText}>MIRA</span> */}
           </Link>
+          
           {user && (
-            <div className={styles.iconsContainer}>
-              <div className="otherIcon">
-                <IoNotificationsCircleOutline className={styles.icon} />
-                <div
-                  className={styles.pagesWrapper}
+            <div className={styles.navContainer}>
+              <nav className={styles.mainNav}>
+                {currentPages.map((page) => (
+                  <Link 
+                    key={page.path} 
+                    to={page.path}
+                    className={styles.navLink}
+                  >
+                    {page.name}
+                  </Link>
+                ))}
+              </nav>
+
+              <div className={styles.actionsContainer}>
+                {/* <button className={styles.notificationBtn}>
+                  <IoNotificationsOutline className={styles.actionIcon} />
+                  <span className={styles.notificationBadge}>3</span>
+                </button> */}
+
+                <div 
+                  className={styles.pagesDropdownContainer}
                   onMouseEnter={() => setShowPagesDropdown(true)}
                   onMouseLeave={() => setShowPagesDropdown(false)}
                 >
-                  <RiPagesFill className={styles.icon} />
+                  <button 
+                    className={styles.pagesToggle}
+                    onClick={() => setShowPagesDropdown(!showPagesDropdown)}
+                  >
+                    <RiPagesLine className={styles.actionIcon} />
+                    <span>Menu</span>
+                    {showPagesDropdown ? (
+                      <IoChevronUp className={styles.chevronIcon} />
+                    ) : (
+                      <IoChevronDown className={styles.chevronIcon} />
+                    )}
+                  </button>
+
                   {showPagesDropdown && (
                     <div className={styles.pagesDropdown}>
                       {currentPages.map((page) => (
@@ -68,16 +107,25 @@ function Header() {
                           className={styles.dropdownItem}
                           onClick={() => setShowPagesDropdown(false)}
                         >
+                          <span className={styles.itemIcon}>{page.icon}</span>
                           {page.name}
                         </Link>
                       ))}
-                      <hr />
-                      {/* <Link to={() => setShowPopup(true)} className={styles.dropdownItem}><IoLogOut className={styles.icon} />Log out</Link> */}
+                      <div className={styles.dropdownDivider}></div>
+                      <button 
+                        className={styles.dropdownItem} 
+                        onClick={() => {
+                          setShowPagesDropdown(false);
+                          setShowPopup(true);
+                        }}
+                      >
+                        <IoLogOut className={styles.itemIcon} />
+                        Log Out
+                      </button>
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="logOutIcon">
+
                 <button
                   className={`${styles.logoutBtn} ${
                     isHovered ? styles.hovered : ""
@@ -87,7 +135,7 @@ function Header() {
                   onMouseLeave={() => setIsHovered(false)}
                   aria-label="Logout"
                 >
-                  <IoLogOut className={styles.icon} />
+                  <IoLogOut className={styles.actionIcon} />
                 </button>
               </div>
             </div>

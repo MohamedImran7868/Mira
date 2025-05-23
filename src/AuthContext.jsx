@@ -631,7 +631,7 @@ export function AuthProvider({ children }) {
 
     // Get Resources
     getResources: async (page = 1, type = undefined, searchQuery = "") => {
-      const itemsPerPage = 4;
+      const itemsPerPage = 9;
       const from = (page - 1) * itemsPerPage;
       const to = from + itemsPerPage - 1;
 

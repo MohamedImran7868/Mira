@@ -1,231 +1,309 @@
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-primary);
+.container {
   display: flex;
-  flex-direction: column;
-  min-height: 100vh;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: calc(100vh - 70px);
+  padding: 2rem;
   background-color: var(--color-background);
 }
 
-.container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 50px;
+.card {
+  width: 100%;
+  max-width: 1200px;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2rem;
 }
 
-.topContainer{
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: row;
-    align-items: center;
+.header {
+  margin-bottom: 2rem;
 }
 
-.topContainer label{
-    font-size: 1.5rem;
-    color: var(--color-text);
-    margin-right: 20px;
+.header h2 {
+  font-size: 1.75rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
 }
 
-.topContainer input{
-    width: 300px;
-    padding: 10px;
-    border-radius: 50px;
-    border: none;
-    background-color: #ddd;
-    color: var(--color-text);
-    font-size: 1rem;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+.header p {
+  color: var(--color-text-light);
+  font-size: 0.95rem;
 }
 
-.topContainer input:focus{
-    outline: none;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.3);
-    background-color:#c3c0c0;
-}
-
-.topContainer .searchBtn{
-    width: 150px;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 50px;
-    border: none;
-    background-color: var(--color-button);
-    color: var(--color-text);
-    font-size: 1rem;
-    cursor: pointer;
-    margin-left: 20px;
-    transition: all 0.3s ease;
-}
-
-.topContainer .searchBtn:hover{
-    background-color: var(--color-button-hover);
-}
-
-.userList{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    width: 100%;
-    margin-top: 20px;
-    background-color: var(--color-navbar);
-    padding: 50px;
-    box-sizing: border-box;
-    border-radius: 15px;
-}
-
-.userItem{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-radius: 15px;
-    background-color: var(--color-button);
-    margin-bottom: 5px;
-    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.userItem:hover{
-    background-color: var(--color-button-hover);
-}
-
-.btnContainer{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 20%;
-}
-
-.suspendBtn, .deleteBtn{
-    width: 100px;
-    font-weight: bold;
-    padding: 10px 15px;
-    border-radius: 50px;
-    border: none;
-    color: var(--color-text);
-    font-size: 1rem;
-    cursor: pointer;
-    margin-left: 20px;
-    transition: all 0.3s ease;
-}
-
-.suspendBtn{
-    background-color: orange;
-}
-
-.deleteBtn{
-    background-color: red;
-} 
-
-.suspendBtn:hover, .deleteBtn:hover{
-    color: black;
-    filter: brightness(90%);
-}
-
-.container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.topContainer {
-    margin-bottom: 20px;
+.searchSection {
+  margin-bottom: 1.5rem;
 }
 
 .searchForm {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
+  margin-bottom: 1rem;
 }
 
-.label {
-    font-weight: bold;
-    min-width: 120px;
+.searchInputContainer {
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.input {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    flex-grow: 1;
-    min-width: 250px;
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--color-text-light);
 }
 
-.searchBtn {
-    padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.searchInput {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-primary);
+  transition: all var(--transition-fast);
 }
 
-.searchBtn:hover {
-    background-color: #45a049;
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
 }
 
-.searchBtn:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
+.searchButton {
+  position: absolute;
+  right: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
 }
 
-.error {
-    color: #f44336;
-    padding: 10px;
-    margin-bottom: 15px;
-    background-color: #ffebee;
-    border-radius: 4px;
+.searchButton:hover:not(:disabled) {
+  background: var(--color-primary-dark);
 }
 
-.tableContainer {
-    overflow-x: auto;
+.searchButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.resultsInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.resultsCount {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.errorMessage {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.errorIcon {
+  font-size: 1.25rem;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
 }
 
 .userTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-.userTable th, .userTable td {
-    padding: 12px 15px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .userTable th {
-    background-color: #f8f9fa;
-    font-weight: bold;
+  text-align: left;
+  padding: 1rem;
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
 }
 
-.userTable tr:hover {
-    background-color: #f5f5f5;
+.headerIcon {
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
 }
 
-.deleteBtn {
-    padding: 6px 12px;
-    background-color: #f44336;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.userTable td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
 }
 
-.deleteBtn:hover {
-    background-color: #d32f2f;
+.userRow:hover {
+  background-color: rgba(74, 111, 165, 0.05);
 }
 
-.deleteBtn:disabled {
-    background-color: #ffcdd2;
-    cursor: not-allowed;
+.nameCell {
+  font-weight: 500;
+}
+
+.emailCell {
+  color: var(--color-text-light);
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.statusBadge.active {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--color-success);
+}
+
+.statusBadge.inactive {
+  background: rgba(220, 53, 69, 0.1);
+  color: var(--color-error);
+}
+
+.actionsCell {
+  text-align: right;
+}
+
+.deleteButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--color-error-bg);
+  color: var(--color-error);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.deleteButton:hover:not(:disabled) {
+  background: rgba(220, 53, 69, 0.2);
+}
+
+.deleteButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.deleteIcon {
+  font-size: 0.9rem;
+}
+
+.emptyRow td {
+  padding: 2rem;
+  text-align: center;
+  color: var(--color-text-light);
 }
 
 .noResults {
-    text-align: center;
-    color: #666;
-    padding: 20px;
+  font-style: italic;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.paginationButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: white;
+  color: var(--color-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+}
+
+.paginationButton:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+}
+
+.paginationButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.paginationIcon {
+  font-size: 0.8rem;
+}
+
+.pageInfo {
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .card {
+    padding: 1.5rem;
+  }
+  
+  .userTable th, 
+  .userTable td {
+    padding: 0.75rem;
+    font-size: 0.9rem;
+  }
+  
+  .deleteButton span {
+    display: none;
+  }
+  
+  .deleteButton {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .searchButton {
+    position: static;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+  
+  .searchInputContainer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .searchIcon {
+    top: 1rem;
+  }
+  
+  .searchInput {
+    padding-left: 1rem;
+  }
+  
+  .pagination {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 }

@@ -40,7 +40,7 @@ class MIRA:
             exit(1)
 
         # Load LLaMA model
-        llama_model_path = "C:\\Users\\Shadow\\OneDrive\\Documents\\MIRA\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+        llama_model_path = "C:\\Users\\NITRO 5\\Desktop\\Project\\React\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
         try:
             self.llama = Llama(
                 model_path=llama_model_path,
