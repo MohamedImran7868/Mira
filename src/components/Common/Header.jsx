@@ -31,6 +31,7 @@ function Header() {
 
   // Pages based on role
   const studentPages = [
+    { path: "/student-dashboard", name: "Dashboard", icon: "📊" },
     { path: "/chat", name: "Chat", icon: "💬" },
     { path: "/feedback", name: "Feedback", icon: "📝" },
     { path: "/view-resources", name: "Resources", icon: "📚" },

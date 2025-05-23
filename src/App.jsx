@@ -12,9 +12,8 @@ import AdminDashboard from "./components/Admin/Admin-Dashboard/AdminDashboard.js
 import ManageUser from "./components/Admin/Manage-User/ManageUser.jsx";
 import ViewFeedback from "./components/Admin/View-Feedback/ViewFeedback.jsx";
 import ViewResources from "./components/Admin/View-Resources/ViewResources.jsx";
-import AddResources from "./components/Admin/Add-resources/AddResources.jsx";
-import EditResources from "./components/Admin/Edit-Resources/EditResources.jsx";
 import UpdatePassword from "./components/Common/UpdatePassword.jsx";
+import StudentDashboard from "./components/User/StudentDashboard.jsx";
 
 function App() {
   return (
@@ -27,6 +26,14 @@ function App() {
           <Route path="/update-password" element={<UpdatePassword />} />
 
           {/* Student routes */}
+          <Route
+            path="/student-dashboard"
+            element={
+              <ProtectedRoute studentOnly>
+                <StudentDashboard />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/chat"
             element={
@@ -82,22 +89,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <ViewResources />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/add-resources"
-            element={
-              <ProtectedRoute adminOnly>
-                <AddResources />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/edit-resources/:resourceid"
-            element={
-              <ProtectedRoute adminOnly>
-                <EditResources />
               </ProtectedRoute>
             }
           />

@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../AuthContext";
 import Header from "../../Common/Header.jsx";
 import styles from "./ViewResources.module.css";
-import { 
-  MdAttachEmail, 
+import {
+  MdAttachEmail,
   MdSearch,
   MdAdd,
   MdEdit,
   MdDelete,
   MdAccessTime,
-  MdClose
+  MdClose,
 } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
@@ -28,6 +28,10 @@ function ViewResources() {
   const [totalPages, setTotalPages] = useState(1);
   const [resourceType, setResourceType] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Delete Confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [resourceToDelete, setResourceToDelete] = useState(null);
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
@@ -71,7 +75,7 @@ function ViewResources() {
     if (newPage >= 1 && newPage <= totalPages) {
       setCurrentPage(newPage);
     }
-  }
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -79,20 +83,30 @@ function ViewResources() {
     fetchResources();
   };
 
-  const handleDelete = async (resourceId) => {
-    if (!window.confirm("Are you sure you want to delete this resource?")) {
-      return;
-    }
+  const promptDelete = (resourceId) => {
+    setResourceToDelete(resourceId);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!resourceToDelete) return;
 
     setLoading(true);
     try {
-      await deleteResource(resourceId);
+      await deleteResource(resourceToDelete);
       await fetchResources();
+      setShowDeleteModal(false);
+      setResourceToDelete(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setResourceToDelete(null);
   };
 
   const openAddModal = () => {
@@ -224,18 +238,20 @@ function ViewResources() {
               <div key={resource.resourceid} className={styles.resourceCard}>
                 <div className={styles.resourceHeader}>
                   <span className={styles.resourceType}>
-                    {resource.resource_type === 'association' ? 'Association' : 'Consultant'}
+                    {resource.resource_type === "association"
+                      ? "Association"
+                      : "Consultant"}
                   </span>
                   {userProfile?.role === "admin" && (
                     <div className={styles.resourceActions}>
-                      <button 
+                      <button
                         onClick={() => openEditModal(resource)}
                         className={styles.editButton}
                       >
                         <MdEdit />
                       </button>
-                      <button 
-                        onClick={() => handleDelete(resource.resourceid)}
+                      <button
+                        onClick={() => promptDelete(resource.resourceid)}
                         className={styles.deleteButton}
                         disabled={loading}
                       >
@@ -244,8 +260,12 @@ function ViewResources() {
                     </div>
                   )}
                 </div>
-                <h3 className={styles.resourceName}>{resource.resource_name}</h3>
-                <p className={styles.resourceDesc}>{resource.resource_details}</p>
+                <h3 className={styles.resourceName}>
+                  {resource.resource_name}
+                </h3>
+                <p className={styles.resourceDesc}>
+                  {resource.resource_details}
+                </p>
                 <div className={styles.resourceMeta}>
                   <div className={styles.metaItem}>
                     <MdAttachEmail className={styles.metaIcon} />
@@ -305,13 +325,49 @@ function ViewResources() {
         )}
       </div>
 
+      {/* Delete Confimation Modal */}
+      {showDeleteModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.confirmationModal}>
+            <div className={styles.modalHeader}>
+              <h3>Confirm Deletion</h3>
+              <button onClick={cancelDelete} className={styles.closeButton}>
+                <MdClose />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>
+                Are you sure you want to delete this resource? This action
+                cannot be undone.
+              </p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                onClick={cancelDelete}
+                className={styles.cancelButton}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                className={styles.deleteConfirmButton}
+                disabled={loading}
+              >
+                {loading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add Resource Modal */}
       {showAddModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <h2>Add New Resource</h2>
-              <button 
+              <button
                 onClick={() => setShowAddModal(false)}
                 className={styles.closeButton}
               >
@@ -360,7 +416,9 @@ function ViewResources() {
               </div>
 
               <div className={styles.formRow}>
-                <label className={styles.formLabel}>Availability (Optional)</label>
+                <label className={styles.formLabel}>
+                  Availability (Optional)
+                </label>
                 <input
                   type="text"
                   name="resource_time"
@@ -385,15 +443,15 @@ function ViewResources() {
               </div>
 
               <div className={styles.modalFooter}>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowAddModal(false)}
                   className={styles.cancelButton}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className={styles.submitButton}
                 >
@@ -411,7 +469,7 @@ function ViewResources() {
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
               <h2>Edit Resource</h2>
-              <button 
+              <button
                 onClick={() => setShowEditModal(false)}
                 className={styles.closeButton}
               >
@@ -458,7 +516,9 @@ function ViewResources() {
               </div>
 
               <div className={styles.formRow}>
-                <label className={styles.formLabel}>Availability (Optional)</label>
+                <label className={styles.formLabel}>
+                  Availability (Optional)
+                </label>
                 <input
                   type="text"
                   name="resource_time"
@@ -481,15 +541,15 @@ function ViewResources() {
               </div>
 
               <div className={styles.modalFooter}>
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => setShowEditModal(false)}
                   className={styles.cancelButton}
                 >
                   Cancel
                 </button>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={loading}
                   className={styles.submitButton}
                 >

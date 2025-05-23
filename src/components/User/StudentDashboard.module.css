@@ -1,0 +1,509 @@
+.dashboard {
+  display: flex;
+  min-height: calc(100vh - 70px);
+  background-color: #f5f7fa;
+}
+
+.sidebar {
+  width: 300px;
+  background: white;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.profileSummary {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 1rem;
+}
+
+.profileInfo h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.profileInfo p {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  color: var(--color-text-light);
+}
+
+.navMenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  color: var(--color-text-light);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.navItem:hover {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+}
+
+.navItem.active {
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.navIcon {
+  font-size: 1.1rem;
+  width: 24px;
+}
+
+.upcomingSessions {
+  margin-top: auto;
+}
+
+.upcomingSessions h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+  color: var(--color-text-light);
+  margin-bottom: 1rem;
+}
+
+.sectionIcon {
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.sessionCard {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-background);
+  margin-bottom: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.sessionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.sessionDate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: white;
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+  min-width: 50px;
+}
+
+.sessionDay {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.sessionMonth {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+}
+
+.sessionInfo h5 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--color-text);
+}
+
+.sessionInfo p {
+  margin: 0.25rem 0 0;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+}
+
+.mainContent {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.topBar h2 {
+  color: var(--color-text);
+  margin: 0;
+}
+
+.searchBar {
+  position: relative;
+  width: 300px;
+}
+
+.searchBar input {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-primary);
+  transition: all 0.2s ease;
+}
+
+.searchBar input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-light);
+}
+
+.overviewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.welcomeCard {
+  grid-column: span 2;
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+  color: white;
+}
+
+.welcomeCard h3 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.welcomeCard p {
+  margin: 0 0 1rem;
+  opacity: 0.9;
+}
+
+.moodSelector {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.moodOption {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.moodOption:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.performanceCard h3 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  color: var(--color-text);
+}
+
+.chartContainer {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+}
+
+.chartPlaceholder {
+  display: flex;
+  align-items: flex-end;
+  height: 150px;
+  gap: 0.5rem;
+  padding: 0 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.chartBar {
+  flex: 1;
+  background: var(--color-primary);
+  border-radius: 5px 5px 0 0;
+  min-height: 1px;
+  transition: all 0.3s ease;
+}
+
+.chartBar:hover {
+  opacity: 0.8;
+}
+
+.chartLabels {
+  display: flex;
+  justify-content: space-around;
+  font-size: 0.8rem;
+  color: var(--color-text-light);
+}
+
+.notificationsCard .cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.notificationsCard h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.badge {
+  background: var(--color-error);
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: bold;
+}
+
+.notificationsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notificationItem {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.notificationItem:last-child {
+  border-bottom: none;
+}
+
+.notificationItem:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.notificationItem p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.notificationTime {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.notificationItem.unread p {
+  font-weight: 600;
+}
+
+.notificationItem.unread::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  margin-right: 0.5rem;
+}
+
+.activityList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activityItem {
+  display: flex;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.activityItem:last-child {
+  border-bottom: none;
+}
+
+.activityIcon {
+  color: var(--color-primary);
+  font-size: 1rem;
+  width: 24px;
+  height: 24px;
+  background: var(--color-primary-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.activityContent p {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.activityTime {
+  font-size: 0.75rem;
+  color: var(--color-text-light);
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.noResults {
+  text-align: center;
+  color: var(--color-text-light);
+  padding: 1rem 0;
+}
+
+.comingSoon {
+  text-align: center;
+  color: var(--color-text-light);
+  padding: 2rem 0;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 992px) {
+  .sidebar {
+    width: 250px;
+    padding: 1.5rem 1rem;
+  }
+  
+  .overviewGrid {
+    grid-template-columns: 1fr;
+  }
+  
+  .welcomeCard {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    padding: 1rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  .profileSummary {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+  }
+  
+  .navMenu {
+    flex-direction: row;
+    margin-bottom: 0;
+  }
+  
+  .navItem span {
+    display: none;
+  }
+  
+  .upcomingSessions {
+    display: none;
+  }
+  
+  .mainContent {
+    padding: 1.5rem;
+  }
+  
+  .topBar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .searchBar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .moodSelector {
+    gap: 0.5rem;
+  }
+  
+  .moodOption {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+}

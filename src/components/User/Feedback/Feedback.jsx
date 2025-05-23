@@ -10,6 +10,7 @@ import {
   FaBug,
   FaComments,
   FaCog,
+  FaRobot ,
 } from "react-icons/fa";
 import { containsProfanity } from "../../Common/filter";
 
@@ -84,7 +85,7 @@ const Feedback = () => {
     bug: <FaBug />,
     feature: <FaLightbulb />,
     improvement: <FaCog />,
-    response: <FaComments />,
+    response: <FaRobot  />,
   };
 
   return (

@@ -468,6 +468,63 @@ export function AuthProvider({ children }) {
     },
 
     // Admin
+    // Add these new functions:
+    getTotalUsers: async () => {
+      try {
+        const { count, error } = await supabase
+          .from("user")
+          .select("*", { count: "exact", head: true });
+
+        if (error) throw error;
+        return count || 0;
+      } catch (error) {
+        console.error("Error fetching total users:", error);
+        return 0;
+      }
+    },
+
+    getTotalFeedback: async () => {
+      try {
+        const { count, error } = await supabase
+          .from("feedback")
+          .select("*", { count: "exact", head: true });
+
+        if (error) throw error;
+        return count || 0;
+      } catch (error) {
+        console.error("Error fetching total feedback:", error);
+        return 0;
+      }
+    },
+
+    getTotalResources: async () => {
+      try {
+        const { count, error } = await supabase
+          .from("resources")
+          .select("*", { count: "exact", head: true });
+
+        if (error) throw error;
+        return count || 0;
+      } catch (error) {
+        console.error("Error fetching total resources:", error);
+        return 0;
+      }
+    },
+
+    getTotalStudents: async () => {
+      try {
+        const { count, error } = await supabase
+          .from("students")
+          .select("*", { count: "exact", head: true });
+
+        if (error) throw error;
+        return count || 0;
+      } catch (error) {
+        console.error("Error fetching total students:", error);
+        return 0;
+      }
+    },
+
     // Search students
     getStudents: async (page = 1, searchTerm = "") => {
       const itemsPerPage = 15;
