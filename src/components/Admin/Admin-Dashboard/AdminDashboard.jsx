@@ -15,61 +15,32 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 
 function AdminDashboard() {
   const navigate = useNavigate();
-  const {
-    getTotalUsers,
-    getTotalFeedback,
-    getTotalResources,
-    getTotalStudents,
-  } = useAuth();
+  const { getDashboardStats, updateStatsManually } = useAuth();
   const [dashboardStats, setDashboardStats] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   // Fetch stats when component mounts
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [totalUsers, totalFeedback, totalResources, totalStudents] =
-          await Promise.all([
-            getTotalUsers(),
-            getTotalFeedback(),
-            getTotalResources(),
-            getTotalStudents(),
-          ]);
-
-        setDashboardStats([
-          {
-            title: "Total Users",
-            value: totalUsers,
-            change: "+12%",
-            trend: "up",
-          },
-          {
-            title: "New Feedback",
-            value: totalFeedback,
-            change: "+5%",
-            trend: "up",
-          },
-          {
-            title: "Resources",
-            value: totalResources,
-            change: "+2",
-            trend: "up",
-          },
-          {
-            title: "Students",
-            value: totalStudents,
-            change: "-3%",
-            trend: "down",
-          },
-        ]);
+        const stats = await getDashboardStats();
+        setDashboardStats(stats);
       } catch (error) {
         console.error("Error fetching stats:", error);
+        // Fallback to sample data
+        setDashboardStats([
+          { title: "Total Users", value: 248, change: "+12%", trend: "up" },
+          { title: "New Feedback", value: 32, change: "+5%", trend: "up" },
+          { title: "Resources", value: 18, change: "+2", trend: "up" },
+          { title: "Students", value: 56, change: "-3%", trend: "down" },
+        ]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchStats();
-  }, [getTotalUsers, getTotalFeedback, getTotalResources, getTotalStudents]);
+  }, [getDashboardStats]);
 
   // Recent activities sample data
   const recentActivities = [
@@ -93,6 +64,10 @@ function AdminDashboard() {
       icon: <FaCog />,
     },
   ];
+
+  if (loading) {
+    return <div>Loading dashboard...</div>;
+  }
 
   return (
     <>

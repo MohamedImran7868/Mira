@@ -131,6 +131,138 @@ export function AuthProvider({ children }) {
     return categoryMap[category] || category;
   }
 
+  const getTotalUsers = async () => {
+    const { count } = await supabase
+      .from("user")
+      .select("*", { count: "exact", head: true });
+    return count || 0;
+  };
+
+  const getTotalFeedback = async () => {
+    const { count } = await supabase
+      .from("feedback")
+      .select("*", { count: "exact", head: true });
+    return count || 0;
+  };
+
+  const getTotalResources = async () => {
+    const { count } = await supabase
+      .from("resources")
+      .select("*", { count: "exact", head: true });
+    return count || 0;
+  };
+
+  const getTotalStudents = async () => {
+    const { count } = await supabase
+      .from("students")
+      .select("*", { count: "exact", head: true });
+    return count || 0;
+  };
+
+  // Add these new functions:
+  const getDashboardStats = async () => {
+      try {
+        // Get current counts
+        const [
+          currentUsers,
+          currentFeedback,
+          currentResources,
+          currentStudents,
+        ] = await Promise.all([
+          getTotalUsers(),
+          getTotalFeedback(),
+          getTotalResources(),
+          getTotalStudents(),
+        ]);
+
+        // Get yesterday's stats for comparison
+        const { data: history } = await supabase
+          .from("statistics_history")
+          .select("*")
+          .order("date", { ascending: false })
+          .limit(2); // Get latest 2 entries (today and yesterday)
+
+        const yesterday = history?.length > 1 ? history[1] : null;
+
+        // Calculate changes
+        const calculateChange = (current, previous) => {
+          if (!previous || previous === 0)
+            return { change: "+0%", trend: "neutral" };
+          const percentage = ((current - previous) / previous) * 100;
+          const trend =
+            percentage > 0 ? "up" : percentage < 0 ? "down" : "neutral";
+          return {
+            change: `${percentage >= 0 ? "+" : ""}${Math.round(percentage)}%`,
+            trend,
+          };
+        };
+
+        return [
+          {
+            title: "Total Users",
+            value: currentUsers,
+            ...calculateChange(currentUsers, yesterday?.user_count),
+          },
+          {
+            title: "New Feedback",
+            value: currentFeedback,
+            ...calculateChange(currentFeedback, yesterday?.feedback_count),
+          },
+          {
+            title: "Resources",
+            value: currentResources,
+            ...calculateChange(currentResources, yesterday?.resource_count),
+          },
+          {
+            title: "Students",
+            value: currentStudents,
+            ...calculateChange(currentStudents, yesterday?.student_count),
+          },
+        ];
+      } catch (error) {
+        console.error("Error getting dashboard stats:", error);
+        // Fallback to simple counts without changes
+        const [
+          currentUsers,
+          currentFeedback,
+          currentResources,
+          currentStudents,
+        ] = await Promise.all([
+          getTotalUsers(),
+          getTotalFeedback(),
+          getTotalResources(),
+          getTotalStudents(),
+        ]);
+
+        return [
+          {
+            title: "Total Users",
+            value: currentUsers,
+            change: "+0%",
+            trend: "neutral",
+          },
+          {
+            title: "New Feedback",
+            value: currentFeedback,
+            change: "+0%",
+            trend: "neutral",
+          },
+          {
+            title: "Resources",
+            value: currentResources,
+            change: "+0",
+            trend: "neutral",
+          },
+          {
+            title: "Students",
+            value: currentStudents,
+            change: "+0%",
+            trend: "neutral",
+          },
+        ];
+      }
+    }
+
   const value = {
     session,
     user,
@@ -469,59 +601,21 @@ export function AuthProvider({ children }) {
 
     // Admin
     // Add these new functions:
-    getTotalUsers: async () => {
+    getDashboardStats,
+
+    // Function to manually trigger stats update (for testing) - Put a button in ViewFeedback and call this
+    updateStatsManually: async () => {
       try {
-        const { count, error } = await supabase
-          .from("user")
-          .select("*", { count: "exact", head: true });
-
+        // Update the statistics
+        const { data, error } = await supabase.rpc("update_daily_statistics");
         if (error) throw error;
-        return count || 0;
+
+        // Return fresh stats after update
+        const stats = await getDashboardStats();
+        return stats;
       } catch (error) {
-        console.error("Error fetching total users:", error);
-        return 0;
-      }
-    },
-
-    getTotalFeedback: async () => {
-      try {
-        const { count, error } = await supabase
-          .from("feedback")
-          .select("*", { count: "exact", head: true });
-
-        if (error) throw error;
-        return count || 0;
-      } catch (error) {
-        console.error("Error fetching total feedback:", error);
-        return 0;
-      }
-    },
-
-    getTotalResources: async () => {
-      try {
-        const { count, error } = await supabase
-          .from("resources")
-          .select("*", { count: "exact", head: true });
-
-        if (error) throw error;
-        return count || 0;
-      } catch (error) {
-        console.error("Error fetching total resources:", error);
-        return 0;
-      }
-    },
-
-    getTotalStudents: async () => {
-      try {
-        const { count, error } = await supabase
-          .from("students")
-          .select("*", { count: "exact", head: true });
-
-        if (error) throw error;
-        return count || 0;
-      } catch (error) {
-        console.error("Error fetching total students:", error);
-        return 0;
+        console.error("Error updating stats:", error);
+        throw error;
       }
     },
 
