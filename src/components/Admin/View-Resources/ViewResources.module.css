@@ -178,77 +178,8 @@
   background: rgba(220, 53, 69, 0.1);
 }
 
-.confirmationModal {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-xl);
-  width: 100%;
-  max-width: 450px;
-  overflow: hidden;
-}
-
-.modalHeader {
-  padding: 1.25rem;
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.modalHeader h3 {
-  margin: 0;
-  color: var(--color-error);
-}
-
-.modalBody {
-  padding: 1.5rem;
-  text-align: center;
-}
-
-.modalBody p {
-  color: var(--color-text);
-  line-height: 1.5;
-}
-
-.modalFooter {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid var(--color-border);
-}
-
-.cancelButton {
-  background: white;
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cancelButton:hover {
-  background: #f8f9fa;
-}
-
-.deleteConfirmButton {
-  background: var(--color-error);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: var(--radius-sm);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.deleteConfirmButton:hover:not(:disabled) {
-  background: #c82333;
-}
-
-.deleteConfirmButton:disabled {
-  opacity: 0.7;
+.deleteButton:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 

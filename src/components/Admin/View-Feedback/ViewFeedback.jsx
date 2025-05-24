@@ -4,12 +4,12 @@ import Header from "../../Common/Header";
 import styles from "./ViewFeedback.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { 
-  FaSearch, 
-  FaFilter, 
-  FaTrash, 
-  FaChevronLeft, 
-  FaChevronRight, 
+import {
+  FaSearch,
+  FaFilter,
+  FaTrash,
+  FaChevronLeft,
+  FaChevronRight,
   FaTimes,
   FaStar,
   FaRegStar,
@@ -19,8 +19,9 @@ import {
   FaInfoCircle,
   FaSort,
   FaSortUp,
-  FaSortDown
+  FaSortDown,
 } from "react-icons/fa";
+import DeleteConfirmation from "../../Common/DeleteConfirmation";
 
 function ViewFeedback() {
   const { getFeedback, deleteFeedback } = useAuth();
@@ -45,6 +46,10 @@ function ViewFeedback() {
     field: "timestamp",
     order: "desc",
   });
+
+  // Delete Confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [feedbackToDelete, setfeedbackToDelete] = useState(null);
 
   useEffect(() => {
     fetchFeedback();
@@ -72,22 +77,6 @@ function ViewFeedback() {
       setFeedback(feedback);
       setTotalCount(totalCount);
       setTotalPages(totalPages);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDelete = async (feedbackId, feedbackTitle) => {
-    if (!window.confirm(`Are you sure you want to delete "${feedbackTitle || 'this feedback'}"?`)) {
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await deleteFeedback(feedbackId);
-      await fetchFeedback();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -128,40 +117,50 @@ function ViewFeedback() {
     setSelectedFeedback(null);
   };
 
-  const handleDeleteFromModal = async () => {
-    if (!selectedFeedback) return;
-
-    if (window.confirm(`Are you sure you want to delete "${selectedFeedback.feedback_title || 'this feedback'}"?`)) {
-      setLoading(true);
-      try {
-        await deleteFeedback(selectedFeedback.feedback_id);
-        closeModal();
-        await fetchFeedback();
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+  const handleDelete = async (feedbackId) => {
+    setLoading(true);
+    try {
+      await deleteFeedback(feedbackId);
+      await fetchFeedback();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+      setShowDeleteModal(false);
     }
   };
 
   const renderSortIcon = (field) => {
-    if (sortConfig.field !== field) return <FaSort className={styles.sortIcon} />;
-    return sortConfig.order === "asc" 
-      ? <FaSortUp className={styles.sortIcon} /> 
-      : <FaSortDown className={styles.sortIcon} />;
+    if (sortConfig.field !== field)
+      return <FaSort className={styles.sortIcon} />;
+    return sortConfig.order === "asc" ? (
+      <FaSortUp className={styles.sortIcon} />
+    ) : (
+      <FaSortDown className={styles.sortIcon} />
+    );
   };
 
   const renderStars = (rating) => {
-    return Array.from({ length: 5 }).map((_, i) => (
-      i < rating 
-        ? <FaStar key={i} className={styles.starFilled} />
-        : <FaRegStar key={i} className={styles.starEmpty} />
-    ));
+    return Array.from({ length: 5 }).map((_, i) =>
+      i < rating ? (
+        <FaStar key={i} className={styles.starFilled} />
+      ) : (
+        <FaRegStar key={i} className={styles.starEmpty} />
+      )
+    );
   };
 
   return (
     <>
+      <DeleteConfirmation
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => handleDelete(feedbackToDelete)}
+        title="Delete Feedback"
+        message="Are you sure you want to delete this feedback? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Header />
       <div className={styles.container}>
         <div className={styles.card}>
@@ -250,8 +249,8 @@ function ViewFeedback() {
               </div>
 
               <div className={styles.filterActions}>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className={styles.applyButton}
                   disabled={loading}
                 >
@@ -280,7 +279,7 @@ function ViewFeedback() {
             <table className={styles.feedbackTable}>
               <thead>
                 <tr>
-                  <th 
+                  <th
                     onClick={() => handleSort("feedback_title")}
                     className={styles.sortableHeader}
                   >
@@ -290,7 +289,7 @@ function ViewFeedback() {
                     </div>
                   </th>
                   <th>Content Preview</th>
-                  <th 
+                  <th
                     onClick={() => handleSort("feedback_rating")}
                     className={styles.sortableHeader}
                   >
@@ -299,7 +298,7 @@ function ViewFeedback() {
                       {renderSortIcon("feedback_rating")}
                     </div>
                   </th>
-                  <th 
+                  <th
                     onClick={() => handleSort("timestamp")}
                     className={styles.sortableHeader}
                   >
@@ -308,7 +307,7 @@ function ViewFeedback() {
                       {renderSortIcon("timestamp")}
                     </div>
                   </th>
-                  <th 
+                  <th
                     onClick={() => handleSort("feedback_category")}
                     className={styles.sortableHeader}
                   >
@@ -328,7 +327,7 @@ function ViewFeedback() {
                       <td className={styles.titleCell}>
                         {item.feedback_title || "N/A"}
                       </td>
-                      <td 
+                      <td
                         className={styles.contentCell}
                         onClick={() => openModal(item)}
                       >
@@ -361,7 +360,9 @@ function ViewFeedback() {
                         </button>
                         <button
                           className={styles.deleteButton}
-                          onClick={() => handleDelete(item.feedback_id, item.feedback_title)}
+                          onClick={() =>
+                            {setfeedbackToDelete(item.feedback_id); setShowDeleteModal(true);}
+                          }
                           disabled={loading}
                         >
                           <FaTrash className={styles.deleteIcon} />
@@ -372,7 +373,9 @@ function ViewFeedback() {
                 ) : (
                   <tr className={styles.emptyRow}>
                     <td colSpan="7" className={styles.noResults}>
-                      {loading ? "Loading feedback..." : "No feedback found matching your criteria"}
+                      {loading
+                        ? "Loading feedback..."
+                        : "No feedback found matching your criteria"}
                     </td>
                   </tr>
                 )}

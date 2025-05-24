@@ -12,6 +12,7 @@ import {
   MdClose,
 } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import DeleteConfirmation from "../../Common/DeleteConfirmation.jsx";
 
 function ViewResources() {
   const {
@@ -83,30 +84,17 @@ function ViewResources() {
     fetchResources();
   };
 
-  const promptDelete = (resourceId) => {
-    setResourceToDelete(resourceId);
-    setShowDeleteModal(true);
-  };
-
-  const handleDelete = async () => {
-    if (!resourceToDelete) return;
-
+  const handleDelete = async (resourceId) => {
     setLoading(true);
     try {
-      await deleteResource(resourceToDelete);
+      await deleteResource(resourceId);
       await fetchResources();
-      setShowDeleteModal(false);
-      setResourceToDelete(null);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
+      setShowDeleteModal(false);
     }
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setResourceToDelete(null);
   };
 
   const openAddModal = () => {
@@ -170,6 +158,15 @@ function ViewResources() {
 
   return (
     <>
+      <DeleteConfirmation
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => handleDelete(resourceToDelete)}
+        title="Delete Resource"
+        message="Are you sure you want to delete this resource? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Header />
       <div className={styles.container}>
         <div className={styles.header}>
@@ -251,7 +248,10 @@ function ViewResources() {
                         <MdEdit />
                       </button>
                       <button
-                        onClick={() => promptDelete(resource.resourceid)}
+                        onClick={() => {
+                          setResourceToDelete(resource.resourceid);
+                          setShowDeleteModal(true);
+                        }}
                         className={styles.deleteButton}
                         disabled={loading}
                       >
@@ -324,42 +324,6 @@ function ViewResources() {
           </button>
         )}
       </div>
-
-      {/* Delete Confimation Modal */}
-      {showDeleteModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.confirmationModal}>
-            <div className={styles.modalHeader}>
-              <h3>Confirm Deletion</h3>
-              <button onClick={cancelDelete} className={styles.closeButton}>
-                <MdClose />
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <p>
-                Are you sure you want to delete this resource? This action
-                cannot be undone.
-              </p>
-            </div>
-            <div className={styles.modalFooter}>
-              <button
-                onClick={cancelDelete}
-                className={styles.cancelButton}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className={styles.deleteConfirmButton}
-                disabled={loading}
-              >
-                {loading ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Add Resource Modal */}
       {showAddModal && (
