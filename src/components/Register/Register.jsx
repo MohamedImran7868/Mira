@@ -210,6 +210,7 @@ const Register = () => {
                   minLength="8"
                   className={styles.inputField}
                   placeholder="Create a password"
+                  autoComplete="new-password"
                 />
                 <button
                   type="button"
@@ -287,7 +288,7 @@ const Register = () => {
           </form>
 
           <div className={styles.footer}>
-            <p>Already have an account?</p>
+            <span>Already have an account?</span>
             <button
               onClick={() => navigate("/login")}
               className={styles.loginLink}

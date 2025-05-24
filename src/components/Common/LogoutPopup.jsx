@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './LogoutPopup.module.css';
 import { FaSignOutAlt, FaTimes } from 'react-icons/fa';
 

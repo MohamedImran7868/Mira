@@ -250,6 +250,72 @@
   box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
 }
 
+.input.inappropriate:focus {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 2px rgba(229, 62, 62, 0.2);
+}
+
+/* Warning Popup Styles */
+.warningPopup {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid #ffeeba;
+  max-width: 90%;
+  width: max-content;
+}
+
+.warningContent {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.warningIcon {
+  font-size: 1.5rem;
+}
+
+.closeWarning {
+  background: none;
+  border: none;
+  color: #856404;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 15px;
+  padding: 0 5px;
+}
+
+.closeWarning:hover {
+  color: #5a3b02;
+}
+
+/* Input styling for inappropriate content */
+.input.inappropriate {
+  border: 2px solid #dc3545;
+  background-color: #fff8f8;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
 .sendBtn {
   background-color: var(--color-primary);
   color: white;

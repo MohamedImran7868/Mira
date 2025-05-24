@@ -1,20 +1,17 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
-import LoadingModal from './components/Common/LoadingModal';
 
 export default function ProtectedRoute({ children, adminOnly = false, studentOnly = false }) {
   const { user, userProfile, isLoading } = useAuth();
   const location = useLocation();
 
   if (isLoading) {
-    return <LoadingModal message='Loading session...' />;
+    return null;
   }
 
   if (!user) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
-
-  console.log(userProfile?.role);
 
   // Check role-based access
   if (adminOnly && userProfile?.role !== "admin") {

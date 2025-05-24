@@ -1,24 +1,45 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Header from "../../Common/Header";
 import styles from "./Feedback.module.css";
 import { useAuth } from "../../../AuthContext";
-import { FaStar, FaCheckCircle, FaPaperPlane, FaLightbulb, FaBug, FaComments, FaCog } from "react-icons/fa";
+import {
+  FaStar,
+  FaCheckCircle,
+  FaPaperPlane,
+  FaLightbulb,
+  FaBug,
+  FaComments,
+  FaCog,
+  FaRobot ,
+} from "react-icons/fa";
+import { containsProfanity } from "../../Common/filter";
 
 const Feedback = () => {
   const { uploadFeedback } = useAuth();
   const [feedback, setFeedback] = useState({
     title: "",
     message: "",
-    rating: 0,
+    rating: 1,
     category: "general",
   });
-  const [submitted, setSubmitted] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showWarning, setShowWarning] = useState({
+    title: false,
+    message: false,
+  });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFeedback((prev) => ({ ...prev, [name]: value }));
+
+    // Check for profanity in real-time
+    if (value && containsProfanity(value)) {
+      setShowWarning((prev) => ({ ...prev, [name]: true }));
+    } else {
+      setShowWarning((prev) => ({ ...prev, [name]: false }));
+    }
   };
 
   const handleRatingChange = (rating) => {
@@ -31,57 +52,89 @@ const Feedback = () => {
     setError("");
 
     try {
+      // Check both fields before submission
+      const titleHasProfanity = containsProfanity(feedback.title);
+      const messageHasProfanity = containsProfanity(feedback.message);
+
+      if (titleHasProfanity || messageHasProfanity) {
+        setShowWarning({
+          title: titleHasProfanity,
+          message: messageHasProfanity,
+        });
+        throw new Error("Please remove inappropriate language");
+      }
+
       await uploadFeedback(feedback);
       setFeedback({
         title: "",
         message: "",
-        rating: 0,
+        rating: 1,
         category: "general",
       });
-      setSubmitted(true);
+      setShowSuccess(true);
     } catch (err) {
-      setError("Failed to submit feedback. Please try again.");
+      setError(err.message || "Failed to submit feedback. Please try again.");
       console.error("Submission error:", err);
     } finally {
       setLoading(false);
     }
   };
 
-  if (submitted) {
-    return (
-      <>
-        <Header />
-        <div className={styles.successContainer}>
-          <div className={styles.successCard}>
-            <FaCheckCircle className={styles.successIcon} />
-            <h2>Thank You for Your Feedback!</h2>
-            <p>
-              We appreciate you taking the time to help us improve MIRA. Your insights are valuable to us.
-            </p>
-            <button
-              className={styles.returnButton}
-              onClick={() => setSubmitted(false)}
-            >
-              Submit Another Feedback
-            </button>
-          </div>
-        </div>
-      </>
-    );
-  }
-
   const categoryIcons = {
     general: <FaComments />,
     bug: <FaBug />,
     feature: <FaLightbulb />,
     improvement: <FaCog />,
-    response: <FaComments />,
+    response: <FaRobot  />,
   };
 
   return (
     <>
       <Header />
       <div className={styles.container}>
+        {/* Warning Popup */}
+        {(showWarning.title || showWarning.message) && (
+          <div className={styles.warningPopup}>
+            <div className={styles.warningContent}>
+              <span className={styles.warningIcon}>⚠️</span>
+              <p>
+                Please remove inappropriate language from:
+                {showWarning.title && " Title"}
+                {showWarning.title && showWarning.message && " and"}
+                {showWarning.message && " Message"}
+              </p>
+              <button
+                className={styles.closeWarning}
+                onClick={() => setShowWarning({ title: false, message: false })}
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Success Popup */}
+        {showSuccess && (
+          <div className={styles.successOverlay}>
+            <div className={styles.successPopup}>
+              <div className={styles.successContent}>
+                <FaCheckCircle className={styles.successIcon} />
+                <h3>Thank You for Your Feedback!</h3>
+                <p>
+                  We appreciate you taking the time to help us improve MIRA.
+                  Your insights are valuable to us.
+                </p>
+                <button
+                  className={styles.closeSuccess}
+                  onClick={() => setShowSuccess(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.feedbackCard}>
           <div className={styles.header}>
             <h2>Share Your Feedback</h2>
@@ -101,7 +154,9 @@ const Feedback = () => {
                 onChange={handleChange}
                 required
                 maxLength="100"
-                className={styles.inputField}
+                className={`${styles.inputField} ${
+                  showWarning.title ? styles.inappropriate : ""
+                }`}
                 placeholder="Brief description of your feedback"
               />
             </div>
@@ -142,14 +197,16 @@ const Feedback = () => {
                       star <= feedback.rating ? styles.active : ""
                     }`}
                     onClick={() => handleRatingChange(star)}
-                    aria-label={`Rate ${star} star${star !== 1 ? 's' : ''}`}
+                    aria-label={`Rate ${star} star${star !== 1 ? "s" : ""}`}
                   >
                     <FaStar />
                   </button>
                 ))}
                 <span className={styles.ratingText}>
                   {feedback.rating > 0
-                    ? `${feedback.rating} star${feedback.rating !== 1 ? 's' : ''}`
+                    ? `${feedback.rating} star${
+                        feedback.rating !== 1 ? "s" : ""
+                      }`
                     : "Not rated"}
                 </span>
               </div>
@@ -167,7 +224,9 @@ const Feedback = () => {
                 required
                 rows="5"
                 maxLength="500"
-                className={styles.textareaField}
+                className={`${styles.textareaField} ${
+                  showWarning.message ? styles.inappropriate : ""
+                }`}
                 placeholder="Please share your detailed thoughts, suggestions, or issues..."
               />
               <div className={styles.footerNote}>

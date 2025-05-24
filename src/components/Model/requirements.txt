@@ -1,0 +1,11 @@
+# requirements.txt
+
+# Core Libraries
+torch==2.0.1
+transformers==4.30.2
+llama-cpp-python==0.1.72
+
+# Optional but recommended for compatibility and performance
+sentencepiece
+accelerate
+numpy
