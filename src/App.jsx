@@ -13,7 +13,6 @@ import ManageUser from "./components/Admin/Manage-User/ManageUser.jsx";
 import ViewFeedback from "./components/Admin/View-Feedback/ViewFeedback.jsx";
 import ViewResources from "./components/Admin/View-Resources/ViewResources.jsx";
 import UpdatePassword from "./components/Common/UpdatePassword.jsx";
-import StudentDashboard from "./components/User/StudentDashboard.jsx";
 
 function App() {
   return (
@@ -26,14 +25,6 @@ function App() {
           <Route path="/update-password" element={<UpdatePassword />} />
 
           {/* Student routes */}
-          <Route
-            path="/student-dashboard"
-            element={
-              <ProtectedRoute studentOnly>
-                <StudentDashboard />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="/chat"
             element={

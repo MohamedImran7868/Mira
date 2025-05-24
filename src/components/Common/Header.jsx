@@ -4,8 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/Logo.png";
 import LogoutPopup from "./LogoutPopup";
 import { 
-  IoLogOut, 
-  IoNotificationsOutline,
+  IoLogOut,
   IoChevronDown,
   IoChevronUp
 } from "react-icons/io5";
@@ -31,7 +30,6 @@ function Header() {
 
   // Pages based on role
   const studentPages = [
-    { path: "/student-dashboard", name: "Dashboard", icon: "📊" },
     { path: "/chat", name: "Chat", icon: "💬" },
     { path: "/feedback", name: "Feedback", icon: "📝" },
     { path: "/view-resources", name: "Resources", icon: "📚" },
@@ -76,11 +74,6 @@ function Header() {
               </nav>
 
               <div className={styles.actionsContainer}>
-                {/* <button className={styles.notificationBtn}>
-                  <IoNotificationsOutline className={styles.actionIcon} />
-                  <span className={styles.notificationBadge}>3</span>
-                </button> */}
-
                 <div 
                   className={styles.pagesDropdownContainer}
                   onMouseEnter={() => setShowPagesDropdown(true)}
