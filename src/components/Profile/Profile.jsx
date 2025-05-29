@@ -3,7 +3,7 @@ import { useAuth } from "../../AuthContext";
 import Header from "../Common/Header";
 import styles from "./Profile.module.css";
 import LoadingModal from "../Common/LoadingModal";
-import { FaEye, FaEyeSlash, FaUser, FaBirthdayCake, FaEnvelope, FaLock, FaEdit, FaTimes, FaSave, FaCamera } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaLock, FaEdit, FaTimes, FaSave, FaCamera, FaIdCard } from "react-icons/fa";
 
 const Profile = () => {
   const {
@@ -38,34 +38,17 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
-  // Date calculations
-  const currentYear = new Date().getFullYear();
-  const maxDate = `${currentYear - 18}-12-31`;
-  const minDate = `${currentYear - 30}-01-01`;
-
   // Fetch user profile on mount
   useEffect(() => {
     if (userProfile) {
       setEditData({
         name: userProfile.user_name,
         email: userProfile.user_email,
-        birthday: userProfile.student_birthday,
-        age: userProfile.student_age,
+        id: userProfile.id,
       });
       setImageUrl(getImageUrl(userProfile.user_image));
     }
   }, [userProfile]);
-
-  // Calculate age from birthday
-  useEffect(() => {
-    if (editData.birthday) {
-      const birthDate = new Date(editData.birthday);
-      const today = new Date();
-      let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-
-      setEditData((prev) => ({ ...prev, age: calculatedAge.toString() }));
-    }
-  }, [editData.birthday]);
 
   const handleEditToggle = () => {
     setIsEditing(!isEditing);
@@ -79,7 +62,16 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setEditData((prev) => ({ ...prev, [name]: value }));
+    
+    // Validate ID field to only accept digits and limit to 10 characters
+    if (name === "id") {
+      if (value === "" || (/^\d+$/.test(value) && value.length <= 10)) {
+        setEditData(prev => ({ ...prev, [name]: value }));
+      }
+      return;
+    }
+    
+    setEditData(prev => ({ ...prev, [name]: value }));
   };
 
   const handlePasswordChange = (e) => {
@@ -138,7 +130,10 @@ const Profile = () => {
       setError(null);
       setSuccess(null);
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Validate ID length if editing
+      if (isEditing && editData.id?.length !== 10) {
+        throw new Error("ID must be exactly 10 digits");
+      }
 
       await updateProfile(editData);
 
@@ -230,40 +225,24 @@ const Profile = () => {
               <div className={styles.infoGrid}>
                 <div className={styles.infoItem}>
                   <label className={styles.infoLabel}>
-                    <FaBirthdayCake className={styles.fieldIcon} />
-                    Birthday
+                    <FaIdCard className={styles.fieldIcon} />
+                    ID Number
                   </label>
                   {isEditing ? (
                     <input
-                      type="date"
-                      name="birthday"
-                      value={editData.birthday}
+                      type="text"
+                      name="id"
+                      value={editData.id}
                       onChange={handleInputChange}
                       className={styles.editField}
-                      max={maxDate}
-                      min={minDate}
+                      placeholder="10-digit ID"
+                      maxLength="10"
+                      pattern="\d{10}"
+                      inputMode="numeric"
                     />
                   ) : (
                     <span className={styles.infoValue}>
-                      {new Date(userProfile?.student_birthday).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
-
-                <div className={styles.infoItem}>
-                  <label className={styles.infoLabel}>Age</label>
-                  {isEditing ? (
-                    <input
-                      type="number"
-                      name="age"
-                      value={editData.age}
-                      onChange={handleInputChange}
-                      className={styles.editField}
-                      readOnly
-                    />
-                  ) : (
-                    <span className={styles.infoValue}>
-                      {userProfile?.student_age}
+                      {userProfile?.id}
                     </span>
                   )}
                 </div>

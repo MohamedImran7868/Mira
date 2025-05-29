@@ -40,9 +40,13 @@ const LoginScreen = () => {
         return;
       }
 
+      console.log(profile?.isProfile_set);
+
       // Redirect based on role
-      if (profile?.role === "admin") {
+      if (profile?.role === "admin" && profile?.isProfile_set === "set") {
         navigate("/admin-dashboard");
+      } else if (profile?.role === "admin" && profile?.isProfile_set === "not set") {
+        navigate("/complete-profile");
       } else {
         navigate("/chat");
       }

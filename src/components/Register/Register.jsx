@@ -1,16 +1,23 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../Common/Header";
 import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import { useAuth } from "../../AuthContext";
 import LoadingModal from "../Common/LoadingModal";
-import { FaEye, FaEyeSlash, FaUser, FaCalendarAlt, FaEnvelope, FaLock, FaArrowLeft } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaArrowLeft,
+  FaIdCard,
+} from "react-icons/fa";
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
-    birthday: "",
-    age: "",
+    id: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -30,23 +37,26 @@ const Register = () => {
   const { registerStudent } = useAuth();
   const navigate = useNavigate();
 
-  // Date calculations
-  const currentYear = new Date().getFullYear();
-  const maxDate = `${currentYear - 18}-12-31`;
-  const minDate = `${currentYear - 30}-01-01`;
-
-  // Calculate age from birthday
   useEffect(() => {
-    if (formData.birthday) {
-      const birthDate = new Date(formData.birthday);
-      const today = new Date();
-      let calculatedAge = today.getFullYear() - birthDate.getFullYear();
-      setFormData((prev) => ({ ...prev, age: calculatedAge.toString() }));
+    if (formData.id && formData.id.length === 10) {
+      setFormData((prev) => ({
+        ...prev,
+        email: `${prev.id}@student.mmu.edu.my`,
+      }));
     }
-  }, [formData.birthday]);
+  }, [formData.id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Validate ID field to only accept digits and limit to 10 characters
+    if (name === "id") {
+      if (value === "" || (/^\d+$/.test(value) && value.length <= 10)) {
+        setFormData((prev) => ({ ...prev, [name]: value }));
+      }
+      return;
+    }
+
     if (name === "password") {
       setPasswordRequirements({
         length: value.length >= 8,
@@ -61,8 +71,10 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (parseInt(formData.age) < 18) {
-      setError("You must be at least 18 years old to register");
+
+    // Validate ID length
+    if (formData.id.length !== 10) {
+      setError("ID must be exactly 10 digits");
       return;
     }
 
@@ -72,8 +84,7 @@ const Register = () => {
     try {
       await registerStudent(formData.email, formData.password, {
         name: formData.name,
-        age: parseInt(formData.age),
-        birthday: formData.birthday,
+        id: formData.id,
       });
       navigate("/login", { state: { registrationSuccess: true } });
     } catch (err) {
@@ -92,13 +103,10 @@ const Register = () => {
       <Header />
       <div className={styles.container}>
         <div className={styles.card}>
-          <button 
-            onClick={() => navigate(-1)} 
-            className={styles.backButton}
-          >
+          <button onClick={() => navigate(-1)} className={styles.backButton}>
             <FaArrowLeft /> Back
           </button>
-          
+
           <div className={styles.header}>
             <h2>Create Your Account</h2>
             <p>Join our community of learners</p>
@@ -143,38 +151,24 @@ const Register = () => {
               />
             </div>
 
-            <div className={styles.row}>
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>
-                  <FaCalendarAlt className={styles.inputIcon} />
-                  Birth Date
-                </label>
-                <input
-                  type="date"
-                  name="birthday"
-                  value={formData.birthday}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
-                  max={maxDate}
-                  min={minDate}
-                  className={styles.inputField}
-                />
-              </div>
-
-              <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>Age</label>
-                <input
-                  type="number"
-                  name="age"
-                  value={formData.age}
-                  onChange={handleChange}
-                  required
-                  readOnly
-                  min="18"
-                  className={styles.inputField}
-                />
-              </div>
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                <FaIdCard className={styles.inputIcon} />
+                ID Number
+              </label>
+              <input
+                type="text"
+                name="id"
+                value={formData.id}
+                onChange={handleChange}
+                required
+                disabled={loading}
+                className={styles.inputField}
+                placeholder="Enter your 10-digit ID"
+                maxLength="10"
+                pattern="\d{10}"
+                inputMode="numeric"
+              />
             </div>
 
             <div className={styles.inputGroup}>
@@ -187,10 +181,9 @@ const Register = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                required
-                disabled={loading}
+                readOnly
                 className={styles.inputField}
-                placeholder="Enter your email"
+                placeholder="Enter your ID to autocomplete this row"
               />
             </div>
 
@@ -227,20 +220,41 @@ const Register = () => {
               <div className={styles.passwordRequirements}>
                 <h4>Password Requirements:</h4>
                 <ul>
-                  <li className={passwordRequirements.length ? styles.valid : ""}>
-                    {passwordRequirements.length ? "✓" : "✗"} Minimum 8 characters
+                  <li
+                    className={passwordRequirements.length ? styles.valid : ""}
+                  >
+                    {passwordRequirements.length ? "✓" : "✗"} Minimum 8
+                    characters
                   </li>
-                  <li className={passwordRequirements.uppercase ? styles.valid : ""}>
-                    {passwordRequirements.uppercase ? "✓" : "✗"} At least one uppercase letter
+                  <li
+                    className={
+                      passwordRequirements.uppercase ? styles.valid : ""
+                    }
+                  >
+                    {passwordRequirements.uppercase ? "✓" : "✗"} At least one
+                    uppercase letter
                   </li>
-                  <li className={passwordRequirements.lowercase ? styles.valid : ""}>
-                    {passwordRequirements.lowercase ? "✓" : "✗"} At least one lowercase letter
+                  <li
+                    className={
+                      passwordRequirements.lowercase ? styles.valid : ""
+                    }
+                  >
+                    {passwordRequirements.lowercase ? "✓" : "✗"} At least one
+                    lowercase letter
                   </li>
-                  <li className={passwordRequirements.number ? styles.valid : ""}>
-                    {passwordRequirements.number ? "✓" : "✗"} At least one number
+                  <li
+                    className={passwordRequirements.number ? styles.valid : ""}
+                  >
+                    {passwordRequirements.number ? "✓" : "✗"} At least one
+                    number
                   </li>
-                  <li className={passwordRequirements.specialChar ? styles.valid : ""}>
-                    {passwordRequirements.specialChar ? "✓" : "✗"} At least one special character
+                  <li
+                    className={
+                      passwordRequirements.specialChar ? styles.valid : ""
+                    }
+                  >
+                    {passwordRequirements.specialChar ? "✓" : "✗"} At least one
+                    special character
                   </li>
                 </ul>
               </div>
@@ -261,7 +275,8 @@ const Register = () => {
                   disabled={loading}
                   minLength="8"
                   className={`${styles.inputField} ${
-                    formData.confirmPassword && formData.password !== formData.confirmPassword
+                    formData.confirmPassword &&
+                    formData.password !== formData.confirmPassword
                       ? styles.invalid
                       : ""
                   }`}
@@ -271,7 +286,9 @@ const Register = () => {
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
                   className={styles.passwordToggle}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
                 >
                   {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </button>

@@ -244,8 +244,7 @@ export function AuthProvider({ children }) {
       const { data: studentData, error: studentError } = await supabase
         .from("students")
         .update({
-          student_birthday: updates.birthday,
-          student_age: updates.age,
+          id: updates.id,
           updated_at: new Date().toISOString(),
         })
         .eq("userID", user.id)

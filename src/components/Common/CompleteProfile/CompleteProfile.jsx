@@ -8,7 +8,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const CompleteProfile = () => {
   const [editData, setEditData] = useState({
     name: "",
-    age: "",
     contact: "",
   });
   const [error, setError] = useState(null);
@@ -59,7 +58,7 @@ const CompleteProfile = () => {
   };
 
   const validateForm = () => {
-    if (!editData.name || !editData.age || !editData.contact) {
+    if (!editData.name || !editData.contact) {
       throw new Error("All fields are required");
     }
 
@@ -148,22 +147,6 @@ const CompleteProfile = () => {
               required
               disabled={loading}
             />
-          </div>
-
-          <div className={styles.rowContainer}>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Age:</label>
-              <input
-                type="number"
-                id="age"
-                name="age"
-                value={editData.age}
-                onChange={handleInputChange}
-                required
-                min="18"
-                disabled={loading}
-              />
-            </div>
           </div>
 
           <div className={styles.inputGroup}>
