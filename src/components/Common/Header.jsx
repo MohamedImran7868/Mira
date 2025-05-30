@@ -38,6 +38,7 @@ function Header() {
 
   const adminPages = [
     { path: "/admin-dashboard", name: "Dashboard", icon: "📊" },
+    { path: "/invite-admin", name: "Invite Admin", icon: "👨‍💻" },
     { path: "/manage-user", name: "Users", icon: "👥" },
     { path: "/view-feedback", name: "Feedback", icon: "📝" },
     { path: "/view-resources", name: "Resources", icon: "📚" },

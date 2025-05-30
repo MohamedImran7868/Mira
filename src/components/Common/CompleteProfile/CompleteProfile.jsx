@@ -32,7 +32,7 @@ const CompleteProfile = () => {
   const { user, CompleteAdminProfile, updatePassword } = useAuth();
   const navigate = useNavigate();
 
-  // Add this useEffect to prevent back navigation
+  // To prevent back navigation
   useEffect(() => {
     if (user?.isProfile_set === "not set") {
       window.history.pushState(null, null, window.location.pathname);
@@ -44,7 +44,7 @@ const CompleteProfile = () => {
       window.addEventListener("popstate", handlePopState);
       return () => window.removeEventListener("popstate", handlePopState);
     }
-  }, [user?.isProfile_set]); // More specific dependency
+  }, [user?.isProfile_set]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

@@ -14,6 +14,7 @@ import ManageUser from "./components/Admin/Manage-User/ManageUser.jsx";
 import ViewFeedback from "./components/Admin/View-Feedback/ViewFeedback.jsx";
 import ViewResources from "./components/Admin/View-Resources/ViewResources.jsx";
 import UpdatePassword from "./components/Common/UpdatePassword.jsx";
+import InviteAdmin from "./components/Admin/Invite-Admin/inviteAdmin.jsx";
 
 function App() {
   return (
@@ -52,6 +53,14 @@ function App() {
           />
 
           {/* Admin routes */}
+          <Route
+            path="/invite-admin"
+            element={
+              <ProtectedRoute adminOnly>
+                <InviteAdmin />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/complete-profile"
             element={

@@ -97,6 +97,16 @@ CREATE TABLE statistics_history (
   UNIQUE(date) -- Ensures only one entry per date
 );
 
+create table public.invite_emails (
+  id uuid not null default extensions.uuid_generate_v4(),
+  email varchar(255) not null,
+  password varchar(255) not null,
+  invited_by uuid not null,
+  created_at timestamp with time zone not null default now(),
+  constraint invite_emails_pkey primary key (id),
+  constraint invite_emails_invited_by_fkey foreign key (invited_by) references auth.users(id)
+);
+
 -- RLS POLICIES
 -- Enable RLS on all tables
 ALTER TABLE "user" ENABLE ROW LEVEL SECURITY;

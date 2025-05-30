@@ -587,6 +587,20 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const inviteAdmin = async (email) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('invite-admin', {
+      body: { email }
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Error inviting admin:', error);
+    return { error: error.message };
+  }
+};
+
   const getStudents = async (page = 1, searchTerm = "") => {
     const itemsPerPage = 15;
     const from = (page - 1) * itemsPerPage;
@@ -866,6 +880,7 @@ export function AuthProvider({ children }) {
     // Admin
     getDashboardStats, //For admin Dasboard
     updateStatsManually, // Function to manually trigger stats update (for testing) - Put a button in ViewFeedback and call this
+    inviteAdmin, //Invite New Admin
     getStudents, // Search students
     deleteStudent, // Delete student account
     getFeedback, // Get all Feedback
