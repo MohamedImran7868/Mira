@@ -23,6 +23,7 @@ function ManageUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalStudents, setTotalStudents] = useState(0);
+  const [deleting, setDeleting] = useState(false);
 
   // Delete Confirmation
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -36,13 +37,13 @@ function ManageUser() {
     setLoading(true);
     setError(null);
     try {
-      const { students, totalCount, totalPages } = await getStudents(
-        currentPage,
-        searchQuery
-      );
-      setStudents(students);
-      setTotalStudents(totalCount);
-      setTotalPages(totalPages);
+      const response = await getStudents(currentPage, searchQuery);
+      // Make sure the response has the expected structure
+      if (response && response.students) {
+        setStudents(response.students);
+        setTotalStudents(response.totalCount || 0);
+        setTotalPages(response.totalPages || 1);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -57,15 +58,15 @@ function ManageUser() {
   };
 
   const handleDelete = async (userToDelete) => {
-    setLoading(true);
+    setDeleting(true);
     try {
+      setShowDeleteModal(false);
       await deleteStudent(userToDelete);
       await fetchStudents();
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
-      setShowDeleteModal(false);
     }
   };
 
@@ -77,6 +78,7 @@ function ManageUser() {
 
   return (
     <>
+      {deleting && <LoadingModal message="Deleting resource..." />}
       <DeleteConfirmation
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

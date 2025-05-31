@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
         .from("user")
         .select("*")
         .eq("userID", authUser.id)
-        .maybeSingle(); // Use maybeSingle instead of single
+        .maybeSingle();
 
       if (error || !userData) {
         console.error("Profile not found");
@@ -119,18 +119,6 @@ export function AuthProvider({ children }) {
     };
   }, []);
 
-  // Helper function to format category display
-  function formatCategoryDisplay(category) {
-    const categoryMap = {
-      general: "General Feedback",
-      bug: "Bug Report",
-      feature: "Feature Request",
-      improvement: "Improvement Suggestion",
-      response: "Chatbot Response",
-    };
-    return categoryMap[category] || category;
-  }
-
   // Global
   const signIn = async (email, password) => {
     setLoading(true);
@@ -179,9 +167,18 @@ export function AuthProvider({ children }) {
 
   //Student
   const registerStudent = async (email, password, studentData) => {
-    await supabase.functions.invoke("register-student", {
-      body: { email, password, studentData },
-    });
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "register-student",
+        {
+          body: { email, password, studentData },
+        }
+      );
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const resendVerification = async (email) => {
@@ -449,125 +446,31 @@ export function AuthProvider({ children }) {
   };
 
   // Admin
-  const getTotalUsers = async () => {
-    const { count } = await supabase
-      .from("user")
-      .select("*", { count: "exact", head: true });
-    return count || 0;
-  };
-
-  const getTotalFeedback = async () => {
-    const { count } = await supabase
-      .from("feedback")
-      .select("*", { count: "exact", head: true });
-    return count || 0;
-  };
-
-  const getTotalResources = async () => {
-    const { count } = await supabase
-      .from("resources")
-      .select("*", { count: "exact", head: true });
-    return count || 0;
-  };
-
-  const getTotalStudents = async () => {
-    const { count } = await supabase
-      .from("students")
-      .select("*", { count: "exact", head: true });
-    return count || 0;
-  };
-
   const getDashboardStats = async () => {
     try {
-      // Get current counts
-      const [currentUsers, currentFeedback, currentResources, currentStudents] =
-        await Promise.all([
-          getTotalUsers(),
-          getTotalFeedback(),
-          getTotalResources(),
-          getTotalStudents(),
-        ]);
-
-      // Get yesterday's stats for comparison
-      const { data: history } = await supabase
-        .from("statistics_history")
-        .select("*")
-        .order("date", { ascending: false })
-        .limit(2); // Get latest 2 entries (today and yesterday)
-
-      const yesterday = history?.length > 1 ? history[1] : null;
-
-      // Calculate changes
-      const calculateChange = (current, previous) => {
-        if (!previous || previous === 0)
-          return { change: "+0%", trend: "neutral" };
-        const percentage = ((current - previous) / previous) * 100;
-        const trend =
-          percentage > 0 ? "up" : percentage < 0 ? "down" : "neutral";
-        return {
-          change: `${percentage >= 0 ? "+" : ""}${Math.round(percentage)}%`,
-          trend,
-        };
-      };
-
-      return [
+      const { data, error } = await supabase.functions.invoke(
+        "get-dashboard-stats",
         {
-          title: "Total Users",
-          value: currentUsers,
-          ...calculateChange(currentUsers, yesterday?.user_count),
-        },
-        {
-          title: "New Feedback",
-          value: currentFeedback,
-          ...calculateChange(currentFeedback, yesterday?.feedback_count),
-        },
-        {
-          title: "Resources",
-          value: currentResources,
-          ...calculateChange(currentResources, yesterday?.resource_count),
-        },
-        {
-          title: "Students",
-          value: currentStudents,
-          ...calculateChange(currentStudents, yesterday?.student_count),
-        },
-      ];
+          method: "GET",
+        }
+      );
+
+      if (error) throw error;
+      return (
+        data || [
+          { title: "Total Users", value: 0, change: "+0%", trend: "neutral" },
+          { title: "New Feedback", value: 0, change: "+0%", trend: "neutral" },
+          { title: "Resources", value: 0, change: "+0", trend: "neutral" },
+          { title: "Students", value: 0, change: "+0%", trend: "neutral" },
+        ]
+      );
     } catch (error) {
-      console.error("Error getting dashboard stats:", error);
-      // Fallback to simple counts without changes
-      const [currentUsers, currentFeedback, currentResources, currentStudents] =
-        await Promise.all([
-          getTotalUsers(),
-          getTotalFeedback(),
-          getTotalResources(),
-          getTotalStudents(),
-        ]);
-
+      console.error("Error fetching dashboard stats:", error);
       return [
-        {
-          title: "Total Users",
-          value: currentUsers,
-          change: "+0%",
-          trend: "neutral",
-        },
-        {
-          title: "New Feedback",
-          value: currentFeedback,
-          change: "+0%",
-          trend: "neutral",
-        },
-        {
-          title: "Resources",
-          value: currentResources,
-          change: "+0",
-          trend: "neutral",
-        },
-        {
-          title: "Students",
-          value: currentStudents,
-          change: "+0%",
-          trend: "neutral",
-        },
+        { title: "Total Users", value: 0, change: "+0%", trend: "neutral" },
+        { title: "New Feedback", value: 0, change: "+0%", trend: "neutral" },
+        { title: "Resources", value: 0, change: "+0", trend: "neutral" },
+        { title: "Students", value: 0, change: "+0%", trend: "neutral" },
       ];
     }
   };
@@ -588,65 +491,42 @@ export function AuthProvider({ children }) {
   };
 
   const inviteAdmin = async (email) => {
-  try {
-    const { data, error } = await supabase.functions.invoke('invite-admin', {
-      body: { email }
-    });
-
-    if (error) throw error;
-    return data;
-  } catch (error) {
-    console.error('Error inviting admin:', error);
-    return { error: error.message };
-  }
-};
-
-  const getStudents = async (page = 1, searchTerm = "") => {
-    const itemsPerPage = 15;
-    const from = (page - 1) * itemsPerPage;
-    const to = from + itemsPerPage - 1;
-
     try {
-      let query = supabase
-        .from("user")
-        .select(
-          `
-          userID,
-          user_name,
-          user_email,
-          students:students(status)
-        `,
-          { count: "exact" }
-        ) // Get total count
-        .eq("role", "student")
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
-      if (searchTerm) {
-        query = query.or(
-          `user_name.ilike.%${searchTerm}%,user_email.ilike.%${searchTerm}%`
-        );
-      }
-
-      const { data, error, count } = await query;
+      const { data, error } = await supabase.functions.invoke("invite-admin", {
+        body: { email },
+      });
 
       if (error) throw error;
-      return {
-        students: data || [],
-        totalCount: count || 0,
-        totalPages: Math.ceil(count / itemsPerPage) || 1,
-      };
+      return data;
+    } catch (error) {
+      console.error("Error inviting admin:", error);
+      return { error: error.message };
+    }
+  };
+
+  const getStudents = async (page = 1, searchTerm = "") => {
+    try {
+      const { data, error } = await supabase.functions.invoke("get-students", {
+        body: { page, searchTerm },
+      });
+
+      if (error) throw error;
+      return data || { students: [], totalCount: 0, totalPages: 1 };
     } catch (error) {
       console.error("Error fetching students:", error);
-      throw error;
+      return { students: [], totalCount: 0, totalPages: 1 };
     }
   };
 
   const deleteStudent = async (userId) => {
     try {
-      const { error } = await supabase.rpc("delete_auth_user", {
-        user_id: userId,
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "delete-students",
+        {
+          body: { userId },
+        }
+      );
+
       if (error) throw error;
       return true;
     } catch (error) {
@@ -662,94 +542,43 @@ export function AuthProvider({ children }) {
     sortOrder = "desc",
     searchQuery = ""
   ) => {
-    const itemsPerPage = 15;
-    const from = (page - 1) * itemsPerPage;
-    const to = from + itemsPerPage - 1;
-
     try {
-      let query = supabase
-        .from("feedback")
-        .select(
-          `
-        feedback_id,
-        feedback_title,
-        feedback_message,
-        feedback_rating,
-        feedback_category,
-        feedback_by,
-        timestamp,
-        created_at,
-        user:students(
-          user:user(user_name)
-        )
-      `,
-          { count: "exact" }
-        )
-        .range(from, to);
-
-      // Apply filters
-      if (filters.category) {
-        query = query.eq("feedback_category", filters.category);
-      }
-      if (filters.rating) {
-        query = query.eq("feedback_rating", filters.rating);
-      }
-      if (filters.startDate && filters.endDate) {
-        query = query
-          .gte("timestamp", filters.startDate)
-          .lte("timestamp", filters.endDate);
-      }
-
-      // Apply search - exact match when searching for user
-      if (searchQuery) {
-        query = query.ilike("feedback_by", `%${searchQuery}%`);
-      }
-
-      // Apply sorting
-      if (sortField === "feedback_category") {
-        query = query.order("feedback_category", {
-          ascending: sortOrder === "asc",
-        });
-      } else if (sortField === "feedback_rating") {
-        query = query.order("feedback_rating", {
-          ascending: sortOrder === "asc",
-        });
-      } else if (sortField === "timestamp") {
-        query = query.order("timestamp", {
-          ascending: sortOrder === "asc",
-        });
-      } else {
-        query = query.order(sortField, { ascending: sortOrder === "asc" });
-      }
-
-      const { data, error, count } = await query;
+      const { data, error } = await supabase.functions.invoke("get-feedbacks", {
+        body: {
+          page,
+          filters,
+          sortField,
+          sortOrder,
+          searchQuery,
+        },
+      });
 
       if (error) throw error;
-
-      // Format category display names
-      const formattedData =
-        data?.map((item) => ({
-          ...item,
-          displayCategory: formatCategoryDisplay(item.feedback_category),
-        })) || [];
-
-      return {
-        feedback: formattedData,
-        totalCount: count || 0,
-        totalPages: Math.ceil(count / itemsPerPage) || 1,
-      };
+      return (
+        data || {
+          feedback: [],
+          totalCount: 0,
+          totalPages: 1,
+        }
+      );
     } catch (error) {
       console.error("Error fetching feedback:", error);
-      throw error;
+      return {
+        feedback: [],
+        totalCount: 0,
+        totalPages: 1,
+      };
     }
   };
 
   const deleteFeedback = async (feedbackId) => {
     try {
-      const { error } = await supabase
-        .from("feedback")
-        .delete()
-        .eq("feedback_id", feedbackId);
+      const { data, error } = await supabase.functions.invoke(
+        "delete-feedback",
+        {
+          body: { feedbackId },
+        }
+      );
 
       if (error) throw error;
       return true;
@@ -765,27 +594,21 @@ export function AuthProvider({ children }) {
     const to = from + itemsPerPage - 1;
 
     try {
-      let query = supabase
-        .from("resources")
-        .select("*", { count: "exact" })
-        .order("created_at", { ascending: false })
-        .range(from, to);
-
-      if (type) {
-        query = query.eq("resource_type", type);
-      }
-
-      if (searchQuery) {
-        query = query.ilike("resource_name", `%${searchQuery}%`);
-      }
-
-      const { data, error, count } = await query;
+      const { data, error } = await supabase.functions.invoke("get-resources", {
+        body: {
+          page,
+          type,
+          searchQuery,
+        },
+      });
 
       if (error) throw error;
-      return {
-        data: data || [],
-        totalPages: Math.ceil(count / itemsPerPage) || 1,
-      };
+      return (
+        data || {
+          data: [],
+          totalPages: 1,
+        }
+      );
     } catch (error) {
       console.error("Error fetching resources:", error);
       throw error;
@@ -794,11 +617,12 @@ export function AuthProvider({ children }) {
 
   const getResourceById = async (resourceId) => {
     try {
-      const { data, error } = await supabase
-        .from("resources")
-        .select("*")
-        .eq("resourceid", resourceId)
-        .single();
+      const { data, error } = await supabase.functions.invoke(
+        "get-resourcebyid",
+        {
+          body: { resourceId },
+        }
+      );
 
       if (error) throw error;
       return data;
@@ -808,24 +632,14 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const addResource = async (resourceData) => {
-    try {
-      const { error } = await supabase.from("resources").insert([resourceData]);
-
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error("Error adding resource:", error);
-      throw error;
-    }
-  };
-
   const updateResource = async (resourceId, updatedData) => {
     try {
-      const { error } = await supabase
-        .from("resources")
-        .update(updatedData)
-        .eq("resourceid", resourceId);
+      const { data, error } = await supabase.functions.invoke(
+        "update-resource",
+        {
+          body: { resourceId, updatedData },
+        }
+      );
 
       if (error) throw error;
       return true;
@@ -835,12 +649,28 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const addResource = async (resourceData) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("add-resource", {
+        body: { resourceData },
+      });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error adding resource:", error);
+      throw error;
+    }
+  };
+
   const deleteResource = async (resourceId) => {
     try {
-      const { error } = await supabase
-        .from("resources")
-        .delete()
-        .eq("resourceid", resourceId);
+      const { data, error } = await supabase.functions.invoke(
+        "delete-resource",
+        {
+          body: { resourceId },
+        }
+      );
 
       if (error) throw error;
       return true;

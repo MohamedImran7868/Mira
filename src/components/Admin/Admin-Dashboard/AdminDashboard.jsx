@@ -12,6 +12,7 @@ import {
   FaCog,
 } from "react-icons/fa";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
+import LoadingModal from "../../Common/LoadingModal";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -65,12 +66,9 @@ function AdminDashboard() {
     },
   ];
 
-  if (loading) {
-    return <div>Loading dashboard...</div>;
-  }
-
   return (
     <>
+    {loading && <LoadingModal message="Loading dashboard..." />}
       <Header />
       <div className={styles.container}>
         <div className={styles.header}>
@@ -132,7 +130,7 @@ function AdminDashboard() {
           <div className={styles.recentActivity}>
             <h2>
               <FaCalendarAlt className={styles.sectionIcon} />
-              Recent Activity (Sample)
+              Recent Activity (To Be Implemented)
             </h2>
             <div className={styles.activityList}>
               {recentActivities.map((activity) => (

@@ -22,6 +22,7 @@ import {
   FaSortDown,
 } from "react-icons/fa";
 import DeleteConfirmation from "../../Common/DeleteConfirmation";
+import LoadingModal from "../../Common/LoadingModal";
 
 function ViewFeedback() {
   const { getFeedback, deleteFeedback } = useAuth();
@@ -34,6 +35,7 @@ function ViewFeedback() {
   const [searchName, setSearchName] = useState("");
   const [selectedFeedback, setSelectedFeedback] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Filters
   const [category, setCategory] = useState("");
@@ -118,15 +120,23 @@ function ViewFeedback() {
   };
 
   const handleDelete = async (feedbackId) => {
-    setLoading(true);
+    setDeleting(true);
     try {
+      
+      setShowDeleteModal(false);
       await deleteFeedback(feedbackId);
       await fetchFeedback();
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
-      setShowDeleteModal(false);
+      setDeleting(false);
+    }
+  };
+
+  const handleDeleteFromModal = async () => {
+    if (selectedFeedback) {
+      await handleDelete(selectedFeedback.feedback_id);
+      closeModal();
     }
   };
 
@@ -152,6 +162,7 @@ function ViewFeedback() {
 
   return (
     <>
+    {deleting && <LoadingModal message="Deleting feedback..." />}
       <DeleteConfirmation
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -360,9 +371,10 @@ function ViewFeedback() {
                         </button>
                         <button
                           className={styles.deleteButton}
-                          onClick={() =>
-                            {setfeedbackToDelete(item.feedback_id); setShowDeleteModal(true);}
-                          }
+                          onClick={() => {
+                            setfeedbackToDelete(item.feedback_id);
+                            setShowDeleteModal(true);
+                          }}
                           disabled={loading}
                         >
                           <FaTrash className={styles.deleteIcon} />

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../Common/Header";
 import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
@@ -88,10 +88,20 @@ const Register = () => {
       });
       navigate("/login", { state: { registrationSuccess: true } });
     } catch (err) {
-      setError(err.message);
+      setError(
+        "This email is already registered. Please use another email or sign in."
+      );
     } finally {
       setLoading(false);
     }
+
+    setFormData({
+      name: "",
+      id: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    });
   };
 
   if (loading) {

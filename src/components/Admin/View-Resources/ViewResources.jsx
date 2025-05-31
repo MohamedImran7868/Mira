@@ -13,6 +13,7 @@ import {
 } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import DeleteConfirmation from "../../Common/DeleteConfirmation.jsx";
+import LoadingModal from "../../Common/LoadingModal";
 
 function ViewResources() {
   const {
@@ -29,6 +30,7 @@ function ViewResources() {
   const [totalPages, setTotalPages] = useState(1);
   const [resourceType, setResourceType] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   // Delete Confirmation
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -85,15 +87,16 @@ function ViewResources() {
   };
 
   const handleDelete = async (resourceId) => {
-    setLoading(true);
+    setDeleting(true);
     try {
+      
+      setShowDeleteModal(false);
       await deleteResource(resourceId);
       await fetchResources();
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
-      setShowDeleteModal(false);
+      setDeleting(false);
     }
   };
 
@@ -158,6 +161,7 @@ function ViewResources() {
 
   return (
     <>
+    {deleting && <LoadingModal message="Deleting resource..." />}
       <DeleteConfirmation
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
@@ -381,7 +385,7 @@ function ViewResources() {
 
               <div className={styles.formRow}>
                 <label className={styles.formLabel}>
-                  Availability (Optional)
+                  Availability
                 </label>
                 <input
                   type="text"
@@ -481,7 +485,7 @@ function ViewResources() {
 
               <div className={styles.formRow}>
                 <label className={styles.formLabel}>
-                  Availability (Optional)
+                  Availability
                 </label>
                 <input
                   type="text"

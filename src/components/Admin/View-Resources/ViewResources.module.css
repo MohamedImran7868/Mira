@@ -58,6 +58,10 @@
   font-family: var(--font-primary);
 }
 
+.searchInput:focus{
+  box-shadow: none;
+}
+
 .searchButton {
   background: var(--color-primary);
   color: white;
