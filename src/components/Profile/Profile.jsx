@@ -3,7 +3,18 @@ import { useAuth } from "../../AuthContext";
 import Header from "../Common/Header";
 import styles from "./Profile.module.css";
 import LoadingModal from "../Common/LoadingModal";
-import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaLock, FaEdit, FaTimes, FaSave, FaCamera, FaIdCard } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaUser,
+  FaEnvelope,
+  FaLock,
+  FaEdit,
+  FaTimes,
+  FaSave,
+  FaCamera,
+  FaIdCard,
+} from "react-icons/fa";
 
 const Profile = () => {
   const {
@@ -62,16 +73,16 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    
+
     // Validate ID field to only accept digits and limit to 10 characters
     if (name === "id") {
       if (value === "" || (/^\d+$/.test(value) && value.length <= 10)) {
-        setEditData(prev => ({ ...prev, [name]: value }));
+        setEditData((prev) => ({ ...prev, [name]: value }));
       }
       return;
     }
-    
-    setEditData(prev => ({ ...prev, [name]: value }));
+
+    setEditData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handlePasswordChange = (e) => {
@@ -113,8 +124,10 @@ const Profile = () => {
     try {
       setLoading(true);
       setError(null);
-      const imageUrl = await uploadProfileImage(file);
-      setImageUrl(getImageUrl(imageUrl));
+      const { fileName, imageUrl } = await uploadProfileImage(file);
+
+      // Set both the immediate URL and update state
+      setImageUrl(imageUrl); // This will show immediately
       setSuccess("Profile image updated successfully!");
     } catch (err) {
       setError(err.message || "Failed to upload image");
@@ -157,12 +170,9 @@ const Profile = () => {
     return <LoadingModal message="Loading Profile..." />;
   }
 
-  if (loading) {
-    return <LoadingModal message="Updating Profile..." />;
-  }
-
   return (
     <>
+      {loading && <LoadingModal message="Updating Profile..." />}
       <Header />
       <div className={styles.container}>
         <div className={styles.profileCard}>
@@ -241,9 +251,7 @@ const Profile = () => {
                       inputMode="numeric"
                     />
                   ) : (
-                    <span className={styles.infoValue}>
-                      {userProfile?.id}
-                    </span>
+                    <span className={styles.infoValue}>{userProfile?.id}</span>
                   )}
                 </div>
               </div>
@@ -300,7 +308,9 @@ const Profile = () => {
                         onClick={() => setShowConfirmPassword((prev) => !prev)}
                         className={styles.toggleBtn}
                         aria-label={
-                          showConfirmPassword ? "Hide password" : "Show password"
+                          showConfirmPassword
+                            ? "Hide password"
+                            : "Show password"
                         }
                       >
                         {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}

@@ -20,7 +20,7 @@ function UpdatePassword() {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { updatePassword } = useAuth();
+  const { updatePassword, userProfile } = useAuth();
 
   const validatePassword = (value) => {
     setPasswordRequirements({
@@ -51,7 +51,9 @@ function UpdatePassword() {
     try {
       await updatePassword(password);
       setMessage("Password updated successfully!");
-      setTimeout(() => navigate('/profile'), 2000);
+      setTimeout(() => navigate(userProfile?.role === "student"
+            ? "/chat"
+            : "/admin-dashboard"), 2000);
     } catch (err) {
       setError(err.message);
     } finally {

@@ -40,11 +40,13 @@ const LoginScreen = () => {
         return;
       }
 
-      // Redirect based on role
-      if (profile?.role === "admin" && profile?.isProfile_set === "set") {
-        navigate("/admin-dashboard");
-      } else if (profile?.role === "admin" && profile?.isProfile_set === "not set") {
-        navigate("/complete-profile");
+      // Redirect based on role and profile status
+      if (profile?.role === "admin") {
+        navigate(
+          profile?.isProfile_set === "set"
+            ? "/admin-dashboard"
+            : "/complete-profile"
+        );
       } else {
         navigate("/chat");
       }
@@ -176,26 +178,26 @@ const LoginScreen = () => {
                     Password
                   </label>
                   <div className={styles.passwordWrapper}>
-                  <input
-                    type={showPassword? "text" : "password"}
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    disabled={loading}
-                    className={styles.inputField}
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((prev) => !prev)}
-                    className={styles.passwordToggle}
-                    aria-label={
-                      showPassword ? "Hide password" : "Show password"
-                    }
-                  >
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
-                  </button>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={loading}
+                      className={styles.inputField}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className={styles.passwordToggle}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
                   </div>
                 </div>
 
