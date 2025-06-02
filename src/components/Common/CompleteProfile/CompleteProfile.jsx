@@ -8,7 +8,6 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 const CompleteProfile = () => {
   const [editData, setEditData] = useState({
     name: "",
-    age: "",
     contact: "",
   });
   const [error, setError] = useState(null);
@@ -33,7 +32,7 @@ const CompleteProfile = () => {
   const { user, CompleteAdminProfile, updatePassword } = useAuth();
   const navigate = useNavigate();
 
-  // Add this useEffect to prevent back navigation
+  // To prevent back navigation
   useEffect(() => {
     if (user?.isProfile_set === "not set") {
       window.history.pushState(null, null, window.location.pathname);
@@ -45,7 +44,7 @@ const CompleteProfile = () => {
       window.addEventListener("popstate", handlePopState);
       return () => window.removeEventListener("popstate", handlePopState);
     }
-  }, [user?.isProfile_set]); // More specific dependency
+  }, [user?.isProfile_set]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -59,7 +58,7 @@ const CompleteProfile = () => {
   };
 
   const validateForm = () => {
-    if (!editData.name || !editData.age || !editData.contact) {
+    if (!editData.name || !editData.contact) {
       throw new Error("All fields are required");
     }
 
@@ -148,22 +147,6 @@ const CompleteProfile = () => {
               required
               disabled={loading}
             />
-          </div>
-
-          <div className={styles.rowContainer}>
-            <div className={styles.inputGroup}>
-              <label className={styles.label}>Age:</label>
-              <input
-                type="number"
-                id="age"
-                name="age"
-                value={editData.age}
-                onChange={handleInputChange}
-                required
-                min="18"
-                disabled={loading}
-              />
-            </div>
           </div>
 
           <div className={styles.inputGroup}>

@@ -12,6 +12,7 @@ import {
   FaEnvelope,
   FaInfoCircle,
 } from "react-icons/fa";
+import DeleteConfirmation from "../../Common/DeleteConfirmation";
 
 function ManageUser() {
   const { getStudents, deleteStudent } = useAuth();
@@ -22,6 +23,11 @@ function ManageUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalStudents, setTotalStudents] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  // Delete Confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     fetchStudents();
@@ -31,13 +37,13 @@ function ManageUser() {
     setLoading(true);
     setError(null);
     try {
-      const { students, totalCount, totalPages } = await getStudents(
-        currentPage,
-        searchQuery
-      );
-      setStudents(students);
-      setTotalStudents(totalCount);
-      setTotalPages(totalPages);
+      const response = await getStudents(currentPage, searchQuery);
+      // Make sure the response has the expected structure
+      if (response && response.students) {
+        setStudents(response.students);
+        setTotalStudents(response.totalCount || 0);
+        setTotalPages(response.totalPages || 1);
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -51,19 +57,12 @@ function ManageUser() {
     fetchStudents(searchTerm);
   };
 
-  const handleDelete = async (userId, userName) => {
-    if (
-      !window.confirm(
-        `Are you sure you want to delete ${userName || "this student"}?`
-      )
-    ) {
-      return;
-    }
-
-    setLoading(true);
+  const handleDelete = async (userToDelete) => {
+    setDeleting(true);
     try {
-      await deleteStudent(userId);
-      await fetchStudents(searchTerm);
+      setShowDeleteModal(false);
+      await deleteStudent(userToDelete);
+      await fetchStudents();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -79,6 +78,16 @@ function ManageUser() {
 
   return (
     <>
+      {deleting && <LoadingModal message="Deleting resource..." />}
+      <DeleteConfirmation
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => handleDelete(userToDelete)}
+        title="Delete Resource"
+        message="Are you sure you want to delete this resource? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Header />
       <div className={styles.container}>
         <div className={styles.card}>
@@ -161,9 +170,10 @@ function ManageUser() {
                       <td className={styles.actionsCell}>
                         <button
                           className={styles.deleteButton}
-                          onClick={() =>
-                            handleDelete(user.userID, user.user_name)
-                          }
+                          onClick={() => {
+                            setUserToDelete(user.userID);
+                            setShowDeleteModal(true);
+                          }}
                           disabled={loading}
                         >
                           <FaTrash className={styles.deleteIcon} />

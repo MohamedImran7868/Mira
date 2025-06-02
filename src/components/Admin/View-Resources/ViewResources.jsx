@@ -12,6 +12,8 @@ import {
   MdClose,
 } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import DeleteConfirmation from "../../Common/DeleteConfirmation.jsx";
+import LoadingModal from "../../Common/LoadingModal";
 
 function ViewResources() {
   const {
@@ -28,6 +30,7 @@ function ViewResources() {
   const [totalPages, setTotalPages] = useState(1);
   const [resourceType, setResourceType] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   // Delete Confirmation
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -83,30 +86,18 @@ function ViewResources() {
     fetchResources();
   };
 
-  const promptDelete = (resourceId) => {
-    setResourceToDelete(resourceId);
-    setShowDeleteModal(true);
-  };
-
-  const handleDelete = async () => {
-    if (!resourceToDelete) return;
-
-    setLoading(true);
+  const handleDelete = async (resourceId) => {
+    setDeleting(true);
     try {
-      await deleteResource(resourceToDelete);
-      await fetchResources();
+      
       setShowDeleteModal(false);
-      setResourceToDelete(null);
+      await deleteResource(resourceId);
+      await fetchResources();
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      setDeleting(false);
     }
-  };
-
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
-    setResourceToDelete(null);
   };
 
   const openAddModal = () => {
@@ -170,6 +161,16 @@ function ViewResources() {
 
   return (
     <>
+    {deleting && <LoadingModal message="Deleting resource..." />}
+      <DeleteConfirmation
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={() => handleDelete(resourceToDelete)}
+        title="Delete Resource"
+        message="Are you sure you want to delete this resource? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
       <Header />
       <div className={styles.container}>
         <div className={styles.header}>
@@ -251,7 +252,10 @@ function ViewResources() {
                         <MdEdit />
                       </button>
                       <button
-                        onClick={() => promptDelete(resource.resourceid)}
+                        onClick={() => {
+                          setResourceToDelete(resource.resourceid);
+                          setShowDeleteModal(true);
+                        }}
                         className={styles.deleteButton}
                         disabled={loading}
                       >
@@ -325,42 +329,6 @@ function ViewResources() {
         )}
       </div>
 
-      {/* Delete Confimation Modal */}
-      {showDeleteModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.confirmationModal}>
-            <div className={styles.modalHeader}>
-              <h3>Confirm Deletion</h3>
-              <button onClick={cancelDelete} className={styles.closeButton}>
-                <MdClose />
-              </button>
-            </div>
-            <div className={styles.modalBody}>
-              <p>
-                Are you sure you want to delete this resource? This action
-                cannot be undone.
-              </p>
-            </div>
-            <div className={styles.modalFooter}>
-              <button
-                onClick={cancelDelete}
-                className={styles.cancelButton}
-                disabled={loading}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className={styles.deleteConfirmButton}
-                disabled={loading}
-              >
-                {loading ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Add Resource Modal */}
       {showAddModal && (
         <div className={styles.modalOverlay}>
@@ -417,7 +385,7 @@ function ViewResources() {
 
               <div className={styles.formRow}>
                 <label className={styles.formLabel}>
-                  Availability (Optional)
+                  Availability
                 </label>
                 <input
                   type="text"
@@ -517,7 +485,7 @@ function ViewResources() {
 
               <div className={styles.formRow}>
                 <label className={styles.formLabel}>
-                  Availability (Optional)
+                  Availability
                 </label>
                 <input
                   type="text"

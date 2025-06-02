@@ -22,13 +22,14 @@ const customWords = [
   "lol",
   "sigma",
   "gyat",
-    "rizz",
-  "kelantan",
+  "rizz",
   "keling",
   "kimak",
   "cibai",
   "kontol",
   "ngentod",
+  "mak kau hijau",
+  "pentan"
   // Add more custom words here
 ];
 

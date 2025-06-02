@@ -165,25 +165,32 @@ const ChatScreen = () => {
     }
 
     let chatId = currentChat;
-    // If no current chat, create a new one
-    if (!chatId) {
-      const newSession = await createChatSession();
-      setChatSessions((prev) => [newSession, ...prev]);
-      chatId = newSession.chatid; // Use the new chatId directly
-      setCurrentChat(chatId); // Still update state for future messages
-      setMessages([]);
-    }
-    // Save human message
-    const newHumanMessage = {
-      message_content: message,
-      sender: "human",
-      message_timestamp: new Date().toISOString(),
-    };
 
-    setMessages((prev) => [...prev, newHumanMessage]);
-    await saveMessage(chatId, message, "human");
-    callModel(message, chatId);
-    setMessage("");
+    try {
+      // If no current chat, create a new one
+      if (!chatId) {
+        const newSession = await createChatSession();
+        setChatSessions((prev) => [newSession, ...prev]);
+        chatId = newSession.chatid;
+        console.log(chatId);
+        setCurrentChat(chatId);
+        setMessages([]);
+      }
+
+      // Save human message
+      const newHumanMessage = {
+        message_content: message,
+        sender: "human",
+        message_timestamp: new Date().toISOString(),
+      };
+
+      setMessages((prev) => [...prev, newHumanMessage]);
+      await saveMessage(chatId, message, "human");
+      callModel(message, chatId);
+      setMessage("");
+    } catch (error) {
+      console.error("Error in sendMessage:", error);
+    }
   };
 
   const callModel = async (input, chatId) => {
@@ -191,23 +198,26 @@ const ChatScreen = () => {
     setTypingIndicator(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/model", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ input }),
-      });
+      // const response = await fetch("http://127.0.0.1:5000/model", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({ input }),
+      // });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
+      // if (!response.ok) {
+      //   throw new Error("Network response was not ok");
+      // }
 
-      const data = await response.json();
-      simulateTypingEffect(data.result);
+      // const data = await response.json();
+      // simulateTypingEffect(data.result);
 
       // Save bot response to database
-      await saveMessage(chatId, data.result, "bot");
+      // await saveMessage(chatId, data.result, "bot");
+
+      simulateTypingEffect("For Testing");
+      await saveMessage(chatId, "For Testing", "bot");
     } catch (error) {
       console.error("Error calling model:", error);
       const errorMsg =
