@@ -46,6 +46,7 @@ export function AuthProvider({ children }) {
         ...data.userData,
         ...data.roleData,
       });
+      console.log(completeUser);
 
       return completeUser;
     } catch (error) {
@@ -210,7 +211,7 @@ export function AuthProvider({ children }) {
   const updateProfile = async (updates) => {
     setLoading(true);
     try {
-      const id = user.id;
+      const id = user.userID;
 
       const { data, error } = await supabase.functions.invoke(
         "update-profile",
@@ -240,7 +241,7 @@ export function AuthProvider({ children }) {
 
   const uploadProfileImage = async (file) => {
     try {
-      const id = user.id;
+      const id = user.userID;
       const fileName = `${id}-${Date.now()}.webp`;
 
       // Convert to WebP if needed

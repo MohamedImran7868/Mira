@@ -162,7 +162,7 @@ const LoginScreen = () => {
                   </label>
                   <input
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder="your@student.mmu.edu.my"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
