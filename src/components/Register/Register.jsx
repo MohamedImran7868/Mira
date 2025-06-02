@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import styles from "./Register.module.css";
 import { useAuth } from "../../AuthContext";
 import LoadingModal from "../Common/LoadingModal";
+import SuccessOverlay from "../Common/SuccessOverlay";
 import {
   FaEye,
   FaEyeSlash,
@@ -33,6 +34,7 @@ const Register = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const { registerStudent } = useAuth();
   const navigate = useNavigate();
@@ -86,7 +88,7 @@ const Register = () => {
         name: formData.name,
         id: formData.id,
       });
-      navigate("/login", { state: { registrationSuccess: true } });
+      setRegistrationSuccess(true);
     } catch (err) {
       setError(
         "This email is already registered. Please use another email or sign in."
@@ -106,6 +108,19 @@ const Register = () => {
 
   if (loading) {
     return <LoadingModal message="Registering account..." />;
+  }
+
+  if (registrationSuccess) {
+    return (
+      <SuccessOverlay 
+        message="Registration successful! Redirecting to login..."
+        redirectTo="/login"
+        redirectDelay={2000}
+        onRedirect={() => {
+          navigate("/login", { state: { registrationSuccess: true } });
+        }}
+      />
+    );
   }
 
   return (
