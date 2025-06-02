@@ -9,3 +9,4 @@ llama-cpp-python==0.1.72
 sentencepiece
 accelerate
 numpy
+gunicorn
