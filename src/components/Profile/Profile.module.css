@@ -1,176 +1,401 @@
 .container {
-  max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 70px);
+  padding: 2rem;
+  background-color: var(--color-background);
 }
 
 .profileCard {
+  width: 100%;
+  max-width: 800px;
   background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .profileHeader {
+  padding: 2rem;
   text-align: center;
-  margin-bottom: 2rem;
+  background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-background) 100%);
+  position: relative;
 }
 
 .imageContainer {
-  position: relative;
-  margin: 0 auto 1rem;
+  margin: 0 auto 1.5rem;
   width: 150px;
   height: 150px;
+  position: relative;
+}
+
+.imageWrapper {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+  border: 4px solid white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .profileImage {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
   object-fit: cover;
-  border: 3px solid #f0f0f0;
+  background-color: #f0f0f0;
 }
 
-.imageUpload {
+.imageUploadOverlay {
   position: absolute;
-  bottom: 0;
-  right: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 50%;
+}
+
+.imageUploadOverlay:hover {
+  opacity: 1;
 }
 
 .uploadBtn {
-  background: #4CAF50;
+  background: none;
+  border: none;
   color: white;
-  padding: 0.5rem;
-  border-radius: 50%;
   cursor: pointer;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 0;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  transition: transform 0.2s ease;
 }
 
-.uploadBtn::before {
-  content: '✎';
-  font-size: 1rem;
+.uploadBtn:hover {
+  transform: scale(1.05);
+}
+
+.cameraIcon {
+  font-size: 1.5rem;
+}
+
+.editNameContainer {
+  width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+.inputWithIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 1rem;
+  color: var(--color-primary);
+}
+
+.editName {
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-primary);
+  transition: border-color 0.3s ease;
+}
+
+.editName:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.nameContainer {
+  margin-top: 1rem;
 }
 
 .profileName {
   margin: 0;
-  color: #333;
+  font-size: 1.75rem;
+  color: var(--color-text);
 }
 
-.editName {
-  font-size: 1.5rem;
-  text-align: center;
-  width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+.profileEmail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  color: var(--color-text-light);
+  font-size: 0.9rem;
 }
 
-.profileInfo {
+.emailIcon {
+  font-size: 0.9rem;
+}
+
+.profileContent {
+  padding: 2rem;
+}
+
+.section {
   margin-bottom: 2rem;
 }
 
-.infoRow {
+.sectionTitle {
+  margin: 0 0 1.5rem;
+  font-size: 1.25rem;
+  color: var(--color-primary);
+  position: relative;
+  padding-bottom: 0.5rem;
   display: flex;
-  margin-bottom: 1rem;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.sectionTitle::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background: var(--color-primary);
+}
+
+.sectionIcon {
+  font-size: 1rem;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.infoItem {
+  margin-bottom: 1rem;
 }
 
 .infoLabel {
-  font-weight: bold;
-  width: 120px;
-  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.fieldIcon {
+  color: var(--color-primary);
+  font-size: 0.9rem;
 }
 
 .infoValue {
-  flex: 1;
+  display: block;
+  padding: 0.75rem;
+  background: #f8f9fa;
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
 }
 
 .editField {
-  flex: 1;
-  padding: 0.5rem;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-primary);
+  transition: all var(--transition-fast);
 }
 
-.invalid {
-  border-color: #ff4444;
+.editField:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.2);
+}
+
+.editField.invalid {
+  border-color: var(--color-error);
+}
+
+.passwordInputContainer {
+  position: relative;
+}
+
+.toggleBtn {
+  position: absolute;
+  right: 10px;
+  top: 30%;
+  transform: translateY(-11%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  color: var(--color-text-light);
 }
 
 .passwordRequirements {
-  background: #f9f9f9;
+  margin-top: 1.5rem;
   padding: 1rem;
-  border-radius: 5px;
-  margin: 1rem 0;
+  background: #f8f9fa;
+  border-radius: var(--radius-md);
 }
 
-.passwordRequirements ul {
+.passwordRequirements h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+
+.requirementsList {
   list-style: none;
   padding: 0;
-  margin: 0.5rem 0 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.5rem;
 }
 
-.passwordRequirements li {
-  margin-bottom: 0.3rem;
-  color: #888;
+.requirementsList li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text-light);
 }
 
-.passwordRequirements li.valid {
-  color: #4CAF50;
+.requirementsList li.valid {
+  color: var(--color-success);
+}
+
+.checkmark {
+  font-weight: bold;
+}
+
+.feedbackContainer {
+  padding: 0 2rem;
+}
+
+.errorMessage, .successMessage {
+  padding: 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.errorMessage {
+  background: var(--color-error-bg);
+  color: var(--color-error);
+}
+
+.successMessage {
+  background: rgba(40, 167, 69, 0.1);
+  color: var(--color-success);
 }
 
 .buttonGroup {
   display: flex;
   gap: 1rem;
+  padding: 0 2rem 2rem;
   justify-content: center;
 }
 
-.editBtn, .saveBtn {
+.actionBtn {
   padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 5px;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-family: var(--font-primary);
   cursor: pointer;
-  font-weight: bold;
-  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all var(--transition-normal);
+  border: none;
+}
+
+.actionBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.actionBtn:not(:disabled):hover {
+  transform: translateY(-2px);
 }
 
 .editBtn {
-  background: #f0f0f0;
-  color: #333;
+  background: white;
+  color: var(--color-primary);
+  border: 2px solid var(--color-primary);
 }
 
-.editBtn:hover {
-  background: #e0e0e0;
+.editBtn:hover:not(:disabled) {
+  background: rgba(74, 111, 165, 0.1);
 }
 
 .saveBtn {
-  background: #4CAF50;
+  background: var(--color-primary);
   color: white;
 }
 
-.saveBtn:hover {
-  background: #45a049;
+.saveBtn:hover:not(:disabled) {
+  background: var(--color-primary-dark);
 }
 
-.errorMessage {
-  color: #ff4444;
-  background: #ffebee;
-  padding: 1rem;
-  border-radius: 5px;
-  margin: 1rem 0;
-  text-align: center;
+.buttonIcon {
+  font-size: 0.9rem;
 }
 
-.successMessage {
-  color: #4CAF50;
-  background: #e8f5e9;
-  padding: 1rem;
-  border-radius: 5px;
-  margin: 1rem 0;
-  text-align: center;
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+  
+  .profileHeader {
+    padding: 1.5rem 1rem;
+  }
+  
+  .profileContent {
+    padding: 1.5rem 1rem;
+  }
+  
+  .buttonGroup {
+    flex-direction: column;
+    padding: 0 1rem 1.5rem;
+  }
+  
+  .actionBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .imageContainer {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .profileName {
+    font-size: 1.5rem;
+  }
+  
+  .sectionTitle {
+    font-size: 1.1rem;
+  }
 }

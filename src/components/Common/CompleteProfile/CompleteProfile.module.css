@@ -2,38 +2,18 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 70px);
+  min-height: 100vh;
   padding: 2rem;
   background-color: var(--color-background);
 }
 
 .card {
   width: 100%;
-  max-width: 600px;
+  max-width: 500px;
   background: white;
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: 2.5rem;
-  position: relative;
-}
-
-.backButton {
-  position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  background: none;
-  border: none;
-  color: var(--color-primary);
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-.backButton:hover {
-  color: var(--color-primary-dark);
 }
 
 .header {
@@ -67,12 +47,6 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
 }
 
 .inputGroup {
@@ -118,7 +92,7 @@
   position: relative;
 }
 
-.passwordToggle {
+.toggleBtn {
   position: absolute;
   right: 0.75rem;
   top: 25%;
@@ -127,8 +101,8 @@
   border: none;
   color: var(--color-text-light);
   cursor: pointer;
-  font-size: 1rem;
   padding: 0.25rem;
+  font-size: 1rem;
 }
 
 .passwordRequirements {
@@ -140,29 +114,38 @@
 
 .passwordRequirements h4 {
   font-size: 0.9rem;
-  margin-bottom: 0.5rem;
   color: var(--color-primary);
+  margin-bottom: 0.5rem;
 }
 
-.passwordRequirements ul {
+.requirementsList {
   list-style: none;
   padding: 0;
   margin: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: 1fr;
   gap: 0.5rem;
-  font-size: 0.85rem;
 }
 
-.passwordRequirements li {
+.requirementsList li {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--color-error);
+  font-size: 0.85rem;
+  color: var(--color-text-light);
 }
 
-.passwordRequirements li.valid {
+.requirementsList li.valid {
   color: var(--color-success);
+}
+
+.checkmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  font-size: 0.8rem;
 }
 
 .submitButton {
@@ -175,7 +158,7 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all var(--transition-normal);
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .submitButton:hover:not(:disabled) {
@@ -189,42 +172,13 @@
   cursor: not-allowed;
 }
 
-.footer {
-  text-align: center;
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  color: var(--color-text-light);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.loginLink {
-  background: none;
-  border: none;
-  color: var(--color-primary);
-  font-weight: 600;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-.loginLink:hover {
-  color: var(--color-primary-dark);
-  text-decoration: underline;
-}
-
 @media (max-width: 768px) {
   .container {
     padding: 1rem;
   }
-  
+
   .card {
     padding: 1.5rem;
-  }
-  
-  .row {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -232,8 +186,8 @@
   .header h2 {
     font-size: 1.5rem;
   }
-  
-  .passwordRequirements ul {
-    grid-template-columns: 1fr;
+
+  .header p {
+    font-size: 0.85rem;
   }
 }

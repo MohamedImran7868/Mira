@@ -5,6 +5,7 @@ import torch
 import json
 from datetime import datetime
 from typing import Dict, List, Optional
+from llama_cpp import Llama
 
 # Configure logging
 logging_level = os.getenv("LOGGING_LEVEL", "INFO").upper()
@@ -15,21 +16,21 @@ logging.basicConfig(
 logger = logging.getLogger("MIRA")
 
 class MIRA:
-    """Core emotion-detection chatbot using RoBERTa."""
+    """Core emotion-detection chatbot using RoBERTa + LLaMA."""
 
-    def __init__(self, model_name: str = "SamLowe/roberta-base-go_emotions"):
+    def __init__(self, model_name: str = "j-hartmann/emotion-english-distilroberta-base"):
         self.model_name = model_name
         self.device = 0 if torch.cuda.is_available() else -1
         self.responses = self._load_responses()
         self.conversation_history: List[Dict] = []
 
+        # Load emotion classifier
         try:
             self.emotion_classifier = pipeline(
                 "text-classification",
                 model=self.model_name,
                 device=self.device,
                 top_k=None,
-                function_to_apply="sigmoid",
                 return_all_scores=True
             )
             logger.info(f"Model '{model_name}' loaded successfully on {'GPU' if self.device == 0 else 'CPU'}.")
@@ -37,6 +38,23 @@ class MIRA:
             logger.error(f"Failed to load model: {e}", exc_info=True)
             print("MIRA: Unable to load the model. Please check your setup.")
             exit(1)
+
+        # Load LLaMA model
+        llama_model_path = "C:\\Users\\NITRO 5\\Desktop\\Project\\React\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+        try:
+            self.llama = Llama(
+                model_path=llama_model_path,
+                n_ctx=1024,  # Reduce context size for faster response
+                n_threads=min(8, os.cpu_count() or 6),
+                n_batch=32,  # Reduce batch size for lower latency
+                use_mlock=True,
+                use_mmap=True,
+                n_gpu_layers=32 if torch.cuda.is_available() else 0
+            )
+            logger.info("LLaMA model loaded successfully.")
+        except Exception as e:
+            logger.error(f"Failed to load LLaMA model: {e}", exc_info=True)
+            self.llama = None
 
     def _load_responses(self) -> Dict[str, str]:
         return {
@@ -77,20 +95,32 @@ class MIRA:
             logger.error(f"Emotion detection failed: {e}", exc_info=True)
             return [{"emotion": "error", "confidence": 0.0}]
 
-    def generate_response(self, emotions: List[str]) -> str:
-        if not emotions:
-            return self.responses["error"]
+    def generate_llama_response(self, user_input: str, emotion_summary: str = "") -> str:
+        if not self.llama:
+            return "Sorry, my generative brain isn't working right now."
 
-        unique_emotions = list(dict.fromkeys(emotions))  # Remove duplicates
+        try:
+            prompt = f"""You are MIRA, a friendly and emotionally intelligent chatbot.
 
-        if len(unique_emotions) == 1:
-            return self.responses.get(unique_emotions[0].lower(), self.responses["error"])
+The user seems to be feeling {emotion_summary}.
+Respond kindly and empathetically to their input.
 
-        mixed_parts = [
-            self.responses.get(e.lower()) for e in unique_emotions
-            if e.lower() in self.responses
-        ]
-        return " ".join(mixed_parts[:2]) if mixed_parts else self.responses["mixed"]
+User: {user_input}
+MIRA:"""
+
+            output = self.llama(
+                prompt,
+                max_tokens=192,
+                temperature=0.7,
+                top_p=0.9,
+                stop=["\nUser:", "\nMIRA:", "\nThis response"]
+            )
+
+            return output["choices"][0]["text"].strip().split("\n")[0]
+
+        except Exception as e:
+            logger.error(f"LLaMA response generation failed: {e}", exc_info=True)
+            return "I'm having trouble responding right now."
 
     def log_conversation(self, user_input: str, response: Dict):
         self.conversation_history.append({
@@ -116,7 +146,7 @@ class MIRA:
             try:
                 user_input = input("You: ").strip()
 
-                if user_input.lower() in ["quit", "exit"]:
+                if user_input.lower() in ["quit", "exit", "bye"]:
                     self.save_conversation()
                     print("\nMIRA: Goodbye! Take care. 💖")
                     break
@@ -126,22 +156,20 @@ class MIRA:
                     continue
 
                 emotion_results = self.detect_emotions(user_input)
-
-                emotion_strings = [
+                emotion_summary = ", ".join([
                     f"{er['emotion']} ({er['confidence']:.0%})"
                     for er in emotion_results
-                ]
-                emotion_display = ", ".join(emotion_strings)
+                    if er["emotion"] != "error"
+                ]) or "unclear emotions"
 
-                emotions = [er["emotion"] for er in emotion_results]
-                response = self.generate_response(emotions)
+                llama_response = self.generate_llama_response(user_input, emotion_summary)
 
-                print(f"\nMIRA: I sense you're feeling {emotion_display}.")
-                print(f"MIRA: {response}\n")
+                print(f"\nMIRA: I sense you're feeling {emotion_summary}.")
+                print(f"MIRA: {llama_response}\n")
 
                 self.log_conversation(user_input, {
                     "emotions_detected": emotion_results,
-                    "bot_response": response
+                    "bot_response": llama_response
                 })
 
             except KeyboardInterrupt:

@@ -6,46 +6,115 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [user, setUser] = useState(null);
-  const [userImage, setUserImage] = useState(null);
+  const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Fetch initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+  const getUserProfile = async () => {
+    try {
+      // 1. Get auth user (client-side)
+      const {
+        data: { user: authUser },
+        error: authError,
+      } = await supabase.auth.getUser();
 
-    // Listen for auth state changes
+      if (authError) throw authError;
+      if (!authUser) return null;
+
+      // 2. Get profile data via edge function
+      const { data, error } = await supabase.functions.invoke(
+        "get-user-profile",
+        {
+          body: { user_id: authUser.id },
+        }
+      );
+
+      if (error || !data) {
+        console.error("Profile not found via edge function");
+        return null;
+      }
+
+      // 3. Combine data
+      const completeUser = {
+        ...authUser,
+        ...data.userData,
+        ...data.roleData,
+      };
+
+      // 4. Update state
+      setUser(completeUser);
+      setUserProfile({
+        ...data.userData,
+        ...data.roleData,
+      });
+
+      return completeUser;
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+      setLoading(false);
+      return null;
+    }
+  };
+
+  const initializeAuth = async () => {
+    setLoading(true);
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session?.user) {
+        const profile = await getUserProfile();
+        if (!profile) await supabase.auth.signOut();
+      } else {
+        setUser(null);
+        setUserProfile(null);
+      }
+    } catch (error) {
+      console.error("Auth init error:", error);
+      setUser(null);
+      setUserProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+    const timer = setTimeout(() => {
+      if (isMounted) initializeAuth();
+    }, 100); //small delay to prevent race condition
+
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-
-      // Handle password recovery
-      if (event === "PASSWORD_RECOVERY") {
-        setLoading(false);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!isMounted) return;
+      if (session?.user) {
+        getUserProfile();
+      } else {
+        setUser(null);
+        setUserProfile(null);
       }
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      clearTimeout(timer);
+      subscription?.unsubscribe();
+    };
   }, []);
 
-  const value = {
-    session,
-    user,
-    isLoading: loading,
+  const signIn = async (email, password) => {
+    setLoading(true);
+    try {
+      // 1. Authenticate
+      const { data: authData, error: authError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-    // Sign in with email/password
-    signIn: async (email, password) => {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) {
-        if (error.message === "Email not confirmed") {
+      if (authError) {
+        if (authError.message === "Email not confirmed") {
           return {
             error: {
               message: "Please verify your email first.",
@@ -54,298 +123,620 @@ export function AuthProvider({ children }) {
             },
           };
         }
-        throw error;
+        throw authError;
       }
-      return data;
-    },
 
-    // Resend verification email
-    resendVerification: async (email) => {
-      setLoading(true);
-      try {
-        const { error } = await supabase.auth.resend({
-          type: "signup",
-          email: email,
-          options: {
-            redirectTo: window.location.origin + "/login",
-          },
-        });
+      // 2. Get profile via edge function
+      const profile = await getUserProfile();
 
-        if (error) {
-          throw new Error(error.message); // Convert to regular Error
-        }
-        return { success: true };
-      } catch (error) {
-        console.error("Resend error:", error);
-        return { error: error.message }; // Return plain error message
-      } finally {
-        setLoading(false);
-      }
-    },
-
-    // Register a new Student
-    registerStudent: async (email, password, studentData) => {
-      setLoading(true);
-      try {
-        // Step 1: Create auth user
-        const { data: authData, error: authError } = await supabase.auth.signUp(
-          {
-            email,
-            password,
-            options: {
-              data: {
-                full_name: studentData.name,
-                age: studentData.age,
-                birthday: studentData.birthday,
-                role: "student", // Set default role
-              },
-              emailRedirectTo: `${window.location.origin}/login`,
-            },
-          }
-        );
-
-        if (authError) throw authError;
-
-        // Step 2: Create User record in user table
-        const { data: userRecord, error } = await supabase
-          .from("user")
-          .insert([
-            {
-              userID: authData.user.id,
-              user_name: studentData.name,
-              user_email: email,
-              user_password: password,
-              role: "student",
-            },
-          ])
-          .select();
-
-        // Step 2: Create student record in students table
-        const { data: studentRecord, error: dbError } = await supabase
-          .from("students")
-          .insert([
-            {
-              student_birthday: studentData.birthday,
-              student_age: studentData.age,
-              status: "active", // Default status
-              userID: authData.user.id,
-            },
-          ])
-          .select();
-
-        if (dbError) throw dbError;
-
-        return {
-          authData,
-          studentData: studentRecord[0],
-        };
-      } catch (error) {
-        console.error("Registration error:", error);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-
-    // SignIn with google
-    signInWithGoogle: async () => {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/chat",
-        },
-      });
-      if (error) throw error;
-      return data;
-    },
-
-    // SignOut
-    signOut: async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    },
-
-    // Reset Password
-    resetPassword: async (email) => {
-      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: window.location.origin + "/update-password",
-      });
-      if (error) throw error;
-      return data;
-    },
-
-    // Update password
-    updatePassword: async (newPassword) => {
-      const { data, error } = await supabase.auth.updateUser({
-        password: newPassword,
-      });
-      if (error) throw error;
-      return data;
-    },
-
-    // Fetch user Profile
-    getUserProfile: async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        // Get user data
-        const { data: userData, error } = await supabase
-          .from("user")
-          .select(`*`)
-          .eq("userID", user.id)
-          .single();
-
-        if (error) throw error;
-        setUserImage(userData.user_image);
-
-        // Get student data if role is student
-        if (userData.role === "student") {
-          const { data: studentData, error: studentError } = await supabase
-            .from("students")
-            .select("*")
-            .eq("userID", user.id)
-            .single();
-
-          if (studentError) throw studentError;
-          return { ...userData, ...studentData };
-        }
-
-        return userData;
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-        throw error;
-      }
-    },
-
-    // Generate the public path for the image
-    getImageUrl: (path) => {
-      return `${supabase.supabaseUrl}/storage/v1/object/public/profile-picture/${path}`;
-    },
-
-    // Update user profile
-    updateProfile: async (updates) => {
-      setLoading(true);
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        // Update auth user data if email is changing
-        if (updates.email) {
-          const { error: authError } = await supabase.auth.updateUser({
-            email: updates.email,
-          });
-          if (authError) throw authError;
-        }
-
-        // Update custom user table
-        const { data, error } = await supabase
-          .from("user")
-          .update({
-            user_name: updates.name,
-            user_email: updates.email,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("userID", user.id)
-          .select();
-
-        if (error) throw error;
-
-        // Update student table if role is student
-        if (updates.birthday || updates.age) {
-          const { error: studentError } = await supabase
-            .from("students")
-            .update({
-              student_birthday: updates.birthday,
-              student_age: updates.age,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("userID", user.id);
-
-          if (studentError) throw studentError;
-        }
-
-        return data;
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    },
-
-    // Upload profile image
-    uploadProfileImage: async (file) => {
-      try {
-        const fileName = `${user.id}-${Date.now()}.webp`;
-        console.log(userImage);
-
-        // Upload to storage
-        const { error: uploadError } = await supabase.storage
-          .from("profile-picture")
-          .upload(fileName, file, {
-            upsert: true, // Overwrite if file already exists
-          });
-        if (uploadError) throw uploadError;
-
-        // Update database with filename only
-        const { error: updateError } = await supabase
-          .from("user")
-          .update({ user_image: fileName })
-          .eq("userID", user.id);
-
-        if (updateError) throw updateError;
-
-        return fileName;
-      } catch (error) {
-        console.error("Error uploading image:", error);
-        throw error;
-      }
-    },
-
-    // Upload feedback
-    uploadFeedback: async (feedback) => {
-      try {
-        // Get user data
-        const { data: userData, error: userError } = await supabase
-          .from("user")
-          .select(`*`)
-          .eq("userID", user.id)
-          .single();
-
-        if (userError) throw userError;
-
-        // Insert feedback
-        const { data, error } = await supabase
-          .from("feedback")
-          .insert([
-            {
-              feedback_title: feedback.title,
-              feedback_category: feedback.category,
-              feedback_rating: feedback.rating,
-              feedback_message: feedback.message,
-              feedback_by: userData.user_name,
-              user_Id: user.id,
-            },
-          ])
-          .select();
-
-        if (error) throw error;
-        return data;
-      } catch (error) {
-        console.error("Error uploading feedback:", error);
-        throw error;
-      }
-    },
+      return {
+        data: authData,
+        profile,
+      };
+    } catch (error) {
+      console.error("Sign in error:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error("Sign out error:", error);
+      throw error;
+    }
+  };
+
+  const resetPassword = async (email) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/update-password",
+    });
+    if (error) throw error;
+    return data;
+  };
+
+  //Student
+  const registerStudent = async (email, password, studentData) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "register-student",
+        {
+          body: { email, password, studentData },
+        }
+      );
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const resendVerification = async (email) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "resend-verification",
+        {
+          body: {
+            email,
+            redirectTo: window.location.origin + "/login",
+          },
+        }
+      );
+
+      if (error) throw error;
+      return { success: true };
+    } catch (error) {
+      console.error("Resend error:", error);
+      return { error: error.message };
+    }
+  };
+
+  const updatePassword = async (newPassword) => {
+    // Update Auth table
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (error) throw error;
+  };
+
+  const getImageUrl = (path) => {
+    return `${supabase.supabaseUrl}/storage/v1/object/public/profile-picture/${path}`;
+  };
+
+  const updateProfile = async (updates) => {
+    setLoading(true);
+    try {
+      const id = user.userID;
+
+      const { data, error } = await supabase.functions.invoke(
+        "update-profile",
+        {
+          body: { updates, id },
+        }
+      );
+      if (error) throw error;
+
+      // Update local state
+      const updatedProfile = {
+        ...userProfile,
+        ...data,
+      };
+
+      // Update the context state
+      setUserProfile(updatedProfile);
+
+      return updatedProfile;
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const uploadProfileImage = async (file) => {
+    try {
+      const id = user.userID;
+      const fileName = `${id}-${Date.now()}.webp`;
+
+      // Convert to WebP if needed
+      let processedFile = file;
+      if (file.type !== "image/webp") {
+        processedFile = await convertToWebP(file);
+      }
+
+      const formData = new FormData();
+      formData.append("file", processedFile);
+      formData.append("userId", id);
+      formData.append("fileName", fileName);
+
+      const { data, error } = await supabase.functions.invoke("upload-image", {
+        body: formData,
+      });
+
+      if (error) throw error;
+      if (!data?.data?.fileName) {
+        throw new Error("Invalid response structure");
+      }
+
+      return {
+        fileName: data.data.fileName,
+        imageUrl: data.data.imageUrl,
+      };
+    } catch (error) {
+      console.error("Upload error details:", {
+        message: error.message,
+        response: error.response?.data,
+        stack: error.stack,
+      });
+      throw error;
+    }
+  };
+  // Helper function to convert image to WebP
+  const convertToWebP = async (file) => {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          canvas.toBlob(
+            (blob) => {
+              resolve(new File([blob], file.name, { type: "image/webp" }));
+            },
+            "image/webp",
+            0.8
+          ); // 0.8 is quality (0-1)
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const uploadFeedback = async (feedback) => {
+    try {
+      const studentid = userProfile.studentid;
+      const name = user.user_name;
+      // Insert feedback
+      const { data, error } = await supabase.functions.invoke(
+        "upload-feedback",
+        {
+          body: {
+            feedback,
+            studentid,
+            name,
+          },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error uploading feedback:", error);
+      throw error;
+    }
+  };
+
+  const getChatSessions = async () => {
+    try {
+      if (!userProfile?.studentid) return [];
+      const studentid = userProfile.studentid;
+      const { data, error } = await supabase.functions.invoke(
+        "get-chat-session",
+        {
+          body: {
+            studentid,
+          },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching chat sessions:", error);
+      return [];
+    }
+  };
+
+  const getChatMessages = async (chatId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "get-chat-messages",
+        {
+          body: {
+            chatId,
+          },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching chat messages:", error);
+      return [];
+    }
+  };
+
+  const createChatSession = async () => {
+    try {
+      // Get studentid from userProfile
+      if (!userProfile?.studentid) {
+        throw new Error("Student profile not loaded");
+      }
+
+      const { data, error } = await supabase.functions.invoke(
+        "create-chat-session",
+        {
+          body: {
+            studentid: userProfile.studentid,
+          },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error creating chat session:", error);
+      throw error;
+    }
+  };
+
+  const saveMessage = async (chatId, message, sender) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("save-message", {
+        body: { chatId, message, sender },
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error saving message:", error);
+      throw error;
+    }
+  };
+
+  const updateChatName = async (chatId, newName) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "update-chat-name",
+        {
+          body: { chatId, newName },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error updating chat name:", error);
+      throw error;
+    }
+  };
+
+  const deleteChatSession = async (chatId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "delete-chat-session",
+        {
+          body: { chatId },
+        }
+      );
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error deleting chat session:", error);
+      throw error;
+    }
+  };
+
+  const endChatSession = async (chatId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "end-chat-session",
+        {
+          body: { chatId },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error ending chat session:", error);
+      throw error;
+    }
+  };
+
+  // Admin
+  const completeProfile = async (data) => {
+    try {
+      setLoading(true);
+      const id = user.userID;
+      const { error } = await supabase.functions.invoke(
+        "complete-profile",
+        {
+          body: { data, id },
+        }
+      );
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error completing profile:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getDashboardStats = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "get-dashboard-stats",
+        {
+          method: "GET",
+        }
+      );
+
+      if (error) throw error;
+      return (
+        data || [
+          { title: "Total Users", value: 0, change: "+0%", trend: "neutral" },
+          { title: "New Feedback", value: 0, change: "+0%", trend: "neutral" },
+          { title: "Resources", value: 0, change: "+0", trend: "neutral" },
+          { title: "Students", value: 0, change: "+0%", trend: "neutral" },
+        ]
+      );
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      return [
+        { title: "Total Users", value: 0, change: "+0%", trend: "neutral" },
+        { title: "New Feedback", value: 0, change: "+0%", trend: "neutral" },
+        { title: "Resources", value: 0, change: "+0", trend: "neutral" },
+        { title: "Students", value: 0, change: "+0%", trend: "neutral" },
+      ];
+    }
+  };
+
+  const inviteAdmin = async (email) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("invite-admin", {
+        body: { email },
+      });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error inviting admin:", error);
+      return { error: error.message };
+    }
+  };
+
+  const getStudents = async (page = 1, searchTerm = "") => {
+    try {
+      const { data, error } = await supabase.functions.invoke("get-students", {
+        body: { page, searchTerm },
+      });
+
+      if (error) throw error;
+      return data || { students: [], totalCount: 0, totalPages: 1 };
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      return { students: [], totalCount: 0, totalPages: 1 };
+    }
+  };
+
+  const deleteStudent = async (userId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "delete-students",
+        {
+          body: { userId },
+        }
+      );
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error deleting student:", error);
+      throw error;
+    }
+  };
+
+  const getFeedback = async (
+    page = 1,
+    filters = {},
+    sortField = "timestamp",
+    sortOrder = "desc",
+    searchQuery = ""
+  ) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("get-feedbacks", {
+        body: {
+          page,
+          filters,
+          sortField,
+          sortOrder,
+          searchQuery,
+        },
+      });
+
+      if (error) throw error;
+      return (
+        data || {
+          feedback: [],
+          totalCount: 0,
+          totalPages: 1,
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching feedback:", error);
+      return {
+        feedback: [],
+        totalCount: 0,
+        totalPages: 1,
+      };
+    }
+  };
+
+  const deleteFeedback = async (feedbackId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "delete-feedback",
+        {
+          body: { feedbackId },
+        }
+      );
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error deleting feedback:", error);
+      throw error;
+    }
+  };
+
+  const getResources = async (page = 1, type = undefined, searchQuery = "") => {
+    const itemsPerPage = 9;
+    const from = (page - 1) * itemsPerPage;
+    const to = from + itemsPerPage - 1;
+
+    try {
+      const { data, error } = await supabase.functions.invoke("get-resources", {
+        body: {
+          page,
+          type,
+          searchQuery,
+        },
+      });
+
+      if (error) throw error;
+      return (
+        data || {
+          data: [],
+          totalPages: 1,
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching resources:", error);
+      throw error;
+    }
+  };
+
+  const getResourceById = async (resourceId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "get-resourcebyid",
+        {
+          body: { resourceId },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching resource:", error);
+      throw error;
+    }
+  };
+
+  const updateResource = async (resourceId, updatedData) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "update-resource",
+        {
+          body: { resourceId, updatedData },
+        }
+      );
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error updating resource:", error);
+      throw error;
+    }
+  };
+
+  const addResource = async (resourceData) => {
+    try {
+      const { data, error } = await supabase.functions.invoke("add-resource", {
+        body: { resourceData },
+      });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error adding resource:", error);
+      throw error;
+    }
+  };
+
+  const deleteResource = async (resourceId) => {
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "delete-resource",
+        {
+          body: { resourceId },
+        }
+      );
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error deleting resource:", error);
+      throw error;
+    }
+  };
+
+  const value = {
+    session,
+    user,
+    userProfile,
+    isLoading: loading,
+
+    // Global
+    signIn, // Sign In
+    signOut, // Sign Out
+    resetPassword, // Reset Password
+
+    //Student
+    registerStudent, // Register Student
+    resendVerification, // Resend verification email
+    updatePassword, // Update password
+    getImageUrl, // Generate the public path for the image
+    updateProfile, // Update user profile
+    uploadProfileImage, // Upload profile image
+    uploadFeedback, // Upload feedback
+    getChatSessions, // Chat-related functions
+    getChatMessages, // Get Chat message
+    createChatSession, // Get Chat session
+    saveMessage, // Save message
+    updateChatName, // Updated the chat name
+    deleteChatSession, // Delete the Chat
+    endChatSession, // End the chat session to count interval
+
+    // Admin
+    completeProfile, // Complete Profile for new User
+    getDashboardStats, //For admin Dasboard
+    inviteAdmin, //Invite New Admin
+    getStudents, // Search students
+    deleteStudent, // Delete student account
+    getFeedback, // Get all Feedback
+    deleteFeedback, // Delete feedback
+    getResources, // Get Resources
+    getResourceById, // Get single resource by ID
+    addResource, // Add new resource
+    updateResource, // Update resource
+    deleteResource, // Delete resource
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

@@ -1,40 +1,34 @@
 import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import Header from "../Header";
+import { useNavigate } from "react-router-dom";
+import Header from "../Common/Header";
 import styles from "./Login.module.css";
 import { useAuth } from "../../AuthContext";
-import googleImage from "../../assets/google.png";
+import { FaEnvelope, FaLock, FaArrowLeft, FaPaperPlane } from "react-icons/fa";
+import LoadingModal from "../Common/LoadingModal";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const [resetEmail, setResetEmail] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // Sent Reset Password
   const [showResetForm, setShowResetForm] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const [resetMessage, setResetMessage] = useState("");
-
-  // Resend verification
   const [showResendVerification, setShowResendVerification] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  const { signIn, signInWithGoogle, resetPassword, resendVerification } =
-    useAuth();
+  const { signIn, resetPassword, resendVerification } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const from = location.state?.from?.pathname || "/chat";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     setShowResendVerification(false);
 
     try {
-      const { data, error: authError } = await signIn(email, password);
+      const { data, profile, error: authError } = await signIn(email, password);
 
       if (authError) {
         if (authError.needsVerification) {
@@ -45,7 +39,17 @@ const LoginScreen = () => {
         }
         return;
       }
-      navigate(from, { replace: true });
+
+      // Redirect based on role and profile status
+      if (profile?.role === "admin") {
+        navigate(
+          profile?.isProfile_set === "set"
+            ? "/admin-dashboard"
+            : "/complete-profile"
+        );
+      } else {
+        navigate("/chat");
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -59,17 +63,6 @@ const LoginScreen = () => {
       setShowResendVerification(false);
     } catch (err) {
       console.error("Resend failed:", err);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    try {
-      await signInWithGoogle();
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -90,63 +83,135 @@ const LoginScreen = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <LoadingModal
+        message={showResetForm ? "Processing..." : "Logging In..."}
+      />
+    );
+  }
+
   return (
     <>
       <Header />
       <div className={styles.container}>
-        <div className={styles.formContainer}>
+        <div className={styles.card}>
           {showResetForm ? (
-            <div className={styles.resetForm}>
-              <h3>Reset Password</h3>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={resetEmail}
-                onChange={(e) => setResetEmail(e.target.value)}
-                required
-                disabled={loading}
-              />
-              <button onClick={handlePasswordReset} disabled={loading}>
-                {loading ? "Sending..." : "Send Reset Link"}
-              </button>
+            <div className={styles.resetContainer}>
               <button
                 onClick={() => setShowResetForm(false)}
-                disabled={loading}
+                className={styles.backButton}
               >
-                Back to Login
+                <FaArrowLeft /> Back to Login
               </button>
+
+              <div className={styles.resetHeader}>
+                <h2>Reset Password</h2>
+                <p>Enter your email to receive a reset link</p>
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>
+                  <FaEnvelope className={styles.inputIcon} />
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  required
+                  disabled={loading}
+                  className={styles.inputField}
+                />
+              </div>
+
+              <button
+                onClick={handlePasswordReset}
+                disabled={loading}
+                className={styles.resetButton}
+              >
+                <FaPaperPlane className={styles.buttonIcon} />
+                {loading ? "Sending..." : "Send Reset Link"}
+              </button>
+
               {resetMessage && (
-                <p className={styles.resetMessage}>{resetMessage}</p>
+                <div
+                  className={
+                    resetMessage.includes("sent")
+                      ? styles.successMessage
+                      : styles.errorMessage
+                  }
+                >
+                  {resetMessage}
+                </div>
               )}
             </div>
           ) : (
             <>
+              <div className={styles.loginHeader}>
+                <h2>Welcome Back</h2>
+                <p>Sign in to continue to your account</p>
+              </div>
+
               <form onSubmit={handleSubmit} className={styles.form}>
-                <h2>Enter Your Information</h2>
-                <input
-                  type="email"
-                  placeholder="Email"
-                  name="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                  autoComplete="true"
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  name="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  disabled={loading}
-                />
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>
+                    <FaEnvelope className={styles.inputIcon} />
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    disabled={loading}
+                    className={styles.inputField}
+                    autoComplete="email"
+                  />
+                </div>
+
+                <div className={styles.inputGroup}>
+                  <label className={styles.inputLabel}>
+                    <FaLock className={styles.inputIcon} />
+                    Password
+                  </label>
+                  <div className={styles.passwordWrapper}>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={loading}
+                      className={styles.inputField}
+                      autoComplete="current-password"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                      className={styles.passwordToggle}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowResetForm(true)}
+                  className={styles.forgotPassword}
+                >
+                  Forgot password?
+                </button>
+
                 {error && (
                   <div className={styles.errorMessage}>
-                    {error}
+                    <div>{error}</div>
                     {showResendVerification && (
                       <button
                         type="button"
@@ -158,31 +223,25 @@ const LoginScreen = () => {
                     )}
                   </div>
                 )}
-                <button type="submit" disabled={loading}>
-                  {loading ? "Logging in..." : "Login"}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={styles.loginButton}
+                >
+                  {loading ? "Signing In..." : "Sign In"}
                 </button>
               </form>
-              <p
-                className={styles.forgotPassword}
-                onClick={() => !loading && setShowResetForm(true)}
-              >
-                Forgot password?
-              </p>
-              <p className={styles.or}>or</p>
-              <button
-                onClick={handleGoogleLogin}
-                className={styles.googlebtn}
-                disabled={loading}
-              >
-                <img src={googleImage} alt="google img" />
-                Sign In With Google
-              </button>
-              <p className={styles.register}>
+
+              <div className={styles.registerPrompt}>
                 Don't have an account?{" "}
-                <span onClick={() => !loading && navigate("/register")}>
-                  Register
-                </span>
-              </p>
+                <button
+                  onClick={() => !loading && navigate("/register")}
+                  className={styles.registerLink}
+                >
+                  Create account
+                </button>
+              </div>
             </>
           )}
         </div>
