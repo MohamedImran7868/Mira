@@ -46,7 +46,6 @@ export function AuthProvider({ children }) {
         ...data.userData,
         ...data.roleData,
       });
-      console.log(completeUser);
 
       return completeUser;
     } catch (error) {

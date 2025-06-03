@@ -5,3 +5,4 @@ react-datepicker
 concurrently
 bad-words
 react-icons
+@vercel/speed-insights

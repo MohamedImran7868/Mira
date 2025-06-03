@@ -117,7 +117,7 @@ const LoginScreen = () => {
                 </label>
                 <input
                   type="email"
-                  placeholder="your@email.com"
+                  placeholder="1234567890@student.mmu.edu.my"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
                   required
@@ -162,7 +162,7 @@ const LoginScreen = () => {
                   </label>
                   <input
                     type="email"
-                    placeholder="your@student.mmu.edu.my"
+                    placeholder="1234567890@student.mmu.edu.my"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
