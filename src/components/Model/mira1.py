@@ -41,14 +41,15 @@ class MIRA:
             exit(1)
 
         # Load LLaMA model
-        llama_model_path = "C:\\Users\\NITRO 5\\Desktop\\Project\\React\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
+        # llama_model_path = "C:\\Users\\NITRO 5\\Desktop\\Project\\React\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
         try:
-            self.llama = Llama(
-                model_path=llama_model_path,
+            self.llama = Llama.from_pretrained(
+                repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+                filename="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
                 n_ctx=1024,
                 n_threads=6,
                 n_batch=64,
-                n_gpu_layers=35,  # Adjust according to your GPU VRAM
+                n_gpu_layers=35,
                 verbose=False
             )
             logger.info("LLaMA model loaded successfully.")

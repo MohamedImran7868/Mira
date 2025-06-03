@@ -10,3 +10,4 @@ sentencepiece
 accelerate
 numpy
 gunicorn
+hf_xet
