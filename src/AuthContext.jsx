@@ -456,6 +456,25 @@ export function AuthProvider({ children }) {
   };
 
   // Admin
+  const completeProfile = async (data) => {
+    try {
+      setLoading(true);
+      const id = user.userID;
+      const { error } = await supabase.functions.invoke(
+        "complete-profile",
+        {
+          body: { data, id },
+        }
+      );
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error completing profile:", error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getDashboardStats = async () => {
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -703,6 +722,7 @@ export function AuthProvider({ children }) {
     endChatSession, // End the chat session to count interval
 
     // Admin
+    completeProfile, // Complete Profile for new User
     getDashboardStats, //For admin Dasboard
     inviteAdmin, //Invite New Admin
     getStudents, // Search students

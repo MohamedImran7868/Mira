@@ -32,6 +32,10 @@
   margin-bottom: 10px;
 }
 
+/* .sidebarIconbutton{
+  color: var(--color-primary-light);
+} */
+
 /* Menu Item Styles */
 .menuItem {
   transition: all 0.3s ease;

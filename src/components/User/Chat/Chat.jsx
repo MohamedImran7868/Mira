@@ -6,6 +6,7 @@ import {
   MenuItem,
   SubMenu,
   sidebarClasses,
+  menuClasses
 } from "react-pro-sidebar";
 import { useAuth } from "../../../AuthContext";
 
