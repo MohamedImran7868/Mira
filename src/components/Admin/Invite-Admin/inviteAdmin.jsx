@@ -2,13 +2,13 @@ import { useState } from "react";
 import { useAuth } from "../../../AuthContext";
 import { useNavigate } from "react-router-dom";
 import Header from "../../Common/Header";
+import styles from "./inviteAdmin.module.css";
 
 const InviteAdmin = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState({ text: "", isError: false });
   const [isLoading, setIsLoading] = useState(false);
   const { inviteAdmin } = useAuth();
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,7 +26,10 @@ const InviteAdmin = () => {
     if (error) {
       setMessage({ text: error, isError: true });
     } else {
-      setMessage({ text: "Admin invited successfully!", isError: false });
+      setMessage({
+        text: "Admin invited successfully! An invitation has been sent to the email.",
+        isError: false,
+      });
       setEmail("");
     }
 
@@ -36,50 +39,58 @@ const InviteAdmin = () => {
   return (
     <>
       <Header />
-      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Invite Admin</h2>
-
-        {message.text && (
-          <div
-            className={`mb-4 p-3 rounded ${
-              message.isError
-                ? "bg-red-100 text-red-700"
-                : "bg-green-100 text-green-700"
-            }`}
-          >
-            {message.text}
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <div className={styles.header}>
+            <h2>Invite New Admin</h2>
+            <p className={styles.subtitle}>
+              Enter the email address of the person you want to invite as an
+              admin
+            </p>
           </div>
-        )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
+          {message.text && (
+            <div
+              className={`${styles.message} ${
+                message.isError ? styles.error : styles.success
+              }`}
             >
-              Admin Email
-            </label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter admin email"
-              required
-            />
-          </div>
+              {message.text}
+            </div>
+          )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-2 px-4 rounded-md text-white font-medium ${
-              isLoading ? "bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
-            } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-          >
-            {isLoading ? "Sending Invite..." : "Send Invite"}
-          </button>
-        </form>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            <div className={styles.formGroup}>
+              <label htmlFor="email" className={styles.label}>
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                required
+                className={styles.input}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={styles.button}
+            >
+              {isLoading ? (
+                <>
+                  <span className={styles.spinner}></span>
+                  Sending Invite...
+                </>
+              ) : (
+                "Send Admin Invite"
+              )}
+            </button>
+          </form>
+        </div>
       </div>
     </>
   );

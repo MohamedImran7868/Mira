@@ -3,7 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../AuthContext";
 import styles from "./CompleteProfile.module.css";
 import LoadingModal from "../../Common/LoadingModal";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaUser,
+  FaPhone,
+  FaLock,
+  FaCheck,
+} from "react-icons/fa";
 
 const CompleteProfile = () => {
   const [editData, setEditData] = useState({
@@ -12,8 +19,6 @@ const CompleteProfile = () => {
   });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  // Password Change Handle
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
     uppercase: false,
@@ -29,7 +34,7 @@ const CompleteProfile = () => {
     confirmPassword: "",
   });
 
-  const { user, CompleteAdminProfile, updatePassword } = useAuth();
+  const { user, completeProfile, updatePassword } = useAuth();
   const navigate = useNavigate();
 
   // To prevent back navigation
@@ -50,7 +55,6 @@ const CompleteProfile = () => {
     const { name, value } = e.target;
 
     if (name === "contact") {
-      // Only allow numbers and optional + at start
       if (!/^\+?\d*$/.test(value)) return;
     }
 
@@ -97,153 +101,209 @@ const CompleteProfile = () => {
     }
   };
 
-  // Sumbit the form
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    //console.log(user.role);
-    navigate("/admin-dashboard", { replace: true });
 
-    // try {
-    //   validateForm();
+    try {
+      validateForm();
+      await completeProfile(editData);
 
-    //   if (user.role === "admin") {
-    //     await CompleteAdminProfile(editData);
+      if (passwordData.password) {
+        await updatePassword(passwordData.password);
+      }
 
-    //     if (passwordData.password) {
-    //       await updatePassword(passwordData.password);
-    //     }
-
-    //     navigate("/admin-dashboard", { replace: true });
-    //   }
-    // } catch (err) {
-    //   setError(err.message);
-    // } finally {
-    //   setLoading(false);
-    // }
+      navigate("/admin-dashboard", { replace: true });
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className={styles.container}>
-      <div className={styles.innerContainer}>
-        <h2>Complete Your Profile</h2>
-        <p>
-          Please provide some additional information to complete your
-          registration
-        </p>
+      <div className={styles.card}>
+        <div className={styles.header}>
+          <h2>Complete Your Profile</h2>
+          <p>
+            Please provide some additional information to finish setting up your
+            account
+          </p>
+        </div>
 
-        {error && <div className={styles.error}>{error}</div>}
+        {error && (
+          <div className={styles.errorMessage}>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {error}
+          </div>
+        )}
 
-        <form className={styles.form} onSubmit={handleSubmit} autoComplete="off" >
+        <form
+          onSubmit={handleSubmit}
+          className={styles.form}
+          autoComplete="off"
+        >
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Full Name:</label>
+            <label className={styles.inputLabel}>
+              <FaUser className={styles.inputIcon} />
+              Full Name
+            </label>
             <input
               type="text"
-              id="username"
               name="name"
               value={editData.name}
               onChange={handleInputChange}
+              className={styles.inputField}
+              placeholder="Enter your full name"
               required
               disabled={loading}
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Contact Number:</label>
+            <label className={styles.inputLabel}>
+              <FaPhone className={styles.inputIcon} />
+              Contact Number
+            </label>
             <input
               type="tel"
               name="contact"
-              id="contact"
               value={editData.contact}
               onChange={handleInputChange}
+              className={styles.inputField}
+              placeholder="+60123456789"
               disabled={loading}
-              autoComplete="tel"
               required
             />
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Password:</label>
-            <input
-              type={showPassword ? "text" : "password"}
-              id="password"
-              name="password"
-              value={passwordData.password}
-              onChange={handlePasswordChange}
-              disabled={loading}
-              autoComplete="new-password"
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((prev) => !prev)}
-              className={styles.toggleBtn}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
+            <label className={styles.inputLabel}>
+              <FaLock className={styles.inputIcon} />
+              Password
+            </label>
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                value={passwordData.password}
+                onChange={handlePasswordChange}
+                className={styles.inputField}
+                placeholder="Create a password"
+                disabled={loading}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className={styles.toggleBtn}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
 
           {passwordData.password && (
             <div className={styles.passwordRequirements}>
               <h4>Password Requirements:</h4>
-              <ul>
+              <ul className={styles.requirementsList}>
                 <li className={passwordRequirements.length ? styles.valid : ""}>
-                  {passwordRequirements.length ? "✓" : "✗"} Minimum 8 characters
+                  <span className={styles.checkmark}>
+                    {passwordRequirements.length ? <FaCheck /> : "✗"}
+                  </span>
+                  Minimum 8 characters
                 </li>
                 <li
                   className={passwordRequirements.uppercase ? styles.valid : ""}
                 >
-                  {passwordRequirements.uppercase ? "✓" : "✗"} At least one
-                  uppercase letter
+                  <span className={styles.checkmark}>
+                    {passwordRequirements.uppercase ? <FaCheck /> : "✗"}
+                  </span>
+                  At least one uppercase letter
                 </li>
                 <li
                   className={passwordRequirements.lowercase ? styles.valid : ""}
                 >
-                  {passwordRequirements.lowercase ? "✓" : "✗"} At least one
-                  lowercase letter
+                  <span className={styles.checkmark}>
+                    {passwordRequirements.lowercase ? <FaCheck /> : "✗"}
+                  </span>
+                  At least one lowercase letter
                 </li>
                 <li className={passwordRequirements.number ? styles.valid : ""}>
-                  {passwordRequirements.number ? "✓" : "✗"} At least one number
+                  <span className={styles.checkmark}>
+                    {passwordRequirements.number ? <FaCheck /> : "✗"}
+                  </span>
+                  At least one number
                 </li>
                 <li
                   className={
                     passwordRequirements.specialChar ? styles.valid : ""
                   }
                 >
-                  {passwordRequirements.specialChar ? "✓" : "✗"} At least one
-                  special character
+                  <span className={styles.checkmark}>
+                    {passwordRequirements.specialChar ? <FaCheck /> : "✗"}
+                  </span>
+                  At least one special character
                 </li>
               </ul>
             </div>
           )}
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Confirm Password:</label>
-            <div></div>
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              id="confirmPassword"
-              name="confirmPassword"
-              value={passwordData.confirmPassword}
-              onChange={handlePasswordChange}
-              disabled={loading}
-              required
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmPassword((prev) => !prev)}
-              className={styles.toggleBtn}
-              aria-label={
-                showConfirmPassword ? "Hide password" : "Show password"
-              }
-            >
-              {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-            </button>
+            <label className={styles.inputLabel}>
+              <FaLock className={styles.inputIcon} />
+              Confirm Password
+            </label>
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                name="confirmPassword"
+                value={passwordData.confirmPassword}
+                onChange={handlePasswordChange}
+                className={`${styles.inputField} ${
+                  passwordData.confirmPassword && !passwordsMatch
+                    ? styles.invalid
+                    : ""
+                }`}
+                placeholder="Confirm your password"
+                disabled={loading}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                className={styles.toggleBtn}
+                aria-label={
+                  showConfirmPassword ? "Hide password" : "Show password"
+                }
+              >
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
 
-          <button type="submit" disabled={loading}>
+          <button
+            type="submit"
+            className={styles.submitButton}
+            disabled={loading}
+          >
             {loading ? "Completing Registration..." : "Complete Registration"}
           </button>
         </form>
