@@ -199,26 +199,26 @@ const ChatScreen = () => {
     setTypingIndicator(true);
 
     try {
-      // const response = await fetch("http://127.0.0.1:5000/model", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify({ input }),
-      // });
+      const response = await fetch("http://127.0.0.1:5000/model", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ input }),
+      });
 
-      // if (!response.ok) {
-      //   throw new Error("Network response was not ok");
-      // }
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
 
-      // const data = await response.json();
-      // simulateTypingEffect(data.result);
+      const data = await response.json();
 
       // Save bot response to database
-      // await saveMessage(chatId, data.result, "bot");
+      simulateTypingEffect(data.result);
+      await saveMessage(chatId, data.result, "bot");
 
-      simulateTypingEffect("For Testing");
-      await saveMessage(chatId, "For Testing", "bot");
+      // simulateTypingEffect("For Testing");
+      // await saveMessage(chatId, "For Testing", "bot");
     } catch (error) {
       console.error("Error calling model:", error);
       const errorMsg =
