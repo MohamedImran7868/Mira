@@ -1,5 +1,6 @@
 # requirements.txt
 
+gunicorn
 # Core Libraries
 torch==2.0.1
 transformers==4.30.2
@@ -9,5 +10,4 @@ llama-cpp-python==0.1.72
 sentencepiece
 accelerate
 numpy
-gunicorn
 hf_xet

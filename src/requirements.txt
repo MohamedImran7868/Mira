@@ -1,7 +1,0 @@
-react-router
-supabase
-react-pro-sidebar
-react-datepicker
-concurrently
-bad-words
-react-icons
