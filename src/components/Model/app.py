@@ -4,7 +4,7 @@ from flask_cors import CORS
 import logging
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 # Initialize MIRA only once when the app starts
 mira = MIRA()
