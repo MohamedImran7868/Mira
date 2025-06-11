@@ -173,7 +173,6 @@ const ChatScreen = () => {
         const newSession = await createChatSession();
         setChatSessions((prev) => [newSession, ...prev]);
         chatId = newSession.chatid;
-        console.log(chatId);
         setCurrentChat(chatId);
         setMessages([]);
       }
@@ -199,7 +198,7 @@ const ChatScreen = () => {
     setTypingIndicator(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/model", {
+      const response = await fetch("http://68.183.87.120:5000/model", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
