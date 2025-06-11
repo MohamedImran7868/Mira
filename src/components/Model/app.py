@@ -4,7 +4,11 @@ from flask_cors import CORS
 import logging
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    "http://localhost:5173",
+    "https://mirahub.me",
+    "https://www.mirahub.me"
+])
 
 # Initialize MIRA only once when the app starts
 mira = MIRA()
