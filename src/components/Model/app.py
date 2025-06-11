@@ -4,17 +4,15 @@ from flask_cors import CORS
 import logging
 
 app = Flask(__name__)
-CORS(app, origins=[
-    "http://localhost:5173",
-    "https://mirahub.me",
-    "https://www.mirahub.me"
-])
+CORS(app)
 
 # Initialize MIRA only once when the app starts
 mira = MIRA()
 
-@app.route('/model', methods=['POST'])
+@app.route('/model', methods=['POST', 'OPTIONS'])
 def process_message():
+    if request.method == 'OPTIONS':
+        return '', 204
     try:
         data = request.get_json()
         if not data or 'input' not in data:
