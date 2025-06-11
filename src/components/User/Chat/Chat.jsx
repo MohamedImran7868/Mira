@@ -198,7 +198,7 @@ const ChatScreen = () => {
     setTypingIndicator(true);
 
     try {
-      const response = await fetch("http://68.183.87.120:5000/model", {
+      const response = await fetch("https://api.mirahub.me/model", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
