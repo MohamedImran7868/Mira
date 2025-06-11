@@ -9,10 +9,8 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # Initialize MIRA only once when the app starts
 mira = MIRA()
 
-@app.route('/model', methods=['POST', 'OPTIONS'])
+@app.route('/model', methods=['POST'])
 def process_message():
-    if request.method == 'OPTIONS':
-        return '', 204
     try:
         data = request.get_json()
         if not data or 'input' not in data:
