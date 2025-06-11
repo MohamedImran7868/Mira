@@ -41,20 +41,21 @@ class MIRA:
             exit(1)
 
         # Load LLaMA 3.2 model
-        llama_model_path = r"C:\Users\Shadow\OneDrive\Documents\MIRA\Llama-3.2-3B-Instruct-Q4_K_M.gguf"
-        
+        # llama_model_path = r"C:\Users\Shadow\OneDrive\Documents\MIRA\Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+
         try:
-            self.llama = Llama(
-                model_path=llama_model_path,
+            self.llama = Llama.from_pretrained(
+                repo_id="bartowski/Llama-3.2-3B-Instruct-GGUF",
+	            filename="Llama-3.2-3B-Instruct-Q4_K_M.gguf",
                 n_ctx=2048,
                 n_threads=8,
                 n_batch=64,
                 n_gpu_layers=40 if torch.cuda.is_available() else 0,
                 verbose=False
             )
-            logger.info("LLaMA 3.2 model loaded successfully.")
+            logger.info("LLaMA model loaded successfully.")
         except Exception as e:
-            logger.error(f"Failed to load LLaMA 3.2 model: {e}", exc_info=True)
+            logger.error(f"Failed to load LLaMA model: {e}", exc_info=True)
             self.llama = None
 
     def _load_responses(self) -> Dict[str, str]:

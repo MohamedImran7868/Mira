@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from mira1 import MIRA
+from mira import MIRA
 from flask_cors import CORS
 import logging
 
