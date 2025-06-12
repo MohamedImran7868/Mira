@@ -23,6 +23,7 @@ def process_message():
         if not user_input:
             return jsonify({'result': "Please share how you're feeling."})
         
+        t0 = time.time()
         # Detect emotions
         emotion_results = mira.detect_emotions(user_input)
         
@@ -32,9 +33,12 @@ def process_message():
             for er in emotion_results
         ])
         
+        t1 = time.time()
         # Generate LLaMA response
         llama_response = mira.generate_llama_response(user_input, emotion_summary)
         
+        t2 = time.time()
+        logging.info(f"Emotion detection: {t1-t0:.2f}s, LLaMA response: {t2-t1:.2f}s")
         # Format response
         response_data = {
             'result': llama_response,

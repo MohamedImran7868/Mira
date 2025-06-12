@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 from llama_cpp import Llama
+import time
 
 # Configure logging
 logging_level = os.getenv("LOGGING_LEVEL", "INFO").upper()
@@ -94,14 +95,14 @@ class MIRA:
 
         try:
             prompt = f"""<|start_header_id|>system<|end_header_id|>
-You are MIRA, an emotionally intelligent and compassionate chatbot powered by LLaMA 3.2.
-You detect the user's emotional state and respond with warmth, empathy, and kindness.
-Current detected emotion(s): {emotion_summary}
-<|eot_id|>
-<|start_header_id|>user<|end_header_id|>
-{user_input}
-<|eot_id|>
-<|start_header_id|>assistant<|end_header_id|>"""
+                You are MIRA, an emotionally intelligent and compassionate chatbot powered by LLaMA 3.2.
+                You detect the user's emotional state and respond with warmth, empathy, and kindness.
+                Current detected emotion(s): {emotion_summary}
+                <|eot_id|>
+                <|start_header_id|>user<|end_header_id|>
+                {user_input}
+                <|eot_id|>
+                <|start_header_id|>assistant<|end_header_id|>"""
 
             output = self.llama(
                 prompt,
@@ -148,13 +149,16 @@ Current detected emotion(s): {emotion_summary}
                 if not user_input:
                     print("MIRA: Please share how you're feeling.")
                     continue
-
+                t0 = time.time()
                 emotion_results = self.detect_emotions(user_input)
+                t1 = time.time()
                 emotion_summary = ", ".join([
                     f"{e['emotion']} ({e['confidence']:.0%})" for e in emotion_results
                 ]) or "unclear"
 
                 llama_response = self.generate_llama_response(user_input, emotion_summary)
+                t2 = time.time()
+                logging.info(f"Emotion detection: {t1-t0:.2f}s, LLaMA response: {t2-t1:.2f}s")
 
                 print(f"\nMIRA: I sense you're feeling {emotion_summary}.")
                 print(f"MIRA: {llama_response}\n")
