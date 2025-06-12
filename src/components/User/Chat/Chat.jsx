@@ -213,8 +213,20 @@ const ChatScreen = () => {
       const data = await response.json();
 
       // Save bot response to database
-      simulateTypingEffect(data.result);
+      //simulateTypingEffect(data.result);
+      // Show bot response instantly (no typing effect)
+      setMessages((prev) => [
+      ...prev,
+      {
+        message_content: data.result,
+        sender: "bot",
+        isTyping: false,
+        message_timestamp: new Date().toISOString(),
+      },
+    ]);
       await saveMessage(chatId, data.result, "bot");
+      setTypingIndicator(false);
+    setIsTyping(false);
 
       // simulateTypingEffect("For Testing");
       // await saveMessage(chatId, "For Testing", "bot");
@@ -222,77 +234,89 @@ const ChatScreen = () => {
       console.error("Error calling model:", error);
       const errorMsg =
         "Sorry, I'm having trouble connecting to the AI service.";
-      simulateTypingEffect(errorMsg);
+      //simulateTypingEffect(errorMsg);
+
+      setMessages((prev) => [
+      ...prev,
+      {
+        message_content: errorMsg,
+        sender: "bot",
+        isTyping: false,
+        message_timestamp: new Date().toISOString(),
+      },
+    ]);
+    setTypingIndicator(false);
+    setIsTyping(false);
     }
   };
 
-  const simulateTypingEffect = (text) => {
-    let i = 0;
-    const words = text.split(" ");
-    let partialMessage = "";
+  // const simulateTypingEffect = (text) => {
+  //   let i = 0;
+  //   const words = text.split(" ");
+  //   let partialMessage = "";
 
-    // Clear any existing interval
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-    }
+  //   // Clear any existing interval
+  //   if (typingIntervalRef.current) {
+  //     clearInterval(typingIntervalRef.current);
+  //   }
 
-    typingIntervalRef.current = setInterval(() => {
-      if (i < words.length) {
-        partialMessage = words.slice(0, i + 1).join(" ");
+  //   typingIntervalRef.current = setInterval(() => {
+  //     if (i < words.length) {
+  //       partialMessage = words.slice(0, i + 1).join(" ");
 
-        // Update the last message with the partial content
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
+  //       // Update the last message with the partial content
+  //       setMessages((prev) => {
+  //         const newMessages = [...prev];
+  //         const lastMessage = newMessages[newMessages.length - 1];
 
-          if (
-            lastMessage &&
-            lastMessage.sender === "bot" &&
-            lastMessage.isTyping
-          ) {
-            newMessages[newMessages.length - 1] = {
-              ...lastMessage,
-              message_content:
-                partialMessage + (i < words.length - 1 ? "..." : ""),
-            };
-          } else {
-            newMessages.push({
-              message_content:
-                partialMessage + (i < words.length - 1 ? "..." : ""),
-              sender: "bot",
-              isTyping: true,
-              message_timestamp: new Date().toISOString(),
-            });
-          }
+  //         if (
+  //           lastMessage &&
+  //           lastMessage.sender === "bot" &&
+  //           lastMessage.isTyping
+  //         ) {
+  //           newMessages[newMessages.length - 1] = {
+  //             ...lastMessage,
+  //             message_content:
+  //               partialMessage + (i < words.length - 1 ? "..." : ""),
+  //           };
+  //         } else {
+  //           newMessages.push({
+  //             message_content:
+  //               partialMessage + (i < words.length - 1 ? "..." : ""),
+  //             sender: "bot",
+  //             isTyping: true,
+  //             message_timestamp: new Date().toISOString(),
+  //           });
+  //         }
 
-          return newMessages;
-        });
+  //         return newMessages;
+  //       });
 
-        i++;
-      } else {
-        clearInterval(typingIntervalRef.current);
-        typingIntervalRef.current = null;
+  //       i++;
+  //     } else {
+  //       clearInterval(typingIntervalRef.current);
+  //       typingIntervalRef.current = null;
 
-        // Mark the message as complete
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
+  //       // Mark the message as complete
+  //       setMessages((prev) => {
+  //         const newMessages = [...prev];
+  //         const lastMessage = newMessages[newMessages.length - 1];
 
-          if (lastMessage && lastMessage.sender === "bot") {
-            newMessages[newMessages.length - 1] = {
-              ...lastMessage,
-              isTyping: false,
-            };
-          }
+  //         if (lastMessage && lastMessage.sender === "bot") {
+  //           newMessages[newMessages.length - 1] = {
+  //             ...lastMessage,
+  //             isTyping: false,
+  //           };
+  //         }
 
-          return newMessages;
-        });
+  //         return newMessages;
+  //       });
 
-        setTypingIndicator(false);
-        setIsTyping(false);
-      }
-    }, 100);
-  };
+  //       setTypingIndicator(false);
+  //       setIsTyping(false);
+  //     }
+  //   }, 30);
+  // };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);

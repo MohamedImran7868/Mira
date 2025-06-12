@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from mira import MIRA
 from flask_cors import CORS
 import logging
+import time
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -11,6 +12,7 @@ mira = MIRA()
 
 @app.route('/model', methods=['POST'])
 def process_message():
+    start = time.time()
     try:
         data = request.get_json()
         if not data or 'input' not in data:
@@ -51,7 +53,10 @@ def process_message():
             'bot_response': llama_response
         })
         
-        return jsonify(response_data)
+        result = jsonify(response_data)
+        elapsed = time.time() - start
+        logging.info(f"/model processed in {elapsed:.2f} seconds")
+        return result
     
     except Exception as e:
         logging.error(f"Error processing message: {e}", exc_info=True)
