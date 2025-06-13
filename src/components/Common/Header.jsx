@@ -57,7 +57,6 @@ function Header() {
         <div className={styles.headerContainer}>
           <Link to="/" className={styles.logoLink}>
             <img src={logo} alt="MIRA Logo" className={styles.logo} />
-            {/* <span className={styles.logoText}>MIRA</span> */}
           </Link>
           
           {user && (

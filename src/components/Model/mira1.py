@@ -6,6 +6,7 @@ import json
 from datetime import datetime
 from typing import Dict, List, Optional
 from llama_cpp import Llama
+import time
 
 # Configure logging
 logging_level = os.getenv("LOGGING_LEVEL", "INFO").upper()
@@ -102,11 +103,11 @@ class MIRA:
 
         try:
             prompt = f"""You are MIRA, a friendly and emotionally intelligent chatbot.
-The user seems to be feeling {emotion_summary}.
-Respond kindly and empathetically to this input:
+                The user seems to be feeling {emotion_summary}.
+                Respond kindly and empathetically to this input:
 
-User: {user_input}
-MIRA:"""
+                User: {user_input}
+                MIRA:"""
 
             output = self.llama(
                 prompt,
@@ -155,13 +156,16 @@ MIRA:"""
                     print("MIRA: Please share how you're feeling.")
                     continue
 
+                t0 = time.time()
                 emotion_results = self.detect_emotions(user_input)
+                t1 = time.time()
                 emotion_summary = ", ".join([
                     f"{er['emotion']} ({er['confidence']:.0%})"
                     for er in emotion_results
                 ])
-
                 llama_response = self.generate_llama_response(user_input, emotion_summary)
+                t2 = time.time()
+                logging.info(f"Emotion detection: {t1-t0:.2f}s, LLaMA response: {t2-t1:.2f}s")
 
                 print(f"\nMIRA: I sense you're feeling {emotion_summary}.")
                 print(f"MIRA: {llama_response}\n")

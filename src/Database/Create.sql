@@ -107,6 +107,20 @@ create table public.invite_emails (
   constraint invite_emails_invited_by_fkey foreign key (invited_by) references auth.users(id)
 );
 
+CREATE TABLE activities (
+  id SERIAL PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id),
+  action_type TEXT NOT NULL,
+  entity_type TEXT NOT NULL, -- 'resource', 'student', or 'feedback'
+  entity_id TEXT, -- ID of the affected entity
+  entity_name TEXT, -- Name to display
+  message TEXT NOT NULL, -- Pre-formatted message
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create index for better query performance
+CREATE INDEX idx_activities_created_at ON activities(created_at);
+
 -- RLS POLICIES
 -- Enable RLS on all tables
 ALTER TABLE "user" ENABLE ROW LEVEL SECURITY;
@@ -117,6 +131,7 @@ ALTER TABLE message ENABLE ROW LEVEL SECURITY;
 ALTER TABLE feedback ENABLE ROW LEVEL SECURITY;
 ALTER TABLE resources ENABLE ROW LEVEL SECURITY;
 ALTER TABLE statistics_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE activities ENABLE ROW LEVEL SECURITY;
 
 -- Create helper function to check if user is admin
 CREATE OR REPLACE FUNCTION is_admin()

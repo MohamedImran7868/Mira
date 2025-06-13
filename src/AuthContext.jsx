@@ -318,8 +318,18 @@ export function AuthProvider({ children }) {
         }
       );
 
+      if (!error && data) {
+        console.log(data);
+        await logActivity(
+          "Submitted",
+          "feedback",
+          data.feedbackId,
+          data.feedbackName
+        );
+      }
+
       if (error) throw error;
-      return data;
+      return true;
     } catch (error) {
       console.error("Error uploading feedback:", error);
       throw error;
@@ -328,6 +338,7 @@ export function AuthProvider({ children }) {
 
   const getChatSessions = async () => {
     try {
+      console.log(user);
       if (!userProfile?.studentid) return [];
       const studentid = userProfile.studentid;
       const { data, error } = await supabase.functions.invoke(
@@ -460,12 +471,9 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true);
       const id = user.userID;
-      const { error } = await supabase.functions.invoke(
-        "complete-profile",
-        {
-          body: { data, id },
-        }
-      );
+      const { error } = await supabase.functions.invoke("complete-profile", {
+        body: { data, id },
+      });
       if (error) throw error;
     } catch (error) {
       console.error("Error completing profile:", error);
@@ -541,6 +549,10 @@ export function AuthProvider({ children }) {
         }
       );
 
+      if (!error && data) {
+        await logActivity("Deleted", "student", data.userId, data.userName);
+      }
+
       if (error) throw error;
       return true;
     } catch (error) {
@@ -594,6 +606,15 @@ export function AuthProvider({ children }) {
         }
       );
 
+      if (!error && data) {
+        await logActivity(
+          "Deleted",
+          "feedback",
+          data.feedbackId,
+          data.feedbackName
+        );
+      }
+
       if (error) throw error;
       return true;
     } catch (error) {
@@ -646,28 +667,23 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const updateResource = async (resourceId, updatedData) => {
+  const addResource = async (resourceData) => {
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "update-resource",
+      const { data: resource, error } = await supabase.functions.invoke(
+        "add-resource",
         {
-          body: { resourceId, updatedData },
+          body: { resourceData },
         }
       );
 
-      if (error) throw error;
-      return true;
-    } catch (error) {
-      console.error("Error updating resource:", error);
-      throw error;
-    }
-  };
-
-  const addResource = async (resourceData) => {
-    try {
-      const { data, error } = await supabase.functions.invoke("add-resource", {
-        body: { resourceData },
-      });
+      if (!error && resource) {
+        await logActivity(
+          "Added",
+          "resource",
+          resource.resourceId,
+          resource.resourceName
+        );
+      }
 
       if (error) throw error;
       return true;
@@ -677,14 +693,49 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const updateResource = async (resourceId, updatedData) => {
+    try {
+      const { data: resource, error } = await supabase.functions.invoke(
+        "update-resource",
+        {
+          body: { resourceId, updatedData },
+        }
+      );
+
+      if (!error && resource) {
+        await logActivity(
+          "Updated",
+          "resource",
+          resource.resourceId,
+          resource.resourceName
+        );
+      }
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error("Error updating resource:", error);
+      throw error;
+    }
+  };
+
   const deleteResource = async (resourceId) => {
     try {
-      const { data, error } = await supabase.functions.invoke(
+      const { data: resource, error } = await supabase.functions.invoke(
         "delete-resource",
         {
           body: { resourceId },
         }
       );
+
+      if (!error && resource) {
+        await logActivity(
+          "Deleted",
+          "resource",
+          resource.resourceId,
+          resource.resourceName
+        );
+      }
 
       if (error) throw error;
       return true;
@@ -692,6 +743,49 @@ export function AuthProvider({ children }) {
       console.error("Error deleting resource:", error);
       throw error;
     }
+  };
+
+  const logActivity = async (actionType, entityType, entityId, entityName) => {
+    try {
+      let message = "";
+
+      // Format the message based on action and entity
+      switch (entityType) {
+        case "resource":
+          message = `Resource ${entityName} is ${actionType}`;
+          break;
+        case "student":
+          message = `Student ${entityName} is ${actionType}`;
+          break;
+        case "feedback":
+          message = `Feedback ${entityName} is ${actionType}`;
+          break;
+      }
+
+      const { error } = await supabase.from("activities").insert({
+        user_id: user.role == "student" ? user.userID : user.id,
+        action_type: actionType,
+        entity_type: entityType,
+        entity_id: entityId,
+        entity_name: entityName,
+        message,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error("Error logging activity:", error);
+    }
+  };
+
+  const getRecentActivities = async (limit = 5) => {
+    const { data, error } = await supabase
+      .from("activities")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(limit);
+
+    if (error) throw error;
+    return data || [];
   };
 
   const value = {
@@ -724,6 +818,7 @@ export function AuthProvider({ children }) {
     // Admin
     completeProfile, // Complete Profile for new User
     getDashboardStats, //For admin Dasboard
+    getRecentActivities, // Get the recent activities for admin
     inviteAdmin, //Invite New Admin
     getStudents, // Search students
     deleteStudent, // Delete student account

@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "_comment": "For test: concurrently \"npm run dev\" \"npm run start-backend\" Production: npm run dev",
     "start": "npm run dev",
     "dev": "vite",
     "build": "vite build",

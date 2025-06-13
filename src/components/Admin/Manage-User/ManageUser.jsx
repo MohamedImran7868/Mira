@@ -66,6 +66,7 @@ function ManageUser() {
     } catch (err) {
       setError(err.message);
     } finally {
+      setDeleting(true);
       setLoading(false);
     }
   };
@@ -78,13 +79,13 @@ function ManageUser() {
 
   return (
     <>
-      {deleting && <LoadingModal message="Deleting resource..." />}
+      {deleting && <LoadingModal message="Deleting Student..." />}
       <DeleteConfirmation
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={() => handleDelete(userToDelete)}
-        title="Delete Resource"
-        message="Are you sure you want to delete this resource? This action cannot be undone."
+        title="Delete Student"
+        message="Are you sure you want to delete this student? This action cannot be undone."
         confirmText="Delete"
         cancelText="Cancel"
       />
@@ -129,8 +130,6 @@ function ManageUser() {
               {error}
             </div>
           )}
-
-          {loading && <LoadingModal message="Loading students..." />}
 
           <div className={styles.tableWrapper}>
             <table className={styles.userTable}>
@@ -184,11 +183,15 @@ function ManageUser() {
                   ))
                 ) : (
                   <tr className={styles.emptyRow}>
-                    <td colSpan="4" className={styles.noResults}>
-                      {searchTerm
-                        ? "No matching students found"
-                        : "No students available"}
-                    </td>
+                    {loading ? (
+                      <td colSpan="4" className={styles.loading}>Loading Students...</td>
+                    ) : (
+                      <td colSpan="4" className={styles.noResults}>
+                        {searchTerm
+                          ? "No matching students found"
+                          : "No students available"}
+                      </td>
+                    )}
                   </tr>
                 )}
               </tbody>

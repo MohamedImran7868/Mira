@@ -6,7 +6,7 @@ import {
   MenuItem,
   SubMenu,
   sidebarClasses,
-  menuClasses
+  menuClasses,
 } from "react-pro-sidebar";
 import { useAuth } from "../../../AuthContext";
 
@@ -53,6 +53,8 @@ const ChatScreen = () => {
   const [typingIndicator, setTypingIndicator] = useState(false);
   const [isInappropriate, setIsInAppropriate] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
+  const [lastBotMessageTime, setLastBotMessageTime] = useState(null);
+  const [showResourcePrompt, setShowResourcePrompt] = useState(false);
 
   const chatContainerRef = useRef(null);
   const typingIntervalRef = useRef(null);
@@ -109,6 +111,36 @@ const ChatScreen = () => {
       setShowWarning(false);
     }
   }, [message]);
+
+  // Check for chat inactivity
+  useEffect(() => {
+    const checkInactivity = () => {
+      if (lastBotMessageTime && !isTyping) {
+        const inactiveTime = Date.now() - lastBotMessageTime;
+        if (inactiveTime > 120000) {
+          // 2 minutes in milliseconds
+          setShowResourcePrompt(true);
+        }
+      }
+    };
+
+    const inactivityInterval = setInterval(checkInactivity, 10000); // Check every 10 seconds
+
+    return () => clearInterval(inactivityInterval);
+  }, [lastBotMessageTime, isTyping]);
+
+  const ResourcePrompt = () => (
+    <div className={styles.resourcePrompt}>
+      <p>
+        If you feel chatting with me isn't enough, you may find additional help
+        at our{" "}
+        <Link to="/view-resources" className={styles.resourceLink}>
+          resources page
+        </Link>
+        .
+      </p>
+    </div>
+  );
 
   const loadChat = async (chatId) => {
     try {
@@ -196,9 +228,11 @@ const ChatScreen = () => {
   const callModel = async (input, chatId) => {
     setIsTyping(true);
     setTypingIndicator(true);
+    setShowResourcePrompt(false);
 
     try {
-      const response = await fetch("https://api.mirahub.me/model", {
+      // Testing: http://127.0.0.1:5000/model  Production: https://api.mirahub.me/model
+      const response = await fetch("https://api.mirahub.me/model ", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -213,110 +247,113 @@ const ChatScreen = () => {
       const data = await response.json();
 
       // Save bot response to database
-      //simulateTypingEffect(data.result);
-      // Show bot response instantly (no typing effect)
-      setMessages((prev) => [
-      ...prev,
-      {
-        message_content: data.result,
-        sender: "bot",
-        isTyping: false,
-        message_timestamp: new Date().toISOString(),
-      },
-    ]);
+      simulateTypingEffect(data.result);
       await saveMessage(chatId, data.result, "bot");
-      setTypingIndicator(false);
-    setIsTyping(false);
+      setLastBotMessageTime(Date.now());
+      // Show bot response instantly (no typing effect)
+      // setMessages((prev) => [
+      //   ...prev,
+      //   {
+      //     message_content: data.result,
+      //     sender: "bot",
+      //     isTyping: false,
+      //     message_timestamp: new Date().toISOString(),
+      //   },
+      // ]);
+      // await saveMessage(chatId, data.result, "bot");
+      // setTypingIndicator(false);
+      // setIsTyping(false);
 
       // simulateTypingEffect("For Testing");
       // await saveMessage(chatId, "For Testing", "bot");
     } catch (error) {
       console.error("Error calling model:", error);
       const errorMsg =
-        "Sorry, I'm having trouble connecting to the AI service.";
-      //simulateTypingEffect(errorMsg);
+        "Sorry, I'm sleepy right now. Mira will take a Nap and get back too you with full Energy.";
+      simulateTypingEffect(errorMsg);
 
-      setMessages((prev) => [
-      ...prev,
-      {
-        message_content: errorMsg,
-        sender: "bot",
-        isTyping: false,
-        message_timestamp: new Date().toISOString(),
-      },
-    ]);
-    setTypingIndicator(false);
-    setIsTyping(false);
+      // Show bot response instantly (no typing effect)
+      // setMessages((prev) => [
+      //   ...prev,
+      //   {
+      //     message_content: errorMsg,
+      //     sender: "bot",
+      //     isTyping: false,
+      //     message_timestamp: new Date().toISOString(),
+      //   },
+      // ]);
+      // setTypingIndicator(false);
+      // setIsTyping(false);
     }
   };
 
-  // const simulateTypingEffect = (text) => {
-  //   let i = 0;
-  //   const words = text.split(" ");
-  //   let partialMessage = "";
+  const simulateTypingEffect = (text) => {
+    let i = 0;
+    const words = text.split(" ");
+    let partialMessage = "";
 
-  //   // Clear any existing interval
-  //   if (typingIntervalRef.current) {
-  //     clearInterval(typingIntervalRef.current);
-  //   }
+    // Clear any existing interval
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
 
-  //   typingIntervalRef.current = setInterval(() => {
-  //     if (i < words.length) {
-  //       partialMessage = words.slice(0, i + 1).join(" ");
+    typingIntervalRef.current = setInterval(() => {
+      if (i < words.length) {
+        partialMessage = words.slice(0, i + 1).join(" ");
 
-  //       // Update the last message with the partial content
-  //       setMessages((prev) => {
-  //         const newMessages = [...prev];
-  //         const lastMessage = newMessages[newMessages.length - 1];
+        // Update the last message with the partial content
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
 
-  //         if (
-  //           lastMessage &&
-  //           lastMessage.sender === "bot" &&
-  //           lastMessage.isTyping
-  //         ) {
-  //           newMessages[newMessages.length - 1] = {
-  //             ...lastMessage,
-  //             message_content:
-  //               partialMessage + (i < words.length - 1 ? "..." : ""),
-  //           };
-  //         } else {
-  //           newMessages.push({
-  //             message_content:
-  //               partialMessage + (i < words.length - 1 ? "..." : ""),
-  //             sender: "bot",
-  //             isTyping: true,
-  //             message_timestamp: new Date().toISOString(),
-  //           });
-  //         }
+          if (
+            lastMessage &&
+            lastMessage.sender === "bot" &&
+            lastMessage.isTyping
+          ) {
+            newMessages[newMessages.length - 1] = {
+              ...lastMessage,
+              message_content:
+                partialMessage + (i < words.length - 1 ? "..." : ""),
+            };
+          } else {
+            newMessages.push({
+              message_content:
+                partialMessage + (i < words.length - 1 ? "..." : ""),
+              sender: "bot",
+              isTyping: true,
+              message_timestamp: new Date().toISOString(),
+            });
+          }
 
-  //         return newMessages;
-  //       });
+          return newMessages;
+        });
 
-  //       i++;
-  //     } else {
-  //       clearInterval(typingIntervalRef.current);
-  //       typingIntervalRef.current = null;
+        i++;
+      } else {
+        clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
 
-  //       // Mark the message as complete
-  //       setMessages((prev) => {
-  //         const newMessages = [...prev];
-  //         const lastMessage = newMessages[newMessages.length - 1];
+        // Mark the message as complete
+        setMessages((prev) => {
+          const newMessages = [...prev];
+          const lastMessage = newMessages[newMessages.length - 1];
 
-  //         if (lastMessage && lastMessage.sender === "bot") {
-  //           newMessages[newMessages.length - 1] = {
-  //             ...lastMessage,
-  //             isTyping: false,
-  //           };
-  //         }
+          if (lastMessage && lastMessage.sender === "bot") {
+            newMessages[newMessages.length - 1] = {
+              ...lastMessage,
+              isTyping: false,
+            };
+          }
 
-  //         return newMessages;
-  //       });
+          return newMessages;
+        });
 
-  //       setTypingIndicator(false);
-  //       setIsTyping(false);
-  //     }
-  //   }, 30);
-  // };
+        setTypingIndicator(false);
+        setIsTyping(false);
+      }
+    }, 30);
+  };
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -562,6 +599,7 @@ const ChatScreen = () => {
               <span className={styles.typingIndicator}></span>
             </div>
           )}
+          {showResourcePrompt && <ResourcePrompt />}
         </div>
 
         <div className={styles.chatInput}>

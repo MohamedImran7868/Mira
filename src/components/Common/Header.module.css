@@ -243,6 +243,10 @@
   .pagesToggle {
     padding: 0.5rem;
   }
+
+  .logoutBtn{
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {

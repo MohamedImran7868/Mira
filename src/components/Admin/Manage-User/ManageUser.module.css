@@ -213,6 +213,11 @@
   color: var(--color-text-light);
 }
 
+.loading {
+  color: var(--color-text-light);
+  font-style: italic;
+}
+
 .noResults {
   font-style: italic;
 }
