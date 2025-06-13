@@ -15,7 +15,7 @@ import {
   FaEdit,
   FaUserPlus,
   FaUserTimes,
-  FaCommentSlash  
+  FaCommentSlash,
 } from "react-icons/fa";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import LoadingModal from "../../Common/LoadingModal";
@@ -26,6 +26,7 @@ function AdminDashboard() {
   const [dashboardStats, setDashboardStats] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchactivities, setFetchactivities] = useState(true);
 
   // Fetch stats when component mounts
   useEffect(() => {
@@ -53,6 +54,7 @@ function AdminDashboard() {
   useEffect(() => {
     const fetchActivities = async () => {
       try {
+        setFetchactivities(true);
         const activities = await getRecentActivities(5); // Get last 5 activities
         setRecentActivities(
           activities.map((activity) => ({
@@ -64,6 +66,8 @@ function AdminDashboard() {
         );
       } catch (error) {
         console.error("Error fetching activities:", error);
+      } finally {
+        setFetchactivities(false);
       }
     };
 
@@ -211,8 +215,14 @@ function AdminDashboard() {
                 ))
               ) : (
                 <div className={styles.noActivities}>
-                  <FaRegCalendarTimes className={styles.noActivityIcon} />
-                  <p>No recent activities</p>
+                  {fetchactivities ? (
+                    <p>Fetching recent activities...</p>
+                  ) : (
+                    <>
+                      <FaRegCalendarTimes className={styles.noActivityIcon} />
+                      <p>No recent activities</p>
+                    </>
+                  )}
                 </div>
               )}
             </div>

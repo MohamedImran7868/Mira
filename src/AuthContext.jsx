@@ -746,30 +746,17 @@ export function AuthProvider({ children }) {
   };
 
   const logActivity = async (actionType, entityType, entityId, entityName) => {
+    const role = user.role;
+    const userID = user.userID
+    const id = user.id;
+
     try {
-      let message = "";
-
-      // Format the message based on action and entity
-      switch (entityType) {
-        case "resource":
-          message = `Resource ${entityName} is ${actionType}`;
-          break;
-        case "student":
-          message = `Student ${entityName} is ${actionType}`;
-          break;
-        case "feedback":
-          message = `Feedback ${entityName} is ${actionType}`;
-          break;
-      }
-
-      const { error } = await supabase.from("activities").insert({
-        user_id: user.role == "student" ? user.userID : user.id,
-        action_type: actionType,
-        entity_type: entityType,
-        entity_id: entityId,
-        entity_name: entityName,
-        message,
-      });
+      const { data, error } = await supabase.functions.invoke(
+        "log-activity",
+        {
+          body: { actionType, entityType, entityId, entityName, role, userID, id },
+        }
+      );
 
       if (error) throw error;
     } catch (error) {
@@ -778,14 +765,28 @@ export function AuthProvider({ children }) {
   };
 
   const getRecentActivities = async (limit = 5) => {
-    const { data, error } = await supabase
-      .from("activities")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(limit);
+    // const { data, error } = await supabase
+    //   .from("activities")
+    //   .select("*")
+    //   .order("created_at", { ascending: false })
+    //   .limit(limit);
 
-    if (error) throw error;
-    return data || [];
+    // if (error) throw error;
+    // return data || [];
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "get-activities",
+        {
+          body: { limit },
+        }
+      );
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error("Error fetching resource:", error);
+      throw error;
+    }
   };
 
   const value = {
