@@ -18,7 +18,7 @@ const LoginScreen = () => {
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { signIn, customResetPassword, resendVerification } = useAuth();
+  const { signIn, resetPassword, resendVerification } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -74,7 +74,7 @@ const LoginScreen = () => {
 
     setLoading(true);
     try {
-      await customResetPassword(resetEmail);
+      await resetPassword(resetEmail);
       setResetMessage("Password reset link sent to your email!");
     } catch (err) {
       setResetMessage(err.message);
