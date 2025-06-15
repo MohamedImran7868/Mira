@@ -153,11 +153,20 @@ export function AuthProvider({ children }) {
   };
 
   const resetPassword = async (email) => {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/update-password",
-    });
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "reset-password",
+        {
+          body: { email },
+        }
+      );
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Resend error:", error);
+      return { error: error.message };
+    }
   };
 
   const customResetPassword = async (email) => {
