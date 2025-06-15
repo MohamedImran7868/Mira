@@ -15,13 +15,13 @@ export async function sendAuthEmail(email, type) {
     case 'confirm':
       subject = 'Confirm Your Email';
       template = ConfirmEmailTemplate({
-        confirmationLink: `http://localhost:5173/complete-profile`
+        confirmationLink: `https://www.mirahub.me/complete-profile`
       });
       break;
     case 'reset':
       subject = 'Reset Your Password';
       template = ResetPasswordTemplate({
-        resetLink: `http://localhost:5173/update-password`
+        resetLink: `https://www.mirahub.me/update-password`
       });
       break;
   }
