@@ -18,7 +18,7 @@ const LoginScreen = () => {
   const [showResendVerification, setShowResendVerification] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const { signIn, resetPassword, resendVerification } = useAuth();
+  const { signIn, customResetPassword, resendVerification } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -74,7 +74,7 @@ const LoginScreen = () => {
 
     setLoading(true);
     try {
-      await resetPassword(resetEmail);
+      await customResetPassword(resetEmail);
       setResetMessage("Password reset link sent to your email!");
     } catch (err) {
       setResetMessage(err.message);
@@ -111,12 +111,14 @@ const LoginScreen = () => {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.inputLabel}>
+                <label className={styles.inputLabel} htmlFor="email">
                   <FaEnvelope className={styles.inputIcon} />
                   Email Address
                 </label>
                 <input
                   type="email"
+                  name="email"
+                  id="email"
                   placeholder="Enter your email"
                   value={resetEmail}
                   onChange={(e) => setResetEmail(e.target.value)}
@@ -156,12 +158,14 @@ const LoginScreen = () => {
 
               <form onSubmit={handleSubmit} className={styles.form}>
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>
+                  <label className={styles.inputLabel} htmlFor="email">
                     <FaEnvelope className={styles.inputIcon} />
                     Email Address
                   </label>
                   <input
                     type="email"
+                    name="email"
+                    id="email"
                     placeholder="Enter your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -173,13 +177,15 @@ const LoginScreen = () => {
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label className={styles.inputLabel}>
+                  <label className={styles.inputLabel} htmlFor="password">
                     <FaLock className={styles.inputIcon} />
                     Password
                   </label>
                   <div className={styles.passwordWrapper}>
                     <input
                       type={showPassword ? "text" : "password"}
+                      name="password"
+                      id="password"
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}

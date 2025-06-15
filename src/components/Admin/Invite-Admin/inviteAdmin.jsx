@@ -24,7 +24,10 @@ const InviteAdmin = () => {
     const { error } = await inviteAdmin(email);
 
     if (error) {
-      setMessage({ text: error, isError: true });
+      setMessage({
+        text: "An invitaion has already been sent to this email. Please inform the owner to check their email.",
+        isError: true,
+      });
     } else {
       setMessage({
         text: "Admin invited successfully! An invitation has been sent to the email.",

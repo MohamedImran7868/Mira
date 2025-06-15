@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "./supabase";
+import { sendAuthEmail } from "./components/Email/sendEmail";
 
 const AuthContext = createContext();
 
@@ -157,6 +158,17 @@ export function AuthProvider({ children }) {
     });
     if (error) throw error;
     return data;
+  };
+
+  const customResetPassword = async (email) => {
+    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: window.location.origin + "/update-password",
+    });
+    if (!error) {
+      await sendAuthEmail(email, "reset");
+    }
+
+    return { data, error };
   };
 
   //Student
@@ -747,16 +759,21 @@ export function AuthProvider({ children }) {
 
   const logActivity = async (actionType, entityType, entityId, entityName) => {
     const role = user.role;
-    const userID = user.userID
+    const userID = user.userID;
     const id = user.id;
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "log-activity",
-        {
-          body: { actionType, entityType, entityId, entityName, role, userID, id },
-        }
-      );
+      const { data, error } = await supabase.functions.invoke("log-activity", {
+        body: {
+          actionType,
+          entityType,
+          entityId,
+          entityName,
+          role,
+          userID,
+          id,
+        },
+      });
 
       if (error) throw error;
     } catch (error) {
@@ -765,14 +782,6 @@ export function AuthProvider({ children }) {
   };
 
   const getRecentActivities = async (limit = 5) => {
-    // const { data, error } = await supabase
-    //   .from("activities")
-    //   .select("*")
-    //   .order("created_at", { ascending: false })
-    //   .limit(limit);
-
-    // if (error) throw error;
-    // return data || [];
     try {
       const { data, error } = await supabase.functions.invoke(
         "get-activities",
@@ -830,6 +839,7 @@ export function AuthProvider({ children }) {
     addResource, // Add new resource
     updateResource, // Update resource
     deleteResource, // Delete resource
+    customResetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
