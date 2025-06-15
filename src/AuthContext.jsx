@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "./supabase";
-import { sendAuthEmail } from "./components/Email/sendEmail";
 
 const AuthContext = createContext();
 
@@ -154,30 +153,15 @@ export function AuthProvider({ children }) {
 
   const resetPassword = async (email) => {
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "reset-password",
-        {
-          body: { email },
-        }
-      );
-
+      const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/update-password",
+      });
       if (error) throw error;
       return data;
     } catch (error) {
       console.error("Resend error:", error);
       return { error: error.message };
     }
-  };
-
-  const customResetPassword = async (email) => {
-    const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/update-password",
-    });
-    if (!error) {
-      await sendAuthEmail(email, "reset");
-    }
-
-    return { data, error };
   };
 
   //Student
@@ -848,7 +832,6 @@ export function AuthProvider({ children }) {
     addResource, // Add new resource
     updateResource, // Update resource
     deleteResource, // Delete resource
-    customResetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
