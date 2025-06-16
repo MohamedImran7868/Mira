@@ -324,7 +324,6 @@ export function AuthProvider({ children }) {
       );
 
       if (!error && data) {
-        console.log(data);
         await logActivity(
           "Submitted",
           "feedback",
@@ -343,7 +342,6 @@ export function AuthProvider({ children }) {
 
   const getChatSessions = async () => {
     try {
-      console.log(user);
       if (!userProfile?.studentid) return [];
       const studentid = userProfile.studentid;
       const { data, error } = await supabase.functions.invoke(

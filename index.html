@@ -1,12 +1,83 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Basic Meta Tags -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="./src/assets/LogoOnly.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mira</title>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="theme-color" content="#4a6fa5" />
+
+    <!-- Primary Meta Tags -->
+    <title>Mira - Mood Identifier and Response Assistant</title>
+    <meta
+      name="description"
+      content="Mira (Mood Identifier and Response Assistant) helps student to express their emotions in a stigma-free environment while the conversation is guaranteed to be private and secure, only accessible for the user and chatbot"
+    />
+    <meta
+      name="keywords"
+      content="Mira, MIRA, mira, mirahub, mirahub.me, Mood Identifier and Response Assistant, Mood Identifier, Response Assistant, AI chatbot, Emotional AI chatbot"
+    />
+    <meta name="author" content="Mohamed Imran and Zahin Adri" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="./src/assets/LogoOnly.png" />
+    <link rel="apple-touch-icon" href="./src/assets/LogoOnly.png" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.mirahub.me/" />
+    <meta property="og:title" content="Mira" />
+    <meta
+      property="og:description"
+      content="Mira (Mood Identifier and Response Assistant) helps student to express their emotions in a stigma-free environment while the conversation is guaranteed to be private and secure, only accessible for the user and chatbot"
+    />
+    <meta property="og:image" content="https://www.mirahub.me/homepage.png" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://www.mirahub.me/" />
+    <meta property="twitter:title" content="Mira" />
+    <meta
+      property="twitter:description"
+      content="Mira (Mood Identifier and Response Assistant) helps student to express their emotions in a stigma-free environment while the conversation is guaranteed to be private and secure, only accessible for the user and chatbot"
+    />
+    <meta property="twitter:image" content="https://www.mirahub.me/homepage.png" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://www.mirahub.me/" />
+
+    <!-- Preconnect for external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Structured Data / Schema.org -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Mira",
+        "url": "https://www.mirahub.me/",
+        "logo": "https://www.mirahub.me/assets/Logo-ClVvsIpw.png",
+        "image": {
+          "@type": "ImageObject",
+          "url": "https://www.mirahub.me/assets/Logo-ClVvsIpw.png",
+          "height": "630px",
+          "width": "1200px"
+        },
+        "description": "Mira (Mood Identifier and Response Assistant) helps student to express their emotions in a stigma-free environment while the conversation is guaranteed to be private and secure, only accessible for the user and chatbot"
+      }
+    </script>
   </head>
   <body>
+    <noscript>
+      <strong
+        >We're sorry but Mira doesn't work properly without JavaScript enabled.
+        Please enable it to continue.</strong
+      >
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
