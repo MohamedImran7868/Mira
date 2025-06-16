@@ -9,12 +9,10 @@
   "icons": [
     {
       "src": "/assets/LogoOnly-BH_q4o5C.png",
-      "sizes": "192x192",
       "type": "image/png"
     },
     {
       "src": "/assets/LogoOnly-BH_q4o5C.png",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
