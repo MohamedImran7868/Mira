@@ -269,7 +269,7 @@ const ChatScreen = () => {
     } catch (error) {
       console.error("Error calling model:", error);
       const errorMsg =
-        "Sorry, I'm sleepy right now. Mira will take a Nap and get back too you with full Energy.";
+        "Sorry, I'm sleepy right now. Mira will take a nap and get back too you with full Energy.";
       simulateTypingEffect(errorMsg);
 
       // Show bot response instantly (no typing effect)

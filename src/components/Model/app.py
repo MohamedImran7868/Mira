@@ -5,7 +5,10 @@ import logging
 import time
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, origins=[
+    "https://www.mirahub.me",
+    "http://localhost:5173"
+])
 
 # Initialize MIRA only once when the app starts
 mira = MIRA()
@@ -50,12 +53,6 @@ def process_message():
             ],
             'emotion_summary': emotion_summary
         }
-        
-        # Log conversation
-        mira.log_conversation(user_input, {
-            'emotions_detected': emotion_results,
-            'bot_response': llama_response
-        })
         
         result = jsonify(response_data)
         elapsed = time.time() - start
