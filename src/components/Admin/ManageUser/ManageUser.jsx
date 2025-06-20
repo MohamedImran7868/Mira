@@ -1,8 +1,13 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./ManageUser.module.css";
 import LoadingModal from "../../Common/LoadingModal";
+import DeleteConfirmation from "../../Common/DeleteConfirmation";
+
+// Icons
 import {
   FaSearch,
   FaTrash,
@@ -12,7 +17,6 @@ import {
   FaEnvelope,
   FaInfoCircle,
 } from "react-icons/fa";
-import DeleteConfirmation from "../../Common/DeleteConfirmation";
 
 function ManageUser() {
   const { getStudents, deleteStudent } = useAuth();

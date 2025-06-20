@@ -1,9 +1,17 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./ViewFeedback.module.css";
+import DeleteConfirmation from "../../Common/DeleteConfirmation";
+import LoadingModal from "../../Common/LoadingModal";
+
+// Date Picker
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+// Icons
 import {
   FaSearch,
   FaFilter,
@@ -21,8 +29,6 @@ import {
   FaSortUp,
   FaSortDown,
 } from "react-icons/fa";
-import DeleteConfirmation from "../../Common/DeleteConfirmation";
-import LoadingModal from "../../Common/LoadingModal";
 
 function ViewFeedback() {
   const { getFeedback, deleteFeedback } = useAuth();

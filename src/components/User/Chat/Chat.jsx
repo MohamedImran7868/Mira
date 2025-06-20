@@ -1,19 +1,18 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "../../../contexts/AuthContext";
+import { containsProfanity } from "../../Common/filter";
+
+// Components
+import styles from "./Chat.module.css";
+import LogoutPopup from "../../Common/LogoutPopup";
 import {
   Sidebar,
   Menu,
   MenuItem,
   SubMenu,
   sidebarClasses,
-  menuClasses,
 } from "react-pro-sidebar";
-import { useAuth } from "../../../AuthContext";
-
-// Pages
-import styles from "./Chat.module.css";
-import LogoutPopup from "../../Common/LogoutPopup";
-import { containsProfanity } from "../../Common/filter";
 
 // Images
 import logo from "../../../assets/Logo.png";

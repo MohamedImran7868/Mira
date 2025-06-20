@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
-import Header from "../Common/Header";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
 import styles from "./Register.module.css";
-import { useAuth } from "../../AuthContext";
-import LoadingModal from "../Common/LoadingModal";
-import SuccessOverlay from "../Common/SuccessOverlay";
+import Header from "../../Common/Header";
+import LoadingModal from "../../Common/LoadingModal";
+import SuccessOverlay from "../../Common/SuccessOverlay";
+
+// Icons
 import {
   FaEye,
   FaEyeSlash,

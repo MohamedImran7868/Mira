@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext.jsx";
+
+// Components
 import Header from "../../Common/Header.jsx";
+import DeleteConfirmation from "../../Common/DeleteConfirmation.jsx";
+import LoadingModal from "../../Common/LoadingModal.jsx";
 import styles from "./ViewResources.module.css";
+
+// Icons
 import {
   MdAttachEmail,
   MdSearch,
@@ -12,8 +18,6 @@ import {
   MdClose,
 } from "react-icons/md";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import DeleteConfirmation from "../../Common/DeleteConfirmation.jsx";
-import LoadingModal from "../../Common/LoadingModal";
 
 function ViewResources() {
   const {

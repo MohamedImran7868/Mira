@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useAuth } from "../../../AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./inviteAdmin.module.css";
 

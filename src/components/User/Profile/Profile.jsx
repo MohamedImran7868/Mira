@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthContext";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./Profile.module.css";
 import LoadingModal from "../../Common/LoadingModal";
+
+// Icons
 import {
   FaEye,
   FaEyeSlash,

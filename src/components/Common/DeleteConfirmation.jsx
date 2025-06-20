@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './DeleteConfirmation.module.css';
 import { MdWarning, MdClose } from 'react-icons/md';
 
