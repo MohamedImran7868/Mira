@@ -70,7 +70,7 @@ function ManageUser() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setDeleting(true);
+      setDeleting(false);
       setLoading(false);
     }
   };

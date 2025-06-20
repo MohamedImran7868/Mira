@@ -176,6 +176,7 @@ export function AuthProvider({ children }) {
       if (error) throw error;
       return data;
     } catch (error) {
+      console.error("Register error:", error);
       throw error;
     }
   };
@@ -195,7 +196,7 @@ export function AuthProvider({ children }) {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error("Resend error:", error);
+      console.error("Resend Verification error:", error);
       return { error: error.message };
     }
   };

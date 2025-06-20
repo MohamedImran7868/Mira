@@ -128,7 +128,7 @@ const Profile = () => {
     try {
       setLoading(true);
       setError(null);
-      const { fileName, imageUrl } = await uploadProfileImage(file);
+      const { imageUrl } = await uploadProfileImage(file);
 
       // Set both the immediate URL and update state
       setImageUrl(imageUrl); // This will show immediately
