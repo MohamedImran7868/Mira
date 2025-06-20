@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useAuth } from "../../AuthContext";
-import Header from "../Common/Header";
+import { useAuth } from "../../../AuthContext";
+import Header from "../../Common/Header";
 import styles from "./Profile.module.css";
-import LoadingModal from "../Common/LoadingModal";
+import LoadingModal from "../../Common/LoadingModal";
 import {
   FaEye,
   FaEyeSlash,

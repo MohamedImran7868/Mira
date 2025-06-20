@@ -217,7 +217,6 @@ const ChatScreen = () => {
       };
 
       setMessages((prev) => [...prev, newHumanMessage]);
-      await saveMessage(chatId, message, "human");
       callModel(message, chatId);
       setMessage("");
     } catch (error) {
@@ -247,9 +246,12 @@ const ChatScreen = () => {
       const data = await response.json();
 
       // Save bot response to database
-      simulateTypingEffect(data.result);
-      await saveMessage(chatId, data.result, "bot");
-      setLastBotMessageTime(Date.now());
+      if (data.result) {
+        simulateTypingEffect(data.result);
+        await saveMessage(chatId, message, "human"); // Save human message
+        await saveMessage(chatId, data.result, "bot"); // Save bot response
+        setLastBotMessageTime(Date.now());
+      }
       // Show bot response instantly (no typing effect)
       // setMessages((prev) => [
       //   ...prev,
@@ -267,7 +269,6 @@ const ChatScreen = () => {
       // simulateTypingEffect("For Testing");
       // await saveMessage(chatId, "For Testing", "bot");
     } catch (error) {
-      console.error("Error calling model:", error);
       const errorMsg =
         "Sorry, I'm sleepy right now. Mira will take a nap and get back too you with full Energy.";
       simulateTypingEffect(errorMsg);
