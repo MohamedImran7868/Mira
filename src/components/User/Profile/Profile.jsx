@@ -1,8 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useAuth } from "../../AuthContext";
-import Header from "../Common/Header";
+import { useState, useEffect } from "react";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
+import Header from "../../Common/Header";
 import styles from "./Profile.module.css";
-import LoadingModal from "../Common/LoadingModal";
+import LoadingModal from "../../Common/LoadingModal";
+
+// Icons
 import {
   FaEye,
   FaEyeSlash,
@@ -124,7 +128,7 @@ const Profile = () => {
     try {
       setLoading(true);
       setError(null);
-      const { fileName, imageUrl } = await uploadProfileImage(file);
+      const { imageUrl } = await uploadProfileImage(file);
 
       // Set both the immediate URL and update state
       setImageUrl(imageUrl); // This will show immediately

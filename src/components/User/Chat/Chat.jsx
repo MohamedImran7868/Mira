@@ -1,19 +1,18 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
+import { useAuth } from "../../../contexts/AuthContext";
+import { containsProfanity } from "../../Common/filter";
+
+// Components
+import styles from "./Chat.module.css";
+import LogoutPopup from "../../Common/LogoutPopup";
 import {
   Sidebar,
   Menu,
   MenuItem,
   SubMenu,
   sidebarClasses,
-  menuClasses,
 } from "react-pro-sidebar";
-import { useAuth } from "../../../AuthContext";
-
-// Pages
-import styles from "./Chat.module.css";
-import LogoutPopup from "../../Common/LogoutPopup";
-import { containsProfanity } from "../../Common/filter";
 
 // Images
 import logo from "../../../assets/Logo.png";
@@ -115,7 +114,7 @@ const ChatScreen = () => {
   // Check for chat inactivity
   useEffect(() => {
     const checkInactivity = () => {
-      if (lastBotMessageTime && !isTyping) {
+      if (lastBotMessageTime && !isTyping && messages.length > 0) {
         const inactiveTime = Date.now() - lastBotMessageTime;
         if (inactiveTime > 120000) {
           // 2 minutes in milliseconds
@@ -217,7 +216,6 @@ const ChatScreen = () => {
       };
 
       setMessages((prev) => [...prev, newHumanMessage]);
-      await saveMessage(chatId, message, "human");
       callModel(message, chatId);
       setMessage("");
     } catch (error) {
@@ -247,9 +245,12 @@ const ChatScreen = () => {
       const data = await response.json();
 
       // Save bot response to database
-      simulateTypingEffect(data.result);
-      await saveMessage(chatId, data.result, "bot");
-      setLastBotMessageTime(Date.now());
+      if (data.result) {
+        simulateTypingEffect(data.result);
+        await saveMessage(chatId, message, "human"); // Save human message
+        await saveMessage(chatId, data.result, "bot"); // Save bot response
+        setLastBotMessageTime(Date.now());
+      }
       // Show bot response instantly (no typing effect)
       // setMessages((prev) => [
       //   ...prev,
@@ -267,7 +268,6 @@ const ChatScreen = () => {
       // simulateTypingEffect("For Testing");
       // await saveMessage(chatId, "For Testing", "bot");
     } catch (error) {
-      console.error("Error calling model:", error);
       const errorMsg =
         "Sorry, I'm sleepy right now. Mira will take a nap and get back too you with full Energy.";
       simulateTypingEffect(errorMsg);

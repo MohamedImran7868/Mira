@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>MIRA Admin Invitation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f9fafb;
+        padding: 20px;
+        color: #333;
+      }
+      .container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 30px;
+      }
+      .logo {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+      .logo img {
+        max-width: 140px;
+        height: auto;
+      }
+      h1 {
+        color: #1f2937;
+        text-align: center;
+        margin-bottom: 5px;
+      }
+      p.subtitle {
+        text-align: center;
+        color: #6b7280;
+        margin-top: 0;
+        margin-bottom: 20px;
+      }
+      .button {
+        display: inline-block;
+        background-color: #4f46e5;
+        color: #ffffff;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        margin: 20px 0;
+      }
+      .credentials {
+        background-color: #f1f5f9;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 14px;
+        font-family: monospace;
+        margin: 20px 0;
+        color: #1e293b;
+      }
+      .note {
+        background-color: #fff7ed;
+        border-left: 4px solid #f97316;
+        padding: 12px;
+        margin: 20px 0;
+        font-size: 14px;
+      }
+      .footer {
+        font-size: 12px;
+        color: #94a3b8;
+        text-align: center;
+        border-top: 1px solid #e5e7eb;
+        margin-top: 30px;
+        padding-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="logo">
+        <img
+          src="https://www.mirahub.me/assets/Logo-ClVvsIpw.png"
+          alt="MIRA Logo"
+        />
+      </div>
+
+      <h1>You're Invited as an Admin</h1>
+      <p class="subtitle">Welcome to the MIRA team!</p>
+
+      <p>Hello,</p>
+      <p>
+        You've been invited to join <strong>MIRA</strong> as an administrator.
+        Use the credentials below to log in and access the admin dashboard.
+      </p>
+
+      <div class="credentials">
+        <p><strong>Temporary Credentials:</strong></p>
+        <p>Email: <strong>${email}</strong></p>
+        <p>Password: <strong>${randomPassword}</strong></p>
+      </div>
+
+      <p style="text-align: center">
+        <a href="${SITE_URL}login" class="button" style="color: #ffffff">Access Admin Dashboard</a>
+      </p>
+
+      <div class="note">
+        <p>
+          <strong>Important:</strong> This invite is valid for 24 hours. If it
+          expires, request a new invitation from an existing admin.
+        </p>
+      </div>
+
+      <h3 style="margin-bottom: 10px">Next Steps:</h3>
+      <ol style="padding-left: 20px">
+        <li>Click the button above to log in</li>
+        <li>Complete your profile</li>
+        <li>Begin managing the MIRA platform</li>
+      </ol>
+
+      <p>See you inside,<br /><strong>The MIRA Team</strong></p>
+
+      <div class="footer">
+        <p>© 2025 MIRA. All rights reserved.</p>
+        <p>
+          <a
+            href="https://www.mirahub.me"
+            style="color: #94a3b8; text-decoration: none"
+            >Visit our website</a
+          >
+        </p>
+        <p>
+          This email was sent to ${email} because you were invited as an
+          administrator for MIRA.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

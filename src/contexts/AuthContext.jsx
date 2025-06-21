@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { supabase } from "./supabase";
+import { supabase } from "../supabase";
 
 const AuthContext = createContext();
 
@@ -176,6 +176,7 @@ export function AuthProvider({ children }) {
       if (error) throw error;
       return data;
     } catch (error) {
+      console.error("Register error:", error);
       throw error;
     }
   };
@@ -195,7 +196,7 @@ export function AuthProvider({ children }) {
       if (error) throw error;
       return { success: true };
     } catch (error) {
-      console.error("Resend error:", error);
+      console.error("Resend Verification error:", error);
       return { error: error.message };
     }
   };
@@ -516,9 +517,10 @@ export function AuthProvider({ children }) {
   };
 
   const inviteAdmin = async (email) => {
+    const inviterId = user.id;
     try {
       const { data, error } = await supabase.functions.invoke("invite-admin", {
-        body: { email },
+        body: { email, inviterId },
       });
 
       if (error) throw error;
@@ -789,6 +791,39 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // In AuthContext.jsx
+  const fetchInvitations = async (
+    page = 1,
+    sortField = "sent_at",
+    sortOrder = "desc"
+  ) => {
+    const itemsPerPage = 10;
+    const from = (page - 1) * itemsPerPage;
+    const to = from + itemsPerPage - 1;
+
+    const { data, error, count } = await supabase
+      .from("invitations")
+      .select(
+        `
+      id,
+      email,
+      status,
+      sent_at,
+      accepted_at,
+      expires_at
+    `,
+        { count: "exact" }
+      )
+      .order(sortField, { ascending: sortOrder === "asc" })
+      .range(from, to);
+
+    if (error) throw error;
+    return {
+      invitations: data,
+      totalCount: count,
+    };
+  };
+
   const value = {
     session,
     user,
@@ -830,6 +865,7 @@ export function AuthProvider({ children }) {
     addResource, // Add new resource
     updateResource, // Update resource
     deleteResource, // Delete resource
+    fetchInvitations, // Fetch invitations
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

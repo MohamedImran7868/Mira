@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Header from "../../Common/Header";
 import styles from "./Feedback.module.css";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
 import {
   FaStar,
   FaCheckCircle,

@@ -1,8 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./AdminDashboard.module.css";
+
+// Icons
 import {
   FaUsers,
   FaCommentAlt,

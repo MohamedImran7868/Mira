@@ -1,8 +1,14 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
+import useUserSubscription from "../../../realtime/user";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./ManageUser.module.css";
 import LoadingModal from "../../Common/LoadingModal";
+import DeleteConfirmation from "../../Common/DeleteConfirmation";
+
+// Icons
 import {
   FaSearch,
   FaTrash,
@@ -12,7 +18,6 @@ import {
   FaEnvelope,
   FaInfoCircle,
 } from "react-icons/fa";
-import DeleteConfirmation from "../../Common/DeleteConfirmation";
 
 function ManageUser() {
   const { getStudents, deleteStudent } = useAuth();
@@ -51,6 +56,8 @@ function ManageUser() {
     }
   };
 
+  useUserSubscription(fetchStudents);
+
   const handleSearch = (e) => {
     e.preventDefault();
     setCurrentPage(1);
@@ -66,7 +73,7 @@ function ManageUser() {
     } catch (err) {
       setError(err.message);
     } finally {
-      setDeleting(true);
+      setDeleting(false);
       setLoading(false);
     }
   };

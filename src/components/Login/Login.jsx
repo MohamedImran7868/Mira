@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../Common/Header";
 import styles from "./Login.module.css";
-import { useAuth } from "../../AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 import { FaEnvelope, FaLock, FaArrowLeft, FaPaperPlane } from "react-icons/fa";
 import LoadingModal from "../Common/LoadingModal";
 import { FaEye, FaEyeSlash } from "react-icons/fa";

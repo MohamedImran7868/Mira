@@ -1,9 +1,18 @@
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../AuthContext";
+import { useAuth } from "../../../contexts/AuthContext";
+import useFeedbackSubscription from "../../../realtime/feedback";
+
+// Components
 import Header from "../../Common/Header";
 import styles from "./ViewFeedback.module.css";
+import DeleteConfirmation from "../../Common/DeleteConfirmation";
+import LoadingModal from "../../Common/LoadingModal";
+
+// Date Picker
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
+// Icons
 import {
   FaSearch,
   FaFilter,
@@ -21,8 +30,6 @@ import {
   FaSortUp,
   FaSortDown,
 } from "react-icons/fa";
-import DeleteConfirmation from "../../Common/DeleteConfirmation";
-import LoadingModal from "../../Common/LoadingModal";
 
 function ViewFeedback() {
   const { getFeedback, deleteFeedback } = useAuth();
@@ -86,6 +93,8 @@ function ViewFeedback() {
     }
   };
 
+  useFeedbackSubscription(fetchFeedback);
+
   const handleSort = (field) => {
     setSortConfig((prev) => ({
       field,
@@ -122,7 +131,6 @@ function ViewFeedback() {
   const handleDelete = async (feedbackId) => {
     setDeleting(true);
     try {
-      
       setShowDeleteModal(false);
       await deleteFeedback(feedbackId);
       await fetchFeedback();
@@ -162,7 +170,7 @@ function ViewFeedback() {
 
   return (
     <>
-    {deleting && <LoadingModal message="Deleting feedback..." />}
+      {deleting && <LoadingModal message="Deleting feedback..." />}
       <DeleteConfirmation
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}

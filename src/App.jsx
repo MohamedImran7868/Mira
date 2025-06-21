@@ -1,20 +1,21 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./AuthContext";
-import ProtectedRoute from "./ProtectedRoute";
+import { AuthProvider } from "./contexts/AuthContext.jsx";
+import ProtectedRoute from "./routes/ProtectedRoute.jsx";
 import Home from "./components/Home/Home.jsx";
 import Login from "./components/Login/Login.jsx";
-import Register from "./components/Register/Register.jsx";
+import Register from "./components/User/Register/Register.jsx";
 import Chat from "./components/User/Chat/Chat.jsx";
 import Feedback from "./components/User/Feedback/Feedback.jsx";
-import Profile from "./components/Profile/Profile.jsx";
+import Profile from "./components/User/Profile/Profile.jsx";
 import CompleteProfile from "./components/Common/CompleteProfile/CompleteProfile.jsx";
-import AdminDashboard from "./components/Admin/Admin-Dashboard/AdminDashboard.jsx";
-import ManageUser from "./components/Admin/Manage-User/ManageUser.jsx";
-import ViewFeedback from "./components/Admin/View-Feedback/ViewFeedback.jsx";
-import ViewResources from "./components/Admin/View-Resources/ViewResources.jsx";
+import AdminDashboard from "./components/Admin/AdminDashboard/AdminDashboard.jsx";
+import ManageUser from "./components/Admin/ManageUser/ManageUser.jsx";
+import ViewFeedback from "./components/Admin/ViewFeedback/ViewFeedback.jsx";
+import ViewResources from "./components/Admin/ViewResources/ViewResources.jsx";
 import UpdatePassword from "./components/Common/UpdatePassword.jsx";
-import InviteAdmin from "./components/Admin/Invite-Admin/inviteAdmin.jsx";
+import InviteAdmin from "./components/Admin/InviteAdmin/inviteAdmin.jsx";
+import ServerDown from "./components/Common/ErrorPage/ServerDownPage.jsx";
+import NotFound from "./components/Common/ErrorPage/NotFoundPage.jsx";
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/update-password" element={<UpdatePassword />} />
+          <Route path="/503-server-down" element={<ServerDown />} />
 
           {/* Student routes */}
           <Route
@@ -101,6 +103,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>

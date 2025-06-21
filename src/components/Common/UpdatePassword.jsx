@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './UpdatePassword.module.css';
 import { FaLock, FaCheckCircle, FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 

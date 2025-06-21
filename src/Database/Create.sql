@@ -424,7 +424,7 @@ CREATE TRIGGER calculate_chat_duration
 BEFORE UPDATE ON chatSession
 FOR EACH ROW EXECUTE FUNCTION update_chat_duration();
 
--- Fucntion to update chat history
+-- Fucntion to update statistic history
 CREATE OR REPLACE FUNCTION update_daily_statistics()
 RETURNS void AS $$
 BEGIN
@@ -461,6 +461,26 @@ SELECT cron.schedule(
   '0 0 * * *', -- Every day at midnight
   $$SELECT update_daily_statistics()$$
 );
+
+-- Function to keep only the latest 5 rows in statistics_history
+-- This function will be triggered after each insert to statistics_history
+CREATE OR REPLACE FUNCTION keep_latest_five_rows()
+RETURNS TRIGGER AS $$
+BEGIN
+    DELETE FROM statistics_history
+    WHERE id NOT IN (
+        SELECT id FROM statistics_history
+        ORDER BY created_at DESC
+        LIMIT 5
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_keep_latest_five
+AFTER INSERT ON statistics_history
+FOR EACH ROW
+EXECUTE FUNCTION keep_latest_five_rows();
 
 -- Insert a sample value to the Statistic History
 INSERT INTO statistics_history (date, user_count, feedback_count, resource_count, student_count)
