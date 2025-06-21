@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext.jsx";
+import useResourcesSubscription from "../../../realtime/resources.jsx";
 
 // Components
 import Header from "../../Common/Header.jsx";
@@ -83,6 +84,8 @@ function ViewResources() {
       setCurrentPage(newPage);
     }
   };
+
+  useResourcesSubscription(fetchResources);
 
   const handleSearch = (e) => {
     e.preventDefault();

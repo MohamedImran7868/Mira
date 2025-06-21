@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
+import useUserSubscription from "../../../realtime/user";
 
 // Components
 import Header from "../../Common/Header";
@@ -54,6 +55,8 @@ function ManageUser() {
       setLoading(false);
     }
   };
+
+  useUserSubscription(fetchStudents);
 
   const handleSearch = (e) => {
     e.preventDefault();
