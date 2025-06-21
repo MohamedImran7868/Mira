@@ -38,13 +38,20 @@ function Header() {
 
   const adminPages = [
     { path: "/admin-dashboard", name: "Dashboard", icon: "📊" },
+    { path: "/manage-user", name: "Users", icon: "👥" },
+    { path: "/view-feedback", name: "Feedback", icon: "📝" },
+    { path: "/view-resources", name: "Resources", icon: "📚" },
+  ];
+
+  const superAdminPages = [
+    { path: "/admin-dashboard", name: "Dashboard", icon: "📊" },
     { path: "/invite-admin", name: "Invite Admin", icon: "👨‍💻" },
     { path: "/manage-user", name: "Users", icon: "👥" },
     { path: "/view-feedback", name: "Feedback", icon: "📝" },
     { path: "/view-resources", name: "Resources", icon: "📚" },
   ];
 
-  const currentPages = user?.role === "admin" ? adminPages : studentPages;
+  const currentPages = user?.role === "admin" ? (user?.super_admin === "yes"? superAdminPages : adminPages) : studentPages;
 
   return (
     <>
