@@ -114,7 +114,7 @@ const ChatScreen = () => {
   // Check for chat inactivity
   useEffect(() => {
     const checkInactivity = () => {
-      if (lastBotMessageTime && !isTyping) {
+      if (lastBotMessageTime && !isTyping && messages.length > 0) {
         const inactiveTime = Date.now() - lastBotMessageTime;
         if (inactiveTime > 120000) {
           // 2 minutes in milliseconds
