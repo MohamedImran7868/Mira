@@ -22,12 +22,16 @@ const InviteAdmin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [invitations, setInvitations] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const { inviteAdmin, fetchInvitations } = useAuth();
+  const { inviteAdmin, fetchInvitations, user } = useAuth();
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const itemsPerPage = 10;
+
+  useEffect(() => {
+    user?.super_admin !== "yes" && window.location.replace("/");
+  });
 
   // Sorting state
   const [sortConfig, setSortConfig] = useState({

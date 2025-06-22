@@ -1,5 +1,7 @@
 /* Base Styles */
-.serverErrorContainer, .notFoundContainer {
+.serverErrorContainer,
+.notFoundContainer,
+.unauthorizedContainer {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8,14 +10,6 @@
   padding: 2rem;
   text-align: center;
   background-color: var(--color-background);
-}
-
-.serverErrorContainer {
-  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
-}
-
-.notFoundContainer {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .content {
@@ -132,11 +126,40 @@
   border-bottom-color: var(--color-primary);
 }
 
+.subMessage {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  margin-bottom: 2.5rem;
+  line-height: 1.6;
+  max-width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Adjust icon color for unauthorized page */
+.unauthorizedContainer .errorIcon {
+  color: var(--color-error);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .subMessage {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+}
+
 /* Animations */
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 .errorIcon {
@@ -148,17 +171,19 @@
   .errorTitle {
     font-size: 2rem;
   }
-  
-  .creativeMessage, .errorMessage {
+
+  .creativeMessage,
+  .errorMessage {
     font-size: 1.1rem;
   }
-  
+
   .buttonGroup {
     flex-direction: column;
     align-items: center;
   }
-  
-  .primaryButton, .secondaryButton {
+
+  .primaryButton,
+  .secondaryButton {
     width: 100%;
     max-width: 250px;
     justify-content: center;
@@ -169,11 +194,11 @@
   .errorTitle {
     font-size: 1.75rem;
   }
-  
+
   .errorIcon {
     font-size: 4rem;
   }
-  
+
   .buttonGroup {
     gap: 0.75rem;
   }

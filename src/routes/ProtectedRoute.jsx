@@ -15,11 +15,11 @@ export default function ProtectedRoute({ children, adminOnly = false, studentOnl
 
   // Check role-based access
   if (adminOnly && userProfile?.role !== "admin") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/401-unauthorized" replace />;
   }
 
   if (studentOnly && userProfile?.role !== "student") {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/401-unauthorized" replace />;
   }
 
   return children;

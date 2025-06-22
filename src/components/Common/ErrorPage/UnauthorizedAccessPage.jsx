@@ -1,30 +1,34 @@
 import { useNavigate } from "react-router-dom";
 import Header from "../Header";
 import styles from "./ErrorPages.module.css";
-import { FaServer, FaArrowLeft } from "react-icons/fa";
+import { FaLock, FaArrowLeft, FaSignInAlt, FaHome } from "react-icons/fa";
 
-const ServerError = () => {
+const UnauthorizedPage = () => {
   const navigate = useNavigate();
 
   return (
     <>
       <Header />
-      <div className={styles.serverErrorContainer}>
+      <div className={styles.unauthorizedContainer}>
         <div className={styles.content}>
           <div className={styles.iconContainer}>
-            <FaServer className={styles.errorIcon} />
+            <FaLock className={styles.errorIcon} />
           </div>
-          <h1 className={styles.errorTitle}>503 - Server Unavailable</h1>
-          <p className={styles.creativeMessage}>
-            MIRA is sleeping right now. <br />
-            It will get back to you in full energy!
+          <h1 className={styles.errorTitle}>401 - Unauthorized Access</h1>
+          <p className={styles.errorMessage}>
+            You don't have permission to view this page.
+          </p>
+          <p className={styles.subMessage}>
+            Please sign in with an authorized access account or return to a safe
+            page.
           </p>
           <div className={styles.buttonGroup}>
             <button
               className={styles.primaryButton}
-              onClick={() => window.location.reload()}
+              onClick={() => navigate("/")}
             >
-              Try Again
+              <FaHome className={styles.buttonIcon} />
+              Go Home
             </button>
             <button
               className={styles.secondaryButton}
@@ -35,9 +39,9 @@ const ServerError = () => {
             </button>
           </div>
           <div className={styles.contactSupport}>
-            <p>Need immediate help?</p>
+            <p>Need access to this page?</p>
             <a href="mailto:team@mirahub.me" className={styles.supportLink}>
-              Contact our support team
+              Request access from your administrator
             </a>
           </div>
         </div>
@@ -46,4 +50,4 @@ const ServerError = () => {
   );
 };
 
-export default ServerError;
+export default UnauthorizedPage;
