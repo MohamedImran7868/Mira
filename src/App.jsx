@@ -16,6 +16,7 @@ import UpdatePassword from "./components/Common/UpdatePassword.jsx";
 import InviteAdmin from "./components/Admin/InviteAdmin/inviteAdmin.jsx";
 import ServerDown from "./components/Common/ErrorPage/ServerDownPage.jsx";
 import NotFound from "./components/Common/ErrorPage/NotFoundPage.jsx";
+import UnauthorizedPage from "./components/Common/ErrorPage/UnauthorizedAccessPage.jsx";
 
 function App() {
   return (
@@ -26,7 +27,6 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/update-password" element={<UpdatePassword />} />
-          <Route path="/503-server-down" element={<ServerDown />} />
 
           {/* Student routes */}
           <Route
@@ -103,6 +103,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/503-server-down" element={<ServerDown />} />
+          <Route path="/401-unauthorized" element={<UnauthorizedPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
