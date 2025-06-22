@@ -30,7 +30,7 @@ const InviteAdmin = () => {
   const itemsPerPage = 10;
 
   useEffect(() => {
-    user?.super_admin !== "yes" && window.location.replace("/");
+    user?.super_admin !== "yes" && window.location.replace("/401-unauthorized");
   });
 
   // Sorting state

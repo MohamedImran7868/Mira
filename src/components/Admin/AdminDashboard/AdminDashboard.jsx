@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
 import useActivitiesSubscription from "../../../realtime/activities";
-import useStatisticSubscription from "../../../realtime/statistic";
 
 // Components
 import Header from "../../Common/Header";
+import AdminDashboardSkeleton from "./AdminDashboardSkeleton";
 import styles from "./AdminDashboard.module.css";
 
 // Icons
@@ -24,7 +24,6 @@ import {
   FaCommentSlash,
 } from "react-icons/fa";
 import { MdOutlineAdminPanelSettings } from "react-icons/md";
-import LoadingModal from "../../Common/LoadingModal";
 
 function AdminDashboard() {
   const navigate = useNavigate();
@@ -147,7 +146,7 @@ function AdminDashboard() {
 
   return (
     <>
-      {loading && <LoadingModal message="Loading dashboard..." />}
+      {loading && <AdminDashboardSkeleton />}
       <Header />
       <div className={styles.container}>
         <div className={styles.header}>
