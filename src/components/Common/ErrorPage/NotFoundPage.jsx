@@ -14,7 +14,7 @@ const NotFound = () => {
           <div className={styles.iconContainer}>
             <FaCompass className={styles.errorIcon} />
           </div>
-          <h1 className={styles.errorTitle}>Page Not Found</h1>
+          <h1 className={styles.errorTitle}>404 - Page Not Found</h1>
           <p className={styles.errorMessage}>
             The page you're looking for doesn't exist or has been moved.
           </p>

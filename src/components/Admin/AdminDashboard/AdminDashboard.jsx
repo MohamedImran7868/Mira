@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../../contexts/AuthContext";
+import useActivitiesSubscription from "../../../realtime/activities";
+import useStatisticSubscription from "../../../realtime/statistic";
 
 // Components
 import Header from "../../Common/Header";
@@ -26,7 +28,7 @@ import LoadingModal from "../../Common/LoadingModal";
 
 function AdminDashboard() {
   const navigate = useNavigate();
-  const { getDashboardStats, getRecentActivities } = useAuth();
+  const { getDashboardStats, getRecentActivities, user } = useAuth();
   const [dashboardStats, setDashboardStats] = useState([]);
   const [recentActivities, setRecentActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,26 +57,29 @@ function AdminDashboard() {
     fetchStats();
   }, [getDashboardStats]);
 
+  // Fetch recent activities
+  const fetchActivities = async () => {
+    try {
+      setFetchactivities(true);
+      const activities = await getRecentActivities(5); // Get last 5 activities
+      setRecentActivities(
+        activities.map((activity) => ({
+          id: activity.id,
+          action: activity.message,
+          time: formatTimeAgo(activity.created_at),
+          icon: getActivityIcon(activity.entity_type, activity.action_type),
+        }))
+      );
+    } catch (error) {
+      console.error("Error fetching activities:", error);
+    } finally {
+      setFetchactivities(false);
+    }
+  };
+  // Subscribe to real-time updates for activities
+  useActivitiesSubscription(fetchActivities);
+  // Fetch activities when component mounts or when getRecentActivities changes
   useEffect(() => {
-    const fetchActivities = async () => {
-      try {
-        setFetchactivities(true);
-        const activities = await getRecentActivities(5); // Get last 5 activities
-        setRecentActivities(
-          activities.map((activity) => ({
-            id: activity.id,
-            action: activity.message,
-            time: formatTimeAgo(activity.created_at),
-            icon: getActivityIcon(activity.entity_type, activity.action_type),
-          }))
-        );
-      } catch (error) {
-        console.error("Error fetching activities:", error);
-      } finally {
-        setFetchactivities(false);
-      }
-    };
-
     fetchActivities();
   }, [getRecentActivities]);
 
@@ -154,7 +159,11 @@ function AdminDashboard() {
           </div>
           <div className={styles.adminBadge}>
             <MdOutlineAdminPanelSettings className={styles.adminIcon} />
-            <span>Administrator</span>
+            <span>
+              {user?.super_admin === "yes"
+                ? "Super Administrator"
+                : "Administrator"}
+            </span>
           </div>
         </div>
 
@@ -198,6 +207,15 @@ function AdminDashboard() {
                 <FaBook className={styles.buttonIcon} />
                 Manage Resources
               </button>
+              {user?.super_admin === "yes" && (
+                <button
+                  className={styles.actionButton}
+                  onClick={() => navigate("/invite-admin")}
+                >
+                  <FaUserPlus className={styles.buttonIcon} />
+                  Invite Admin
+                </button>
+              )}
             </div>
           </div>
 

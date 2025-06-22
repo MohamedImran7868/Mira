@@ -791,7 +791,6 @@ export function AuthProvider({ children }) {
     }
   };
 
-  // In AuthContext.jsx
   const fetchInvitations = async (
     page = 1,
     sortField = "sent_at",
@@ -801,26 +800,14 @@ export function AuthProvider({ children }) {
     const from = (page - 1) * itemsPerPage;
     const to = from + itemsPerPage - 1;
 
-    const { data, error, count } = await supabase
-      .from("invitations")
-      .select(
-        `
-      id,
-      email,
-      status,
-      sent_at,
-      accepted_at,
-      expires_at
-    `,
-        { count: "exact" }
-      )
-      .order(sortField, { ascending: sortOrder === "asc" })
-      .range(from, to);
+    const { data, error } = await supabase.functions.invoke("get-invitations", {
+      body: { sortField, sortOrder, from, to },
+    });
 
     if (error) throw error;
     return {
-      invitations: data,
-      totalCount: count,
+      invitations: data.invitations,
+      totalCount: data.totalCount,
     };
   };
 

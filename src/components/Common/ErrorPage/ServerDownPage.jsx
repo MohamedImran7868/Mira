@@ -14,7 +14,7 @@ const ServerError = () => {
           <div className={styles.iconContainer}>
             <FaServer className={styles.errorIcon} />
           </div>
-          <h1 className={styles.errorTitle}>Server Unavailable</h1>
+          <h1 className={styles.errorTitle}>503 - Server Unavailable</h1>
           <p className={styles.creativeMessage}>
             MIRA is sleeping right now. <br />
             It will get back to you in full energy!
