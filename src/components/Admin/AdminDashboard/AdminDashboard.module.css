@@ -238,3 +238,12 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Skeleton loading styles */
+@keyframes skeleton-loading {
+  0% { background-color: #eee; }
+  100% { background-color: #a19e9e; }
+}
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
+}
