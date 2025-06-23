@@ -191,7 +191,9 @@ function ManageUser() {
                 ) : (
                   <tr className={styles.emptyRow}>
                     {loading ? (
-                      <td colSpan="4" className={styles.loading}>Loading Students...</td>
+                      <td colSpan="4" className={styles.loading}>
+                        Loading Students...
+                      </td>
                     ) : (
                       <td colSpan="4" className={styles.noResults}>
                         {searchTerm

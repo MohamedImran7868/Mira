@@ -7,20 +7,20 @@
   --color-primary-light: #e1e8f2;
   --color-secondary: #b3e7c3;
   --color-secondary-dark: #80e49e;
-  
+
   /* Background Colors */
   --color-background: #f5f9fc;
   --color-navbar: var(--color-primary);
   --color-card: #ffffff;
-  --color-star-active: #DAA520;
+  --color-star-active: #daa520;
   --color-star-inactive: #2d3748;
-  
+
   /* Text Colors */
   --color-text: #2d3748;
   --color-text-light: #718096;
   --color-text-lighter: #a0aec0;
   --color-text-on-primary: #ffffff;
-  
+
   /* UI Colors */
   --color-border: #e2e8f0;
   --color-border-dark: #cbd5e0;
@@ -32,20 +32,26 @@
   --color-warning-bg: #fffaf0;
   --color-info: #3182ce;
   --color-disabled: #cbd5e0;
-  
+
   /* Special Colors */
   --color-shadow: rgba(0, 0, 0, 0.1);
   --color-overlay: rgba(0, 0, 0, 0.5);
-  
+
   /* Effects */
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
   /* Typography */
-  --font-primary: "Agrandir", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --font-mono: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  
+  --font-primary:
+    "Agrandir", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  --font-mono:
+    SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+    monospace;
+
   /* Spacing */
   --space-unit: 1rem;
   --space-xs: calc(0.5 * var(--space-unit));
@@ -53,13 +59,13 @@
   --space-md: calc(1.25 * var(--space-unit));
   --space-lg: calc(2 * var(--space-unit));
   --space-xl: calc(3.25 * var(--space-unit));
-  
+
   /* Border Radius */
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-full: 9999px;
-  
+
   /* Transitions */
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
@@ -91,7 +97,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 600;
   line-height: 1.25;
   margin-bottom: var(--space-sm);
@@ -130,7 +141,9 @@ select {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   padding: var(--space-xs) var(--space-sm);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 input:focus,
@@ -159,4 +172,17 @@ select:focus {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Skeleton loading styles */
+@keyframes skeleton-loading {
+  0% {
+    background-color: #eee;
+  }
+  100% {
+    background-color: #a19e9e;
+  }
+}
+.skeleton {
+  animation: skeleton-loading 1s linear infinite alternate;
 }

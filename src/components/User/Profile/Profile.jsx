@@ -28,6 +28,7 @@ const Profile = () => {
     getImageUrl,
     userProfile,
   } = useAuth();
+  
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({});
   const [imageUrl, setImageUrl] = useState(null);

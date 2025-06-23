@@ -39,22 +39,22 @@ const ChatScreen = () => {
     endChatSession,
   } = useAuth();
 
-  const [message, setMessage] = useState("");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [showPopup, setShowPopup] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
+  // State
   const [imageUrl, setImageUrl] = useState(null);
   const [chatSessions, setChatSessions] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
   const [currentChat, setCurrentChat] = useState(null);
   const [editingChatId, setEditingChatId] = useState(null);
   const [newChatName, setNewChatName] = useState("");
-  const [messages, setMessages] = useState([]);
-  const [typingIndicator, setTypingIndicator] = useState(false);
-  const [isInappropriate, setIsInAppropriate] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [lastBotMessageTime, setLastBotMessageTime] = useState(null);
   const [showResourcePrompt, setShowResourcePrompt] = useState(false);
 
+  // Refs
   const chatContainerRef = useRef(null);
   const typingIntervalRef = useRef(null);
   const navigate = useNavigate();
@@ -64,33 +64,25 @@ const ChatScreen = () => {
     const fetchChatSessions = async () => {
       const sessions = await getChatSessions();
       setChatSessions(sessions);
-
-      // If there are sessions but no current chat, set the first one as current
       if (sessions.length > 0 && !currentChat) {
         loadChat(sessions[0].chatid);
       }
     };
-
-    if (userProfile?.studentid) {
-      fetchChatSessions();
-    }
+    if (userProfile?.studentid) fetchChatSessions();
+    // eslint-disable-next-line
   }, [userProfile]);
 
-  // Clean up interval on unmount
+  // Clean up typing interval on unmount
   useEffect(() => {
     return () => {
-      if (typingIntervalRef.current) {
-        clearInterval(typingIntervalRef.current);
-      }
+      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     };
   }, []);
 
-  // Fetch user profile Image on mount
+  // Fetch user profile image on mount
   useEffect(() => {
-    if (userProfile) {
-      setImageUrl(getImageUrl(userProfile.user_image));
-    }
-  }, [userProfile]);
+    if (userProfile) setImageUrl(getImageUrl(userProfile.user_image));
+  }, [userProfile, getImageUrl]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -98,36 +90,26 @@ const ChatScreen = () => {
       chatContainerRef.current.scrollTop =
         chatContainerRef.current.scrollHeight;
     }
-  }, [messages, typingIndicator]);
+  }, [messages, isTyping]);
 
-  // Check for profanity whenever message changes
+  // Profanity check
   useEffect(() => {
-    if (message && containsProfanity(message)) {
-      setIsInAppropriate(true);
-      setShowWarning(true);
-    } else {
-      setIsInAppropriate(false);
-      setShowWarning(false);
-    }
-  }, [message]);
+    setShowWarning(input && containsProfanity(input));
+  }, [input]);
 
-  // Check for chat inactivity
+  // Inactivity prompt
   useEffect(() => {
     const checkInactivity = () => {
       if (lastBotMessageTime && !isTyping && messages.length > 0) {
-        const inactiveTime = Date.now() - lastBotMessageTime;
-        if (inactiveTime > 120000) {
-          // 2 minutes in milliseconds
+        if (Date.now() - lastBotMessageTime > 120000)
           setShowResourcePrompt(true);
-        }
       }
     };
-
-    const inactivityInterval = setInterval(checkInactivity, 10000); // Check every 10 seconds
-
+    const inactivityInterval = setInterval(checkInactivity, 10000);
     return () => clearInterval(inactivityInterval);
-  }, [lastBotMessageTime, isTyping]);
+  }, [lastBotMessageTime, isTyping, messages.length]);
 
+  // Helpers
   const ResourcePrompt = () => (
     <div className={styles.resourcePrompt}>
       <p>
@@ -143,9 +125,9 @@ const ChatScreen = () => {
 
   const loadChat = async (chatId) => {
     try {
-      const messages = await getChatMessages(chatId);
+      const msgs = await getChatMessages(chatId);
       setCurrentChat(chatId);
-      setMessages(messages);
+      setMessages(msgs);
     } catch (error) {
       console.error("Error loading chat:", error);
     }
@@ -180,26 +162,17 @@ const ChatScreen = () => {
     try {
       await deleteChatSession(chatId);
       setChatSessions((prev) => prev.filter((chat) => chat.chatid !== chatId));
-      if (currentChat == chatId) {
-        clearChat();
-      }
+      if (currentChat === chatId) clearChat();
     } catch (error) {
       console.error("Error deleting chat:", error);
     }
   };
 
   const sendMessage = async () => {
-    if (!message.trim() || isTyping) return;
-
-    if (isInappropriate) {
-      setShowWarning(true);
-      return;
-    }
+    if (!input.trim() || isTyping || showWarning) return;
 
     let chatId = currentChat;
-
     try {
-      // If no current chat, create a new one
       if (!chatId) {
         const newSession = await createChatSession();
         setChatSessions((prev) => [newSession, ...prev]);
@@ -207,17 +180,14 @@ const ChatScreen = () => {
         setCurrentChat(chatId);
         setMessages([]);
       }
-
-      // Save human message
       const newHumanMessage = {
-        message_content: message,
+        message_content: input,
         sender: "human",
         message_timestamp: new Date().toISOString(),
       };
-
       setMessages((prev) => [...prev, newHumanMessage]);
-      callModel(message, chatId);
-      setMessage("");
+      callModel(input, chatId);
+      setInput("");
     } catch (error) {
       console.error("Error in sendMessage:", error);
     }
@@ -225,65 +195,25 @@ const ChatScreen = () => {
 
   const callModel = async (input, chatId) => {
     setIsTyping(true);
-    setTypingIndicator(true);
     setShowResourcePrompt(false);
-
     try {
-      // Testing: http://127.0.0.1:5000/model  Production: https://api.mirahub.me/model
-      const response = await fetch("https://api.mirahub.me/model ", {
+      const response = await fetch("https://api.mirahub.me/model", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input }),
       });
-
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
+      if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
-
-      // Save bot response to database
       if (data.result) {
         simulateTypingEffect(data.result);
-        await saveMessage(chatId, message, "human"); // Save human message
-        await saveMessage(chatId, data.result, "bot"); // Save bot response
+        await saveMessage(chatId, input, "human");
+        await saveMessage(chatId, data.result, "bot");
         setLastBotMessageTime(Date.now());
       }
-      // Show bot response instantly (no typing effect)
-      // setMessages((prev) => [
-      //   ...prev,
-      //   {
-      //     message_content: data.result,
-      //     sender: "bot",
-      //     isTyping: false,
-      //     message_timestamp: new Date().toISOString(),
-      //   },
-      // ]);
-      // await saveMessage(chatId, data.result, "bot");
-      // setTypingIndicator(false);
-      // setIsTyping(false);
-
-      // simulateTypingEffect("For Testing");
-      // await saveMessage(chatId, "For Testing", "bot");
     } catch (error) {
-      const errorMsg =
-        "Sorry, I'm sleepy right now. Mira will take a nap and get back too you with full Energy.";
-      simulateTypingEffect(errorMsg);
-
-      // Show bot response instantly (no typing effect)
-      // setMessages((prev) => [
-      //   ...prev,
-      //   {
-      //     message_content: errorMsg,
-      //     sender: "bot",
-      //     isTyping: false,
-      //     message_timestamp: new Date().toISOString(),
-      //   },
-      // ]);
-      // setTypingIndicator(false);
-      // setIsTyping(false);
+      simulateTypingEffect(
+        "Sorry, I'm sleepy right now. Mira will take a nap and get back to you with full Energy."
+      );
     }
   };
 
@@ -291,21 +221,13 @@ const ChatScreen = () => {
     let i = 0;
     const words = text.split(" ");
     let partialMessage = "";
-
-    // Clear any existing interval
-    if (typingIntervalRef.current) {
-      clearInterval(typingIntervalRef.current);
-    }
-
+    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     typingIntervalRef.current = setInterval(() => {
       if (i < words.length) {
         partialMessage = words.slice(0, i + 1).join(" ");
-
-        // Update the last message with the partial content
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-
           if (
             lastMessage &&
             lastMessage.sender === "bot" &&
@@ -325,46 +247,33 @@ const ChatScreen = () => {
               message_timestamp: new Date().toISOString(),
             });
           }
-
           return newMessages;
         });
-
         i++;
       } else {
         clearInterval(typingIntervalRef.current);
         typingIntervalRef.current = null;
-
-        // Mark the message as complete
         setMessages((prev) => {
           const newMessages = [...prev];
           const lastMessage = newMessages[newMessages.length - 1];
-
           if (lastMessage && lastMessage.sender === "bot") {
             newMessages[newMessages.length - 1] = {
               ...lastMessage,
               isTyping: false,
             };
           }
-
           return newMessages;
         });
-
-        setTypingIndicator(false);
         setIsTyping(false);
       }
     }, 30);
   };
 
-  const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
-  };
+  const toggleSidebar = () => setIsSidebarOpen((open) => !open);
 
   const logout = async () => {
     try {
-      // End current chat session if exists
-      if (currentChat) {
-        await endChatSession(currentChat);
-      }
+      if (currentChat) await endChatSession(currentChat);
       await signOut();
       navigate("/chat");
     } catch (err) {
@@ -372,21 +281,18 @@ const ChatScreen = () => {
     }
   };
 
+  // Render
   return (
     <div style={{ display: "flex", height: "100vh" }}>
-      {/* Show popup if needed */}
       <LogoutPopup
         isVisible={showPopup}
         onConfirm={logout}
         onClose={() => setShowPopup(false)}
       />
 
-      {/* Sidebar Overlay for mobile */}
       {!isSidebarOpen && (
         <div
-          className={`${styles.sidebarOverlay} ${
-            isSidebarOpen ? "active" : ""
-          }`}
+          className={`${styles.sidebarOverlay} ${isSidebarOpen ? "active" : ""}`}
           onClick={toggleSidebar}
         />
       )}
@@ -416,7 +322,6 @@ const ChatScreen = () => {
             )}
           </div>
 
-          {/* Menu for chat */}
           <Menu iconShape="circle" className={styles.menu}>
             <MenuItem
               icon={
@@ -491,7 +396,6 @@ const ChatScreen = () => {
           </Menu>
         </div>
 
-        {/* Menu for button */}
         <div>
           <Menu iconShape="circle" className={styles.menu}>
             <MenuItem
@@ -539,9 +443,7 @@ const ChatScreen = () => {
       </Sidebar>
 
       <div
-        className={`${styles.container} ${
-          !isSidebarOpen ? styles.collapsed : ""
-        }`}
+        className={`${styles.container} ${!isSidebarOpen ? styles.collapsed : ""}`}
       >
         <button className={styles.menuToggle} onClick={toggleSidebar}>
           {isSidebarOpen ? (
@@ -555,7 +457,7 @@ const ChatScreen = () => {
           <Link to="/profile" className={styles.profileLink}>
             <img
               src={imageUrl}
-              alt="user profile picture"
+              alt="user profile"
               className={styles.profilePic}
             />
           </Link>
@@ -566,7 +468,7 @@ const ChatScreen = () => {
           className={styles.chatContainer}
           ref={chatContainerRef}
         >
-          {messages.length === 0 && !typingIndicator ? (
+          {messages.length === 0 && !isTyping ? (
             <h1 className={styles.containerPlaceHolder}>
               Hi Bestie!
               <br />
@@ -592,7 +494,7 @@ const ChatScreen = () => {
               />
             ))
           )}
-          {typingIndicator && (
+          {isTyping && (
             <div className={`${styles.botMessage} ${styles.bubble}`}>
               <span className={styles.typingIndicator}></span>
               <span className={styles.typingIndicator}></span>
@@ -603,7 +505,6 @@ const ChatScreen = () => {
         </div>
 
         <div className={styles.chatInput}>
-          {/* Popup Warning */}
           {showWarning && (
             <div className={styles.warningPopup}>
               <div className={styles.warningContent}>
@@ -622,11 +523,11 @@ const ChatScreen = () => {
             type="text"
             id="input"
             name="input"
-            value={message}
+            value={input}
             className={`${styles.input} ${
-              isInappropriate ? styles.inappropriate : ""
+              showWarning ? styles.inappropriate : ""
             }`}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
@@ -639,7 +540,7 @@ const ChatScreen = () => {
           <button
             className={styles.sendBtn}
             onClick={sendMessage}
-            disabled={!message.trim() || isTyping}
+            disabled={!input.trim() || isTyping || showWarning}
           >
             {isTyping ? (
               <div className={styles.loader}></div>
