@@ -56,6 +56,36 @@ function AdminDashboard() {
     fetchStats();
   }, [getDashboardStats]);
 
+  // Helper: Format time ago
+  const formatTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const seconds = Math.floor((now - date) / 1000);
+
+    if (seconds < 60) return `${seconds} seconds ago`;
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
+    return `${Math.floor(seconds / 86400)} days ago`;
+  };
+
+  // Helper: Get activity icon
+  const getActivityIcon = (entityType, actionType) => {
+    switch (entityType) {
+      case "resource":
+        if (actionType === "Deleted") return <FaTrash />;
+        if (actionType === "Updated") return <FaEdit />;
+        return <FaBook />;
+      case "student":
+        if (actionType === "Registered") return <FaUserPlus />;
+        return <FaUserTimes />;
+      case "feedback":
+        if (actionType === "Submitted") return <FaCommentAlt />;
+        return <FaCommentSlash />;
+      default:
+        return <FaCog />;
+    }
+  };
+
   // Fetch recent activities
   const fetchActivities = async () => {
     try {
@@ -75,78 +105,21 @@ function AdminDashboard() {
       setFetchactivities(false);
     }
   };
+
   // Subscribe to real-time updates for activities
   useActivitiesSubscription(fetchActivities);
+
   // Fetch activities when component mounts or when getRecentActivities changes
   useEffect(() => {
     fetchActivities();
   }, [getRecentActivities]);
 
-  // Helper functions
-  const formatTimeAgo = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now - date) / 1000);
-
-    if (seconds < 60) return `${seconds} seconds ago`;
-    if (seconds < 3600) return `${Math.floor(seconds / 60)} minutes ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hours ago`;
-    return `${Math.floor(seconds / 86400)} days ago`;
-  };
-
-  const getActivityIcon = (entityType, actionType) => {
-    switch (entityType) {
-      case "resource":
-        if (actionType == "Deleted") {
-          return <FaTrash />;
-        } else if (actionType == "Updated") {
-          return <FaEdit />;
-        } else {
-          return <FaBook />;
-        }
-      case "student":
-        if (actionType == "Registered") {
-          return <FaUserPlus />;
-        } else {
-          return <FaUserTimes />;
-        }
-      case "feedback":
-        if (actionType == "Submitted") {
-          return <FaCommentAlt />;
-        } else {
-          return <FaCommentSlash />;
-        }
-      default:
-        return <FaCog />;
-    }
-  };
-
-  // Recent activities sample data
-  // const recentActivities = [
-  //   {
-  //     id: 1,
-  //     action: "New feedback submitted",
-  //     time: "5 mins ago",
-  //     icon: <FaCommentAlt />,
-  //   },
-  //   {
-  //     id: 2,
-  //     action: "User account created",
-  //     time: "25 mins ago",
-  //     icon: <FaUsers />,
-  //   },
-  //   { id: 3, action: "Resource updated", time: "1 hour ago", icon: <FaBook /> },
-  //   {
-  //     id: 4,
-  //     action: "System maintenance",
-  //     time: "2 hours ago",
-  //     icon: <FaCog />,
-  //   },
-  // ];
+  if (loading) {
+    return <AdminDashboardSkeleton />;
+  }
 
   return (
     <>
-      {loading && <AdminDashboardSkeleton />}
       <Header />
       <div className={styles.container}>
         <div className={styles.header}>
@@ -253,5 +226,4 @@ function AdminDashboard() {
     </>
   );
 }
-
 export default AdminDashboard;

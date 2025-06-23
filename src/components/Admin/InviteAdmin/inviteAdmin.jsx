@@ -206,17 +206,8 @@ const InviteAdmin = () => {
               disabled={isLoading}
               className={styles.button}
             >
-              {isLoading ? (
-                <>
-                  <FaSpinner className={styles.spinner} />
-                  Sending Invite...
-                </>
-              ) : (
-                <>
-                  <FaPaperPlane className={styles.buttonIcon} />
-                  Send Admin Invite
-                </>
-              )}
+              <FaPaperPlane className={styles.buttonIcon} />
+              Send Admin Invite
             </button>
           </form>
         </div>
