@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Confirm Your Email | MIRA</title>
+    <title>Feedback Received | MIRA</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -24,27 +24,23 @@
       }
       .logo img {
         max-width: 120px;
+        height: auto;
       }
       h2 {
-        color: #111827;
-        margin-bottom: 16px;
+        color: #1f2937;
+        margin-bottom: 10px;
+        text-align: center;
       }
-      .button {
-        display: inline-block;
-        background-color: #3b82f6;
-        color: #ffffff;
-        padding: 12px 24px;
-        text-decoration: none;
-        border-radius: 6px;
-        font-weight: 600;
-        margin: 20px 0;
+      .message {
+        font-size: 15px;
+        line-height: 1.6;
       }
       .footer {
         font-size: 12px;
-        color: #6b7280;
+        color: #94a3b8;
         text-align: center;
-        margin-top: 30px;
         border-top: 1px solid #e5e7eb;
+        margin-top: 30px;
         padding-top: 20px;
       }
     </style>
@@ -59,26 +55,37 @@
           style="display: block; margin: 0 auto"
         />
       </div>
-      <h2>Welcome to MIRA!</h2>
-      <p>Hi there,</p>
-      <p>
-        Thank you for registering with MIRA. To verify your email address and
-        activate your account, please click the button below:
+
+      <h2>Thank You for Your Feedback</h2>
+
+      <p class="message">
+        Hello, <br /><br />
+        We’ve received your feedback and appreciate you taking the time to share
+        your thoughts with us. Your input helps us improve MIRA and better serve
+        our users. <br /><br />
+        If you requested a response or follow-up, a member of our team will get
+        back to you shortly.
       </p>
-      <p style="text-align: center">
-        <a href="{{ .ConfirmationURL }}" class="button">Confirm My Email</a>
+
+      <p class="message">
+        In the meantime, feel free to continue exploring MIRA or visit our
+        website for more resources.
       </p>
-      <p>
-        If you didn’t sign up for this account, you can safely ignore this
-        email.
+
+      <p class="message">
+        With gratitude, <br />
+        <strong>The MIRA Team</strong>
       </p>
-      <p>Best regards,<br />The MIRA Team</p>
+
       <div class="footer">
+        <p>© 2025 MIRA. All rights reserved.</p>
         <p>
-          © 2025 MIRA |
-          <a href="https://www.mirahub.me" style="color: #6b7280">mirahub.me</a>
+          <a
+            href="https://www.mirahub.me"
+            style="color: #94a3b8; text-decoration: none"
+            >mirahub.me</a
+          >
         </p>
-        <p>Multimedia University of Cyberjaya</p>
       </div>
     </div>
   </body>

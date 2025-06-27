@@ -311,6 +311,7 @@ export function AuthProvider({ children }) {
   const uploadFeedback = async (feedback) => {
     try {
       const studentid = userProfile.studentid;
+      const email = user.email;
       const name = user.user_name;
       // Insert feedback
       const { data, error } = await supabase.functions.invoke(
@@ -320,6 +321,7 @@ export function AuthProvider({ children }) {
             feedback,
             studentid,
             name,
+            email,
           },
         }
       );
