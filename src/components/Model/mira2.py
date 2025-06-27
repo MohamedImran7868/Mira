@@ -17,7 +17,7 @@ logging.basicConfig(
 logger = logging.getLogger("MIRA")
 
 class MIRA:
-    """Emotion-aware chatbot using RoBERTa for emotion detection and LLaMA 3.2 for responses."""
+    """Core emotion-detection chatbot using RoBERTa + LLaMA."""
 
     def __init__(self, model_name: str = "j-hartmann/emotion-english-distilroberta-base"):
         self.model_name = model_name
@@ -32,26 +32,25 @@ class MIRA:
                 model=self.model_name,
                 device=self.device,
                 top_k=None,
-                function_to_apply="sigmoid",  # more stable multi-label scoring
+                function_to_apply="sigmoid",
                 return_all_scores=True
             )
-            logger.info(f"Emotion model '{model_name}' loaded successfully on {'GPU' if self.device == 0 else 'CPU'}.")
+            logger.info(f"Model '{model_name}' loaded successfully on {'GPU' if self.device == 0 else 'CPU'}.")
         except Exception as e:
-            logger.error(f"Failed to load emotion model: {e}", exc_info=True)
-            print("MIRA: Unable to load emotion detection model.")
+            logger.error(f"Failed to load model: {e}", exc_info=True)
+            print("MIRA: Unable to load the model. Please check your setup.")
             exit(1)
 
-        # Load LLaMA 3.2 model
-        # llama_model_path = r"C:\Users\Shadow\OneDrive\Documents\MIRA\Llama-3.2-3B-Instruct-Q4_K_M.gguf"
-
+        # Load LLaMA model
+        # llama_model_path = "C:\\Users\\NITRO 5\\Desktop\\Project\\React\\Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf"
         try:
             self.llama = Llama.from_pretrained(
-                repo_id="bartowski/Llama-3.2-3B-Instruct-GGUF",
-	            filename="Llama-3.2-3B-Instruct-Q4_K_M.gguf",
-                n_ctx=2048,
-                n_threads=8,
+                repo_id="bartowski/Meta-Llama-3.1-8B-Instruct-GGUF",
+                filename="Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+                n_ctx=1024,
+                n_threads=6,
                 n_batch=64,
-                n_gpu_layers=40 if torch.cuda.is_available() else 0,
+                n_gpu_layers=35,
                 verbose=False
             )
             logger.info("LLaMA model loaded successfully.")
@@ -79,12 +78,21 @@ class MIRA:
 
         try:
             results = self.emotion_classifier(text)
-            if not results or not isinstance(results[0], list):
-                logger.error(f"Unexpected model output: {results}")
+            if not results or not isinstance(results, list) or not isinstance(results[0], list):
+                logger.error(f"Unexpected model output format: {results}")
                 return [{"emotion": "error", "confidence": 0.0}]
 
-            top_emotions = sorted(results[0], key=lambda x: x["score"], reverse=True)[:2]
-            return [{"emotion": e["label"], "confidence": float(e["score"])} for e in top_emotions]
+            all_scores = results[0]
+            top_emotions = sorted(all_scores, key=lambda x: x["score"], reverse=True)[:2]
+
+            strong_emotions = [
+                {"emotion": emo["label"], "confidence": float(emo["score"])}
+                for emo in top_emotions
+            ]
+
+            logger.info(f"Detected emotions: {strong_emotions}")
+            return strong_emotions
+
         except Exception as e:
             logger.error(f"Emotion detection failed: {e}", exc_info=True)
             return [{"emotion": "error", "confidence": 0.0}]
@@ -94,27 +102,25 @@ class MIRA:
             return "Sorry, my generative brain isn't working right now."
 
         try:
-            prompt = f"""<|start_header_id|>system<|end_header_id|>
-                You are MIRA, an emotionally intelligent and compassionate chatbot powered by LLaMA 3.2.
-                You detect the user's emotional state and respond with warmth, empathy, and kindness.
-                Current detected emotion(s): {emotion_summary}
-                <|eot_id|>
-                <|start_header_id|>user<|end_header_id|>
-                {user_input}
-                <|eot_id|>
-                <|start_header_id|>assistant<|end_header_id|>"""
+            prompt = f"""You are MIRA, a friendly and emotionally intelligent chatbot.
+                The user seems to be feeling {emotion_summary}.
+                Respond kindly and empathetically to this input:
+
+                User: {user_input}
+                MIRA:"""
 
             output = self.llama(
                 prompt,
                 max_tokens=256,
                 temperature=0.7,
                 top_p=0.9,
-                stop=["<|eot_id|>"]
+                stop=["User:", "MIRA:"]
             )
 
             return output["choices"][0]["text"].strip()
+
         except Exception as e:
-            logger.error(f"LLaMA 3.2 response generation failed: {e}", exc_info=True)
+            logger.error(f"LLaMA response generation failed: {e}", exc_info=True)
             return "I'm having trouble responding right now."
 
     def log_conversation(self, user_input: str, response: Dict):
@@ -149,13 +155,14 @@ class MIRA:
                 if not user_input:
                     print("MIRA: Please share how you're feeling.")
                     continue
+
                 t0 = time.time()
                 emotion_results = self.detect_emotions(user_input)
                 t1 = time.time()
                 emotion_summary = ", ".join([
-                    f"{e['emotion']} ({e['confidence']:.0%})" for e in emotion_results
-                ]) or "unclear"
-
+                    f"{er['emotion']} ({er['confidence']:.0%})"
+                    for er in emotion_results
+                ])
                 llama_response = self.generate_llama_response(user_input, emotion_summary)
                 t2 = time.time()
                 logging.info(f"Emotion detection: {t1-t0:.2f}s, LLaMA response: {t2-t1:.2f}s")
