@@ -196,77 +196,98 @@ const ChatScreen = () => {
   const callModel = async (input, chatId) => {
     setIsTyping(true);
     setShowResourcePrompt(false);
+
+    let fullResponse = "";
     try {
+      // Testing: http://127.0.0.1:5000/model  Production: https://api.mirahub.me/model
       const response = await fetch("https://api.mirahub.me/model", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ input }),
       });
       if (!response.ok) throw new Error("Network response was not ok");
-      const data = await response.json();
-      if (data.result) {
-        simulateTypingEffect(data.result);
-        await saveMessage(chatId, input, "human");
-        await saveMessage(chatId, data.result, "bot");
-        setLastBotMessageTime(Date.now());
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+
+      // Add the user's message immediately
+      await saveMessage(chatId, input, "human");
+
+      while (!done) {
+        const { value, done: streamDone } = await reader.read();
+        if (streamDone) break;
+        const lines = decoder
+          .decode(value, { stream: true })
+          .split("\n")
+          .filter(Boolean);
+
+        for (const line of lines) {
+          try {
+            const data = JSON.parse(line);
+            if (data.chunk) {
+              if (fullResponse.length === 0) {
+                data.chunk = data.chunk.replace(/^\s+/, "");
+              }
+              fullResponse += data.chunk;
+              // Update the bot message in the UI as it streams
+              setMessages((prev) => {
+                const newMessages = [...prev];
+                // If last message is bot and isTyping, update it, else add new
+                const last = newMessages[newMessages.length - 1];
+                if (last && last.sender === "bot" && last.isTyping) {
+                  newMessages[newMessages.length - 1] = {
+                    ...last,
+                    message_content: fullResponse,
+                  };
+                } else {
+                  newMessages.push({
+                    message_content: fullResponse,
+                    sender: "bot",
+                    isTyping: true,
+                    message_timestamp: new Date().toISOString(),
+                  });
+                }
+                return newMessages;
+              });
+            }
+            if (data.done) {
+              done = true;
+              // Mark the last bot message as not typing
+              setMessages((prev) => {
+                const newMessages = [...prev];
+                const last = newMessages[newMessages.length - 1];
+                if (last && last.sender === "bot") {
+                  newMessages[newMessages.length - 1] = {
+                    ...last,
+                    isTyping: false,
+                  };
+                }
+                return newMessages;
+              });
+              setIsTyping(false);
+              setLastBotMessageTime(Date.now());
+              // Save the bot's full response to the database
+              await saveMessage(chatId, fullResponse, "bot");
+            }
+          } catch (err) {
+            console.error("Error parsing chunk:", err);
+          }
+        }
       }
     } catch (error) {
-      simulateTypingEffect(
-        "Sorry, I'm sleepy right now. Mira will take a nap and get back to you with full Energy."
-      );
+      setIsTyping(false);
+      setMessages((prev) => [
+        ...prev,
+        {
+          message_content:
+            "Sorry, I'm sleepy right now. Mira will take a nap and get back to you with full Energy.",
+          sender: "bot",
+          isTyping: false,
+          message_timestamp: new Date().toISOString(),
+        },
+      ]);
     }
-  };
-
-  const simulateTypingEffect = (text) => {
-    let i = 0;
-    const words = text.split(" ");
-    let partialMessage = "";
-    if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
-    typingIntervalRef.current = setInterval(() => {
-      if (i < words.length) {
-        partialMessage = words.slice(0, i + 1).join(" ");
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
-          if (
-            lastMessage &&
-            lastMessage.sender === "bot" &&
-            lastMessage.isTyping
-          ) {
-            newMessages[newMessages.length - 1] = {
-              ...lastMessage,
-              message_content:
-                partialMessage + (i < words.length - 1 ? "..." : ""),
-            };
-          } else {
-            newMessages.push({
-              message_content:
-                partialMessage + (i < words.length - 1 ? "..." : ""),
-              sender: "bot",
-              isTyping: true,
-              message_timestamp: new Date().toISOString(),
-            });
-          }
-          return newMessages;
-        });
-        i++;
-      } else {
-        clearInterval(typingIntervalRef.current);
-        typingIntervalRef.current = null;
-        setMessages((prev) => {
-          const newMessages = [...prev];
-          const lastMessage = newMessages[newMessages.length - 1];
-          if (lastMessage && lastMessage.sender === "bot") {
-            newMessages[newMessages.length - 1] = {
-              ...lastMessage,
-              isTyping: false,
-            };
-          }
-          return newMessages;
-        });
-        setIsTyping(false);
-      }
-    }, 30);
   };
 
   const toggleSidebar = () => setIsSidebarOpen((open) => !open);
