@@ -57,6 +57,7 @@ const ChatScreen = () => {
   // Refs
   const chatContainerRef = useRef(null);
   const typingIntervalRef = useRef(null);
+  const inputRef = useRef(null);
   const navigate = useNavigate();
 
   // Fetch chat sessions on mount and when userProfile changes
@@ -78,6 +79,18 @@ const ChatScreen = () => {
       if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
     };
   }, []);
+
+  // Focus input on mount
+  useEffect(() => {
+    if (inputRef.current) inputRef.current.focus();
+  }, []);
+
+  // Focus input after bot response is done typing
+  useEffect(() => {
+    if (!isTyping && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isTyping]);
 
   // Fetch user profile image on mount
   useEffect(() => {
@@ -535,6 +548,7 @@ const ChatScreen = () => {
             </div>
           )}
           <input
+            ref={inputRef}
             type="text"
             id="input"
             name="input"
