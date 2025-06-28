@@ -2,7 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useAuth } from "../../../contexts/AuthContext";
 import { containsProfanity } from "../../Common/filter";
-
+import ReactMarkdown from "react-markdown";
 // Components
 import styles from "./Chat.module.css";
 import LogoutPopup from "../../Common/LogoutPopup";
@@ -504,15 +504,9 @@ const ChatScreen = () => {
                     ? styles.humanMessage
                     : styles.botMessage
                 } ${styles.bubble}`}
-                dangerouslySetInnerHTML={{
-                  __html: msg.message_content
-                    .split("\n")
-                    .map((paragraph, i) =>
-                      paragraph ? `<p key=${i}>${paragraph}</p>` : "<br/>"
-                    )
-                    .join(""),
-                }}
-              />
+              >
+                <ReactMarkdown>{msg.message_content}</ReactMarkdown>
+              </div>
             ))
           )}
           {isTyping && (

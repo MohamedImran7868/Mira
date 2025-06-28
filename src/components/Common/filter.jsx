@@ -8,7 +8,7 @@ const profanityFilter = new Filter({
   list: [], // Add custom words to this array
 });
 
-// Add custom words specific to your application
+// Add custom words to the filter
 const customWords = [
   "babi",
   "anjing",
@@ -29,12 +29,41 @@ const customWords = [
   "kontol",
   "ngentod",
   "mak kau hijau",
-  "pentan"
+  "pentan",
   // Add more custom words here
 ];
-
-// Add the custom words to the filter
 profanityFilter.addWords(...customWords);
+
+// Remove specific words from the filter
+const removeWords = [
+  "hells",
+  "god",
+  "lol",
+  "damn",
+  "shit",
+  "holy",
+  "suck",
+  "bullshit",
+  "heck",
+  "freaking",
+  "freak",
+  "freakin",
+  "freakin'",
+  "freakin'!",
+  "freakin'!",
+  "freakin'",
+  "scerw",
+  "lame",
+  "dumb",
+  "stupid",
+  "idiot",
+  "loser",
+  "fool",
+  "moron",
+  "jerk",
+];
+
+profanityFilter.removeWords(...removeWords);
 
 /**
  * Checks if text contains profanity
@@ -52,12 +81,4 @@ export const containsProfanity = (text) => {
  */
 export const cleanText = (text) => {
   return profanityFilter.clean(text);
-};
-
-/**
- * Adds custom words to the filter
- * @param {string[]} words - Array of words to add
- */
-export const addCustomWords = (words) => {
-  profanityFilter.addWords(...words);
 };
