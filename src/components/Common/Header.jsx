@@ -62,7 +62,7 @@ function Header() {
       />
       <header className={styles.header}>
         <div className={styles.headerContainer}>
-          <Link to="/" className={styles.logoLink}>
+          <Link to={!user ? "/" : (user?.role === "admin" ? "/admin-dashboard" : "/chat")} className={styles.logoLink}>
             <img src={logo} alt="MIRA Logo" className={styles.logo} />
           </Link>
           
